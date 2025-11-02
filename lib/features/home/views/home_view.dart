@@ -21,6 +21,12 @@ class _HomeViewState extends State<HomeView> {
     return GestureDetector(
       onTap: FocusScope.of(context).unfocus,
       child: Scaffold(
+        appBar: AppBar(
+          toolbarHeight: 0,
+          backgroundColor: Colors.white,
+          elevation: 0,
+          surfaceTintColor: Colors.white,
+        ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15.0),
           child: CustomScrollView(

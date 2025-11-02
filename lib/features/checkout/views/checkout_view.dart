@@ -142,14 +142,14 @@ class _CheckoutViewState extends State<CheckoutView> {
         ),
       ),
       bottomSheet: Container(
-        height: 80,
+        height: 100,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),
           ),
           color: Colors.white,
-          boxShadow: [BoxShadow(color: Colors.grey.shade800, blurRadius: 10)],
+          boxShadow: [BoxShadow(color: Colors.grey.shade800, blurRadius: 8)],
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -166,10 +166,11 @@ class _CheckoutViewState extends State<CheckoutView> {
                     fontWeight: FontWeight.w600,
                     fontsize: 14,
                   ),
+                  Gap(10),
                   CustomText(
                     text: "\$18.19",
                     color: Colors.black,
-                    fontsize: 20,
+                    fontsize: 22,
                     fontWeight: FontWeight.w900,
                   ),
                 ],
@@ -179,12 +180,13 @@ class _CheckoutViewState extends State<CheckoutView> {
                 fontSize: 16,
                 onPressed: () {
                   showDialog(
+                    barrierDismissible: false,
                     context: context,
                     builder: (context) {
                       return Dialog(
                         insetPadding: EdgeInsets.symmetric(
                           horizontal: 50,
-                          vertical: 150,
+                          vertical: 200,
                         ),
                         backgroundColor: Colors.white,
                         child: Column(
@@ -217,19 +219,17 @@ class _CheckoutViewState extends State<CheckoutView> {
                               textAlign: TextAlign.center,
                             ),
                             Spacer(),
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 20.0),
-                              child: CustomMainButton(
-                                text: "Go Back",
-                                fontSize: 15,
-                                width: 200,
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                  Navigator.pop(context);
-                                  Navigator.pop(context);
-                                },
-                              ),
+                            CustomMainButton(
+                              text: "Go Back",
+                              fontSize: 15,
+                              width: 200,
+                              onPressed: () {
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+                              },
                             ),
+                            Gap(10),
                           ],
                         ),
                       );

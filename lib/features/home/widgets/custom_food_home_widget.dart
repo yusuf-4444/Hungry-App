@@ -27,7 +27,17 @@ class CustomFoodHomeWidget extends StatelessWidget {
       child: Column(
         children: [
           Gap(10),
-          Image.asset(image, width: 120),
+          Stack(
+            children: [
+              Positioned(
+                bottom: -5,
+                right: 0,
+                left: 0,
+                child: Image.asset("assets/homeIcons/shadow.png"),
+              ),
+              Image.asset(image, width: 120),
+            ],
+          ),
           Gap(10),
           Align(
             alignment: Alignment.centerLeft,

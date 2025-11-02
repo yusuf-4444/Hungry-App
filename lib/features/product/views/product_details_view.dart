@@ -57,42 +57,58 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
 
               CustomToppingsSideOptionsWidget(),
 
-              Gap(50),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              Gap(120),
+            ],
+          ),
+        ),
+      ),
+      bottomSheet: Container(
+        height: 100,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+          color: Colors.white,
+          boxShadow: [BoxShadow(color: Colors.grey.shade800, blurRadius: 8)],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CustomText(
-                        text: "Total",
-                        color: Colors.black,
-                        fontWeight: FontWeight.w600,
-                        fontsize: 18,
-                      ),
-                      CustomText(
-                        text: "\$18.19",
-                        color: Colors.black,
-                        fontsize: 32,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ],
+                  Gap(13),
+                  CustomText(
+                    text: "Total",
+                    color: Colors.black,
+                    fontWeight: FontWeight.w600,
+                    fontsize: 14,
                   ),
-                  CustomMainButton(
-                    text: "Add To Cart",
-                    fontSize: 16,
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return CheckoutView();
-                          },
-                        ),
-                      );
-                    },
+                  Gap(10),
+                  CustomText(
+                    text: "\$18.19",
+                    color: Colors.black,
+                    fontsize: 22,
+                    fontWeight: FontWeight.w900,
                   ),
                 ],
+              ),
+              CustomMainButton(
+                text: "Add To Cart",
+                fontSize: 16,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return CheckoutView();
+                      },
+                    ),
+                  );
+                },
               ),
             ],
           ),

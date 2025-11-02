@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:hungry_app/core/constants/app_colors.dart';
+import 'package:gap/gap.dart';
 import 'package:hungry_app/features/cart/widgets/custom_card.dart';
+import 'package:hungry_app/features/checkout/views/checkout_view.dart';
+import 'package:hungry_app/shared/custom_main_button.dart';
 import 'package:hungry_app/shared/custom_text.dart';
 
 class CartView extends StatefulWidget {
@@ -41,82 +43,78 @@ class _CartViewState extends State<CartView> {
         elevation: 0,
       ),
       body: Padding(
-        padding: const EdgeInsets.only(top: 20, bottom: 50, left: 8, right: 8),
+        padding: const EdgeInsets.only(top: 20, bottom: 80, left: 8, right: 8),
         child: ListView.builder(
           itemCount: itemCount,
           itemBuilder: (context, index) {
-            return CustomCard(
-              onPressed: () {},
-              image: "assets/test/test.png",
-              title: "Hamburger",
-              subTitle: 'Veggie Burger',
-              number: quantities[index],
-              onAdd: () {
-                onAdd(index);
-              },
-              onMinus: () {
-                onMinus(index);
-              },
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 15.0),
+              child: CustomCard(
+                onPressed: () {},
+                image: "assets/test/test.png",
+                title: "Hamburger",
+                subTitle: 'Veggie Burger',
+                number: quantities[index],
+                onAdd: () {
+                  onAdd(index);
+                },
+                onMinus: () {
+                  onMinus(index);
+                },
+              ),
             );
           },
         ),
       ),
       bottomSheet: Container(
+        height: 80,
         decoration: BoxDecoration(
-          color: Colors.white,
           borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(10),
-            topRight: Radius.circular(10),
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
           ),
+          color: Colors.white,
+          boxShadow: [BoxShadow(color: Colors.grey.shade800, blurRadius: 8)],
         ),
-        height: 70,
         child: Padding(
-          padding: const EdgeInsets.all(5.0),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    CustomText(
-                      text: "Total",
-                      color: Colors.black,
-                      fontWeight: FontWeight.w600,
-                      fontsize: 15,
-                    ),
-                    Spacer(),
-                    CustomText(
-                      text: "\$18.19",
-                      color: Colors.black,
-                      fontsize: 20,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ],
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryColor,
-                    borderRadius: BorderRadius.circular(20),
+          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Gap(13),
+                  CustomText(
+                    text: "Total",
+                    color: Colors.black,
+                    fontWeight: FontWeight.w600,
+                    fontsize: 14,
                   ),
-                  child: TextButton(
-                    onPressed: () {},
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 15,
-                        vertical: 20,
-                      ),
-                      child: CustomText(
-                        text: "CheckOut",
-                        color: Colors.white,
-                        fontsize: 15,
-                      ),
-                    ),
+                  Gap(10),
+                  CustomText(
+                    text: "\$18.19",
+                    color: Colors.black,
+                    fontsize: 22,
+                    fontWeight: FontWeight.w900,
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
+              CustomMainButton(
+                text: "Checkout",
+                fontSize: 14,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return CheckoutView();
+                      },
+                    ),
+                  );
+                },
+              ),
+            ],
           ),
         ),
       ),

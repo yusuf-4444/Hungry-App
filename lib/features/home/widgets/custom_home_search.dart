@@ -7,7 +7,8 @@ class SearchHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      elevation: 5,
+      color: Colors.white,
+      elevation: 2,
       borderRadius: BorderRadius.circular(15),
       child: TextFormField(
         style: TextStyle(color: Colors.black),

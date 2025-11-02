@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:hungry_app/core/constants/app_colors.dart';
+import 'package:hungry_app/features/auth/view/signin_view.dart';
 import 'package:hungry_app/features/auth/widgets/custom_button.dart';
+import 'package:hungry_app/shared/custom_text.dart';
 import 'package:hungry_app/shared/custom_text_field.dart';
 
 class SignupView extends StatefulWidget {
@@ -16,62 +18,89 @@ class _SignupViewState extends State<SignupView> {
   final TextEditingController _name = TextEditingController();
   final TextEditingController _emailAddress = TextEditingController();
   final TextEditingController _password = TextEditingController();
-  final TextEditingController _confirmPassword = TextEditingController();
   GlobalKey<FormState> globalKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.primaryColor,
+      backgroundColor: Colors.white,
       body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Form(
-            key: globalKey,
-            child: Column(
-              children: [
-                Gap(70),
-                SvgPicture.asset("assets/logo/Hungry_.svg"),
-                Gap(55),
-                CustomTextField(
-                  controller: _name,
-                  hintText: "Name",
-                  isPassword: false,
+        child: Form(
+          key: globalKey,
+          child: Column(
+            children: [
+              Gap(150),
+              SvgPicture.asset(
+                "assets/logo/Hungry_.svg",
+                color: AppColors.primaryColor,
+              ),
+              CustomText(text: "Welcome To Our Food App", color: Colors.black),
+              Gap(50),
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryColor,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          Gap(40),
+                          CustomTextField(
+                            controller: _name,
+                            hintText: "Name",
+                            isPassword: false,
+                          ),
+                          Gap(15),
+                          CustomTextField(
+                            controller: _emailAddress,
+                            hintText: "Email Address",
+                            isPassword: false,
+                          ),
+                          Gap(15),
+                          CustomTextField(
+                            controller: _password,
+                            hintText: "Password",
+                            isPassword: true,
+                          ),
+                          Gap(15),
+
+                          Gap(15),
+                          CustomAuthButton(
+                            isBackgroudnGreen: true,
+                            text: "Sign Up",
+                            onPressed: () {
+                              if (globalKey.currentState!.validate()) {}
+                            },
+                          ),
+                          Gap(15),
+                          CustomAuthButton(
+                            isBackgroudnGreen: false,
+                            color: Colors.white,
+                            text: "Go To Login ?",
+                            onPressed: () {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) {
+                                    return SigninView();
+                                  },
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
-                Gap(15),
-                CustomTextField(
-                  controller: _emailAddress,
-                  hintText: "Email Address",
-                  isPassword: false,
-                ),
-                Gap(15),
-                CustomTextField(
-                  controller: _password,
-                  hintText: "Password",
-                  isPassword: true,
-                ),
-                Gap(15),
-                CustomTextField(
-                  controller: _confirmPassword,
-                  hintText: "Confirm Password",
-                  isPassword: true,
-                ),
-                Gap(15),
-                Gap(15),
-                CustomAuthButton(
-                  text: "Sign Up",
-                  onPressed: () {
-                    if (globalKey.currentState!.validate()) {
-                      if (_password.text == _confirmPassword.text) {
-                        print("Success");
-                      } else {
-                        print("Confirm Password doesnot match Password");
-                      }
-                    }
-                  },
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
