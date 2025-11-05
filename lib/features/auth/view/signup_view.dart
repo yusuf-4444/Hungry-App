@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:hungry_app/core/constants/app_colors.dart';
+import 'package:hungry_app/core/di/dependancy_injection.dart';
+import 'package:hungry_app/features/auth/login/logic/cubit/login_cubit.dart';
+import 'package:hungry_app/features/auth/register/logic/cubit/register_cubit.dart';
+import 'package:hungry_app/features/auth/register/logic/cubit/register_state.dart';
 import 'package:hungry_app/features/auth/view/signin_view.dart';
 import 'package:hungry_app/features/auth/widgets/custom_button.dart';
 import 'package:hungry_app/shared/custom_text.dart';
@@ -71,11 +76,56 @@ class _SignupViewState extends State<SignupView> {
                           Gap(15),
 
                           Gap(15),
-                          CustomAuthButton(
-                            isBackgroudnGreen: true,
-                            text: "Sign Up",
-                            onPressed: () {
-                              if (globalKey.currentState!.validate()) {}
+                          BlocConsumer<RegisterCubit, RegisterState>(
+                            listener: (context, state) {
+                              state.whenOrNull(
+                                success: (data) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        "Account Created Successfully",
+                                      ),
+                                    ),
+                                  );
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) {
+                                        return BlocProvider(
+                                          create: (context) =>
+                                              getIt<LoginCubit>(),
+                                          child: SigninView(),
+                                        );
+                                      },
+                                    ),
+                                  );
+                                },
+                                failure: (error) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text("error.. $error")),
+                                  );
+                                },
+                              );
+                            },
+                            builder: (context, state) {
+                              final cubit = context.read<RegisterCubit>();
+                              if (state is Loading) {
+                                return CircularProgressIndicator();
+                              } else {
+                                return CustomAuthButton(
+                                  isBackgroudnGreen: true,
+                                  text: "Sign Up",
+                                  onPressed: () {
+                                    if (globalKey.currentState!.validate()) {
+                                      cubit.register(
+                                        name: _name.text,
+                                        email: _emailAddress.text,
+                                        password: _password.text,
+                                      );
+                                    }
+                                  },
+                                );
+                              }
                             },
                           ),
                           Gap(15),
@@ -88,7 +138,10 @@ class _SignupViewState extends State<SignupView> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) {
-                                    return SigninView();
+                                    return BlocProvider(
+                                      create: (context) => getIt<LoginCubit>(),
+                                      child: SigninView(),
+                                    );
                                   },
                                 ),
                               );

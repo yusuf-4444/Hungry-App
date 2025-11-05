@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:hungry_app/core/constants/app_colors.dart';
+import 'package:hungry_app/core/di/dependancy_injection.dart';
+import 'package:hungry_app/features/auth/login/logic/cubit/login_cubit.dart';
+import 'package:hungry_app/features/auth/login/logic/cubit/login_state.dart';
+import 'package:hungry_app/features/auth/register/logic/cubit/register_cubit.dart';
 import 'package:hungry_app/features/auth/view/signup_view.dart';
 import 'package:hungry_app/features/auth/widgets/custom_button.dart';
 import 'package:hungry_app/root.dart';
@@ -71,14 +76,53 @@ class _SigninViewState extends State<SigninView> {
                               isPassword: true,
                             ),
                             Gap(30),
-                            CustomAuthButton(
-                              isBackgroudnGreen: true,
-                              color: AppColors.primaryColor,
-                              text: "Login",
-                              onPressed: () {
-                                if (globalKey.currentState!.validate()) {
-                                  print("Success");
+                            BlocConsumer<LoginCubit, LoginState>(
+                              listener: (context, state) {
+                                state.whenOrNull(
+                                  success: (data) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text("Success Login !"),
+                                      ),
+                                    );
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) {
+                                          return Root();
+                                        },
+                                      ),
+                                    );
+                                  },
+                                  failure: (error) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          "Oops.. please try again",
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                              builder: (context, state) {
+                                final cubit = context.read<LoginCubit>();
+                                if (state is Loading) {
+                                  return CircularProgressIndicator();
                                 }
+                                return CustomAuthButton(
+                                  isBackgroudnGreen: true,
+                                  color: AppColors.primaryColor,
+                                  text: "Login",
+                                  onPressed: () {
+                                    if (globalKey.currentState!.validate()) {
+                                      cubit.login(
+                                        email: _emailAddress.text,
+                                        password: _password.text,
+                                      );
+                                    }
+                                  },
+                                );
                               },
                             ),
                             Gap(10),
@@ -91,7 +135,11 @@ class _SigninViewState extends State<SigninView> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) {
-                                      return SignupView();
+                                      return BlocProvider(
+                                        create: (context) =>
+                                            getIt<RegisterCubit>(),
+                                        child: SignupView(),
+                                      );
                                     },
                                   ),
                                 );

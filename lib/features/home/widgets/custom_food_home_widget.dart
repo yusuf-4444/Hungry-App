@@ -35,7 +35,7 @@ class CustomFoodHomeWidget extends StatelessWidget {
                 left: 0,
                 child: Image.asset("assets/homeIcons/shadow.png"),
               ),
-              Image.asset(image, width: 120),
+              Image.network(image, width: 120, height: 120),
             ],
           ),
           Gap(10),
@@ -47,12 +47,17 @@ class CustomFoodHomeWidget extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   CustomText(
+                    maxLines: 1,
                     text: title,
                     color: Color(0xff3C2F2F),
                     fontsize: 16,
                     fontWeight: FontWeight.w600,
                   ),
-                  CustomText(text: subtitle, color: Colors.grey.shade900),
+                  CustomText(
+                    text: subtitle,
+                    color: Colors.grey.shade900,
+                    maxLines: 2,
+                  ),
                   Gap(10),
                   Row(
                     children: [
