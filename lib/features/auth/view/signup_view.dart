@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -110,7 +111,9 @@ class _SignupViewState extends State<SignupView> {
                             builder: (context, state) {
                               final cubit = context.read<RegisterCubit>();
                               if (state is Loading) {
-                                return CircularProgressIndicator();
+                                return CupertinoActivityIndicator(
+                                  color: Colors.white,
+                                );
                               } else {
                                 return CustomAuthButton(
                                   isBackgroudnGreen: true,

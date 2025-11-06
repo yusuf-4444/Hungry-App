@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -96,7 +97,26 @@ class _SigninViewState extends State<SigninView> {
                                   },
                                   failure: (error) {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text(error)),
+                                      SnackBar(
+                                        clipBehavior: Clip.none,
+                                        elevation: 15,
+                                        behavior: SnackBarBehavior.floating,
+                                        backgroundColor: Colors.red.shade800,
+                                        content: Row(
+                                          children: [
+                                            Icon(
+                                              Icons.info,
+                                              color: Colors.white,
+                                            ),
+                                            Center(
+                                              child: CustomText(
+                                                text: error,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     );
                                   },
                                 );
@@ -104,7 +124,9 @@ class _SigninViewState extends State<SigninView> {
                               builder: (context, state) {
                                 final cubit = context.read<LoginCubit>();
                                 if (state is Loading) {
-                                  return CircularProgressIndicator();
+                                  return CupertinoActivityIndicator(
+                                    color: Colors.white,
+                                  );
                                 }
                                 return CustomAuthButton(
                                   isBackgroudnGreen: true,
