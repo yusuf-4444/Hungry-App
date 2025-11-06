@@ -96,11 +96,7 @@ class _SigninViewState extends State<SigninView> {
                                   },
                                   failure: (error) {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          "Oops.. please try again",
-                                        ),
-                                      ),
+                                      SnackBar(content: Text(error)),
                                     );
                                   },
                                 );
