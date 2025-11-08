@@ -10,6 +10,7 @@ import 'package:hungry_app/features/auth/register/logic/cubit/register_cubit.dar
 import 'package:hungry_app/features/auth/register/logic/cubit/register_state.dart';
 import 'package:hungry_app/features/auth/view/signin_view.dart';
 import 'package:hungry_app/features/auth/widgets/custom_button.dart';
+import 'package:hungry_app/shared/custom_snack_bar.dart';
 import 'package:hungry_app/shared/custom_text.dart';
 import 'package:hungry_app/shared/custom_text_field.dart';
 
@@ -82,10 +83,9 @@ class _SignupViewState extends State<SignupView> {
                               state.whenOrNull(
                                 success: (data) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        "Account Created Successfully",
-                                      ),
+                                    CustomSnackBar(
+                                      "Account Created Successfully",
+                                      AppColors.primaryColor,
                                     ),
                                   );
                                   Navigator.pushReplacement(
@@ -103,7 +103,7 @@ class _SignupViewState extends State<SignupView> {
                                 },
                                 failure: (error) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text("error.. $error")),
+                                    CustomSnackBar(error, Colors.red.shade800),
                                   );
                                 },
                               );

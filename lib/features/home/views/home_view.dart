@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
@@ -24,7 +25,7 @@ class _HomeViewState extends State<HomeView> {
     return BlocBuilder<FoodCubit, FoodState>(
       builder: (context, state) {
         if (state is Loading) {
-          return Center(child: CircularProgressIndicator());
+          return Center(child: CupertinoActivityIndicator(color: Colors.white));
         }
         final foods = context.read<FoodCubit>().food;
         return GestureDetector(

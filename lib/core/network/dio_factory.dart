@@ -7,7 +7,7 @@ class DioFactory {
 
   static Dio? dio;
   static Dio getDio() {
-    Duration timeOut = Duration(seconds: 45);
+    Duration timeOut = Duration(seconds: 120);
     if (dio == null) {
       dio = Dio();
       dio!..options.connectTimeout = timeOut;
@@ -28,7 +28,7 @@ class DioFactory {
     dio!.interceptors.add(
       PrettyDioLogger(
         requestHeader: true,
-        requestBody: false,
+        requestBody: true,
         responseHeader: false,
         responseBody: true,
       ),

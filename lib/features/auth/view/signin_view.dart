@@ -11,6 +11,7 @@ import 'package:hungry_app/features/auth/register/logic/cubit/register_cubit.dar
 import 'package:hungry_app/features/auth/view/signup_view.dart';
 import 'package:hungry_app/features/auth/widgets/custom_button.dart';
 import 'package:hungry_app/root.dart';
+import 'package:hungry_app/shared/custom_snack_bar.dart';
 import 'package:hungry_app/shared/custom_text.dart';
 import 'package:hungry_app/shared/custom_text_field.dart';
 
@@ -82,8 +83,9 @@ class _SigninViewState extends State<SigninView> {
                                 state.whenOrNull(
                                   success: (data) {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text("Success Login !"),
+                                      CustomSnackBar(
+                                        "Success!",
+                                        AppColors.primaryColor,
                                       ),
                                     );
                                     Navigator.pushReplacement(
@@ -97,25 +99,9 @@ class _SigninViewState extends State<SigninView> {
                                   },
                                   failure: (error) {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        clipBehavior: Clip.none,
-                                        elevation: 15,
-                                        behavior: SnackBarBehavior.floating,
-                                        backgroundColor: Colors.red.shade800,
-                                        content: Row(
-                                          children: [
-                                            Icon(
-                                              Icons.info,
-                                              color: Colors.white,
-                                            ),
-                                            Center(
-                                              child: CustomText(
-                                                text: error,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
+                                      CustomSnackBar(
+                                        error,
+                                        Colors.red.shade800,
                                       ),
                                     );
                                   },
