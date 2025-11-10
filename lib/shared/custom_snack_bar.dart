@@ -10,10 +10,16 @@ SnackBar CustomSnackBar(message, color) {
     backgroundColor: color,
     content: Row(
       children: [
-        Icon(Icons.info, color: Colors.white),
+        Icon(
+          Icons.info,
+          color: color == Colors.white ? Colors.black : Colors.white,
+        ),
         Gap(20),
         Center(
-          child: CustomText(text: message, color: Colors.white),
+          child: CustomText(
+            text: message,
+            color: color == Colors.white ? Colors.black : Colors.white,
+          ),
         ),
       ],
     ),

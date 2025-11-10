@@ -4,12 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:hungry_app/core/constants/app_colors.dart';
+import 'package:hungry_app/core/network/pref_helper.dart';
+import 'package:hungry_app/features/auth/logout/logic/cubit/logout_cubit.dart';
 import 'package:hungry_app/features/auth/profile/logic/cubit/profile_cubit.dart';
 import 'package:hungry_app/features/auth/profile/logic/cubit/profile_state.dart';
 import 'package:hungry_app/features/auth/profile/logic/cubit/update_profile_cubit.dart';
 import 'package:hungry_app/features/auth/profile/models/profile_model.dart';
+import 'package:hungry_app/features/auth/view/signin_view.dart';
 import 'package:hungry_app/features/auth/widgets/custom_text_form_field.dart';
 import 'package:hungry_app/shared/custom_main_button.dart';
+import 'package:hungry_app/shared/custom_snack_bar.dart';
 import 'package:hungry_app/shared/custom_text.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -118,7 +122,7 @@ class _ProfileViewState extends State<ProfileView> {
                             shape: BoxShape.circle,
                           ),
                           child: ClipRRect(
-                            borderRadius: BorderRadiusGeometry.circular(60),
+                            borderRadius: BorderRadius.circular(60),
                             child: _selectedImageFile != null
                                 ? Image.file(
                                     _selectedImageFile!,
@@ -129,6 +133,12 @@ class _ProfileViewState extends State<ProfileView> {
                                 ? Image.network(
                                     _selectedImageUrl!,
                                     fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Image.network(
+                                        "https://tse4.mm.bing.net/th/id/OIP.hGSCbXlcOjL_9mmzerqAbQHaHa?pid=Api&P=0&h=220",
+                                        fit: BoxFit.cover,
+                                      );
+                                    },
                                   )
                                 : Image.network(
                                     "https://tse4.mm.bing.net/th/id/OIP.hGSCbXlcOjL_9mmzerqAbQHaHa?pid=Api&P=0&h=220",
@@ -242,6 +252,9 @@ class _ProfileViewState extends State<ProfileView> {
                           );
                         }
                         context.read<ProfileCubit>().getProfile();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          CustomSnackBar("Updated Successfully", Colors.white),
+                        );
                       },
                       child: Container(
                         decoration: BoxDecoration(
@@ -266,23 +279,43 @@ class _ProfileViewState extends State<ProfileView> {
                         ),
                       ),
                     ),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: Colors.black),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 10,
+                    GestureDetector(
+                      onTap: () async {
+                        await context.read<LogoutCubit>().logout();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          CustomSnackBar(
+                            "LOGGED OUT SUCCESSFULLY",
+                            Colors.white,
+                          ),
+                        );
+                        PrefHelper.removeToken();
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return SigninView();
+                            },
+                          ),
+                        );
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.black),
                         ),
-                        child: Row(
-                          children: [
-                            CustomText(text: "Logout", color: Colors.black),
-                            Gap(10),
-                            Icon(Icons.logout, color: Colors.black),
-                          ],
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 10,
+                          ),
+                          child: Row(
+                            children: [
+                              CustomText(text: "Logout", color: Colors.black),
+                              Gap(10),
+                              Icon(Icons.logout, color: Colors.black),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -293,7 +326,7 @@ class _ProfileViewState extends State<ProfileView> {
           ),
         );
       },
-      listener: (context, state) {
+      listener: (context, state) async {
         if (state is Success) {
           profileModel = state.data;
           if (profileModel != null) {
@@ -304,6 +337,9 @@ class _ProfileViewState extends State<ProfileView> {
             visa = _visa.text;
             _selectedImageUrl = profileModel!.data.image?.toString();
             _selectedImageFile = null;
+            if (mounted) {
+              setState(() {});
+            }
           }
         }
       },

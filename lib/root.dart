@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hungry_app/core/constants/app_colors.dart';
 import 'package:hungry_app/core/di/dependancy_injection.dart';
+import 'package:hungry_app/features/auth/logout/logic/cubit/logout_cubit.dart';
 import 'package:hungry_app/features/auth/profile/logic/cubit/profile_cubit.dart';
 import 'package:hungry_app/features/auth/profile/logic/cubit/update_profile_cubit.dart';
 import 'package:hungry_app/features/auth/view/profile_view.dart';
@@ -36,6 +37,7 @@ class _RootState extends State<Root> {
       providers: [
         BlocProvider(create: (context) => getIt<ProfileCubit>()),
         BlocProvider(create: (context) => getIt<UpdateProfileCubit>()),
+        BlocProvider(create: (context) => getIt<LogoutCubit>()),
       ],
       child: Scaffold(
         body: PageView(

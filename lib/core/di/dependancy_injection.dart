@@ -3,15 +3,25 @@ import 'package:get_it/get_it.dart';
 import 'package:hungry_app/core/network/api_services.dart';
 import 'package:hungry_app/core/network/dio_factory.dart';
 import 'package:hungry_app/features/auth/login/data/repo/login_repo.dart';
+import 'package:hungry_app/features/auth/login/logic/cubit/auto_login_cubit.dart';
 import 'package:hungry_app/features/auth/login/logic/cubit/login_cubit.dart';
+import 'package:hungry_app/features/auth/logout/data/repo/logout_repo.dart';
+import 'package:hungry_app/features/auth/logout/logic/cubit/logout_cubit.dart';
 import 'package:hungry_app/features/auth/profile/data/repo/profile_repo.dart';
 import 'package:hungry_app/features/auth/profile/data/repo/update_profile_repo.dart';
 import 'package:hungry_app/features/auth/profile/logic/cubit/profile_cubit.dart';
 import 'package:hungry_app/features/auth/profile/logic/cubit/update_profile_cubit.dart';
 import 'package:hungry_app/features/auth/register/data/repo/register_repo.dart';
 import 'package:hungry_app/features/auth/register/logic/cubit/register_cubit.dart';
+import 'package:hungry_app/features/cart/data/repo/addToCartRepo/add_to_cart_repo.dart';
+import 'package:hungry_app/features/cart/data/repo/myCart/cart_repo.dart';
+import 'package:hungry_app/features/cart/logic/addToCartCubit/add_to_cart_cubit.dart';
+import 'package:hungry_app/features/cart/logic/getCart/get_cart_cubit.dart';
 import 'package:hungry_app/features/home/data/repo/food_repo.dart';
 import 'package:hungry_app/features/home/logic/cubit/food_cubit.dart';
+import 'package:hungry_app/features/product/data/repo/toppings_side_options_repo.dart';
+import 'package:hungry_app/features/product/logic/cubit/side_options_cubit.dart';
+import 'package:hungry_app/features/product/logic/cubit/toppings_cubit.dart';
 
 GetIt getIt = GetIt.instance;
 
@@ -31,10 +41,30 @@ Future<void> setUpGetIt() async {
   getIt.registerLazySingleton<UpdateProfileRepo>(
     () => UpdateProfileRepo(apiServices: getIt(), dio: getIt()),
   );
+  getIt.registerLazySingleton<LogoutRepo>(
+    () => LogoutRepo(apiServices: getIt()),
+  );
+  getIt.registerLazySingleton<ToppingsSideOptionsRepo>(
+    () => ToppingsSideOptionsRepo(apiServices: getIt()),
+  );
+  getIt.registerLazySingleton<AddToCartRepo>(
+    () => AddToCartRepo(apiServices: getIt()),
+  );
+  getIt.registerLazySingleton<CartRepo>(() => CartRepo(apiServices: getIt()));
 
   getIt.registerFactory<FoodCubit>(() => FoodCubit(getIt()));
   getIt.registerFactory<RegisterCubit>(() => RegisterCubit(getIt()));
   getIt.registerFactory<LoginCubit>(() => LoginCubit(getIt()));
   getIt.registerFactory<ProfileCubit>(() => ProfileCubit(getIt()));
   getIt.registerFactory<UpdateProfileCubit>(() => UpdateProfileCubit(getIt()));
+  getIt.registerFactory<LogoutCubit>(() => LogoutCubit(getIt()));
+
+  getIt.registerLazySingleton<AutoLoginCubit>(
+    () => AutoLoginCubit(getIt<LoginRepo>())..checkAuthStatus(),
+  );
+
+  getIt.registerFactory<ToppingsCubit>(() => ToppingsCubit(getIt()));
+  getIt.registerFactory<SideOptionsCubit>(() => SideOptionsCubit(getIt()));
+  getIt.registerFactory<GetCartCubit>(() => GetCartCubit(getIt()));
+  getIt.registerFactory<AddToCartCubit>(() => AddToCartCubit(getIt()));
 }

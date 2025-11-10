@@ -3,25 +3,46 @@ import 'package:gap/gap.dart';
 import 'package:hungry_app/core/constants/app_colors.dart';
 import 'package:hungry_app/shared/custom_text.dart';
 
-class CustomCard extends StatelessWidget {
+class CustomCard extends StatefulWidget {
   const CustomCard({
     super.key,
     required this.image,
     required this.title,
     required this.subTitle,
-    this.onAdd,
     this.onPressed,
-    this.onMinus,
-    required this.number,
+    required this.initialNumber,
   });
 
   final String image;
   final String title;
   final String subTitle;
-  final void Function()? onAdd;
-  final void Function()? onMinus;
+  final int initialNumber;
+
   final void Function()? onPressed;
-  final int number;
+
+  @override
+  State<CustomCard> createState() => _CustomCardState();
+}
+
+class _CustomCardState extends State<CustomCard> {
+  late int number;
+  @override
+  void initState() {
+    number = widget.initialNumber;
+    super.initState();
+  }
+
+  void onAdd() {
+    number++;
+    setState(() {});
+  }
+
+  void onMinus() {
+    if (number > 1) {
+      number--;
+      setState(() {});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,15 +56,15 @@ class CustomCard extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Image.asset(image, width: 111, height: 102.18),
+                Image.network(widget.image, width: 111, height: 102.18),
                 CustomText(
-                  text: title,
+                  text: widget.title,
                   color: Colors.black,
                   fontWeight: FontWeight.w600,
                   fontsize: 16,
                 ),
                 CustomText(
-                  text: subTitle,
+                  text: widget.subTitle,
                   color: Colors.black,
                   fontWeight: FontWeight.w400,
                 ),
@@ -113,7 +134,7 @@ class CustomCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: TextButton(
-                    onPressed: onPressed,
+                    onPressed: widget.onPressed,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 10,

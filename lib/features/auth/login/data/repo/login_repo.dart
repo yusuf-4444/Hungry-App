@@ -21,6 +21,8 @@ class LoginRepo {
       });
 
       await PrefHelper.saveToken(response.data.token);
+      await PrefHelper.setLoggedIn(true);
+      await PrefHelper.setGuestMode(false);
 
       return ApiResult.success(response);
     } on DioException catch (e) {
@@ -28,6 +30,22 @@ class LoginRepo {
       return ApiResult.failure(error.message);
     } catch (e) {
       return ApiResult.failure(e.toString());
+    }
+  }
+
+  Future<ApiResult<bool>> checkAutoLogin() async {
+    try {
+      final isLoggedIn = await PrefHelper.isLoggedIn();
+      final token = await PrefHelper.getToken();
+      final isGuest = await PrefHelper.isGuest();
+
+      if (isLoggedIn && token != null && !isGuest) {
+        return ApiResult.success(true);
+      }
+
+      return ApiResult.success(false);
+    } catch (e) {
+      return ApiResult.failure("auto login failed: $e");
     }
   }
 }

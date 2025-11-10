@@ -5,4 +5,9 @@ class ApiConstants {
   static const String login = "/login";
   static const String profile = "/profile";
   static const String updateProfile = "/update-profile";
+  static const String logout = "/logout";
+  static const String toppings = "/toppings";
+  static const String sideOptions = "/side-options";
+  static const String addToCart = "/cart/add";
+  static const String myCart = "/cart";
 }

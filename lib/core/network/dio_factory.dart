@@ -40,12 +40,23 @@ class DioFactory {
       InterceptorsWrapper(
         onRequest: (options, handler) async {
           final token = await PrefHelper.getToken();
+          final isGuest = await PrefHelper.isGuest();
+
           print('🔐 Token for request: ${token ?? 'null'}');
+          print('👤 Guest mode: $isGuest');
+
+          if (isGuest) {
+            print('🎭 Guest mode - no authorization header');
+            return handler.next(options);
+          }
+
           if (token != null && token.isNotEmpty) {
-            options.headers["Authorization"] = "Bearer $token";
+            options.headers["Authorization"] = "Bearer $token"; // صحّح الـ typo
+            print('✅ Authorization header added');
           } else {
             print('❌ No authorization header added');
           }
+
           return handler.next(options);
         },
       ),

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hungry_app/core/di/dependancy_injection.dart';
+import 'package:hungry_app/features/auth/login/logic/cubit/auto_login_cubit.dart';
+import 'package:hungry_app/features/auth/login/logic/cubit/login_cubit.dart';
+import 'package:hungry_app/features/cart/logic/getCart/get_cart_cubit.dart';
 import 'package:hungry_app/features/home/logic/cubit/food_cubit.dart';
 import 'package:hungry_app/splash.dart';
 
@@ -17,8 +20,13 @@ class HungryApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => getIt<FoodCubit>()..getFood(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => getIt<FoodCubit>()..getFood()),
+        BlocProvider(create: (context) => getIt<LoginCubit>()),
+        BlocProvider(create: (context) => getIt<AutoLoginCubit>()),
+        BlocProvider(create: (context) => getIt<GetCartCubit>()),
+      ],
       child: MaterialApp(
         theme: ThemeData(
           scaffoldBackgroundColor: Colors.white,
