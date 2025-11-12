@@ -4,8 +4,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hungry_app/core/di/dependancy_injection.dart';
 import 'package:hungry_app/features/auth/login/logic/cubit/auto_login_cubit.dart';
 import 'package:hungry_app/features/auth/login/logic/cubit/login_cubit.dart';
-import 'package:hungry_app/features/cart/logic/getCart/get_cart_cubit.dart';
+import 'package:hungry_app/features/auth/profile/logic/cubit/profile_cubit.dart';
+import 'package:hungry_app/features/cart/logic/deleteItem/delete_item_cubit.dart';
 import 'package:hungry_app/features/home/logic/cubit/food_cubit.dart';
+import 'package:hungry_app/features/product/logic/cubit/side_options_cubit.dart';
+import 'package:hungry_app/features/product/logic/cubit/toppings_cubit.dart';
 import 'package:hungry_app/splash.dart';
 
 void main() async {
@@ -25,7 +28,10 @@ class HungryApp extends StatelessWidget {
         BlocProvider(create: (context) => getIt<FoodCubit>()..getFood()),
         BlocProvider(create: (context) => getIt<LoginCubit>()),
         BlocProvider(create: (context) => getIt<AutoLoginCubit>()),
-        BlocProvider(create: (context) => getIt<GetCartCubit>()),
+        BlocProvider(create: (context) => getIt<DeleteItemCubit>()),
+        BlocProvider(create: (context) => getIt<ProfileCubit>()..getProfile()),
+        BlocProvider(create: (context) => getIt<ToppingsCubit>()),
+        BlocProvider(create: (context) => getIt<SideOptionsCubit>()),
       ],
       child: MaterialApp(
         theme: ThemeData(

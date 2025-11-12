@@ -11,7 +11,7 @@ AddToCartResponseModel _$AddToCartResponseModelFromJson(
 ) => AddToCartResponseModel(
   code: (json['code'] as num).toInt(),
   message: json['message'] as String,
-  data: json['data'] as Map<String, dynamic>,
+  data: json['data'] as Map<String, dynamic>?,
 );
 
 Map<String, dynamic> _$AddToCartResponseModelToJson(

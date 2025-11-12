@@ -1,4 +1,3 @@
-import 'package:flutter/src/widgets/container.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'get_cart_state.freezed.dart';

@@ -51,7 +51,7 @@ class DioFactory {
           }
 
           if (token != null && token.isNotEmpty) {
-            options.headers["Authorization"] = "Bearer $token"; // صحّح الـ typo
+            options.headers["Authorization"] = "Bearer $token";
             print('✅ Authorization header added');
           } else {
             print('❌ No authorization header added');

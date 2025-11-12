@@ -10,7 +10,6 @@ class AddToCartCubit extends Cubit<AddToCartState> {
 
   Future<void> addToCart(CartItems cartData) async {
     emit(AddToCartState.loading());
-
     try {
       final response = await addToCartRepo.addToCart(cartData);
       response.when(

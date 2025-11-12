@@ -7,6 +7,7 @@ import 'package:hungry_app/features/auth/profile/models/update_profile_model.dar
 import 'package:hungry_app/features/auth/register/models/register_model.dart';
 import 'package:hungry_app/features/cart/data/models/addToCart/add_to_cart_model.dart';
 import 'package:hungry_app/features/cart/data/models/addToCart/add_to_cart_response_model.dart';
+import 'package:hungry_app/features/cart/data/models/deleteItem/delete_item_model.dart';
 import 'package:hungry_app/features/cart/data/models/myCart/cart_model.dart';
 import 'package:hungry_app/features/home/data/models/food_data_model.dart';
 import 'package:hungry_app/features/home/data/models/side_options_model.dart';
@@ -48,4 +49,7 @@ abstract class ApiServices {
 
   @GET(ApiConstants.myCart)
   Future<CartModel> getCart();
+
+  @DELETE("${ApiConstants.deleteItem}{id}")
+  Future<DeleteItemModel> deleteItem(@Path("id") int id);
 }

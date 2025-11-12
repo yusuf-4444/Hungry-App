@@ -10,4 +10,5 @@ class ApiConstants {
   static const String sideOptions = "/side-options";
   static const String addToCart = "/cart/add";
   static const String myCart = "/cart";
+  static const String deleteItem = "/cart/remove/";
 }

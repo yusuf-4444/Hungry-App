@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hungry_app/shared/custom_text.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-class CustomToppingsSideOptionsWidget extends StatelessWidget {
+class CustomToppingsSideOptionsWidget extends StatefulWidget {
   const CustomToppingsSideOptionsWidget({
     super.key,
     required this.data,
@@ -13,99 +13,121 @@ class CustomToppingsSideOptionsWidget extends StatelessWidget {
 
   final dynamic data;
   final bool isLoading;
-  final List<int> selectedItems;
+  final List<int>? selectedItems;
   final Function(int) onItemSelection;
 
   @override
+  State<CustomToppingsSideOptionsWidget> createState() =>
+      _CustomToppingsSideOptionsWidgetState();
+}
+
+class _CustomToppingsSideOptionsWidgetState
+    extends State<CustomToppingsSideOptionsWidget> {
+  @override
   Widget build(BuildContext context) {
     return Skeletonizer(
-      enabled: isLoading,
+      enabled: widget.isLoading,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
-          children: List.generate(isLoading ? 4 : (data?.data.length ?? 0), (
-            index,
-          ) {
-            final item = isLoading ? null : data.data[index];
-            final isSelected = selectedItems.contains(item.id);
-            return Padding(
-              padding: const EdgeInsets.only(right: 20),
-              child: GestureDetector(
-                onTap: () {
-                  onItemSelection(item.id);
-                },
-                child: Stack(
-                  children: [
-                    Material(
-                      color: isSelected ? Colors.blue : null,
-                      elevation: 4,
-                      child: Container(
-                        height: 110,
-                        width: 100,
-                        decoration: BoxDecoration(
-                          color: Color(0xff3C2F2F),
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                            left: 10,
-                            right: 10,
-                            top: 20,
-                            bottom: 18,
-                          ),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              CustomText(
-                                text: !isLoading
-                                    ? data.data[index].name
-                                    : "tomato",
-                                color: Colors.white,
-                                fontsize: 12,
-                              ),
-                              Spacer(),
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.red,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Icon(
-                                  Icons.add,
-                                  color: Colors.white,
-                                  size: 20,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
+          children: List.generate(
+            widget.isLoading ? 4 : (widget.data?.data?.length ?? 0),
+            (index) {
+              final item = widget.isLoading ? null : widget.data?.data?[index];
+              final itemId = item?.id;
+              final isSelected =
+                  widget.selectedItems?.contains(itemId ?? -1) ?? false;
 
-                    Positioned(
-                      left: 0,
-                      right: 0,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(15),
-                            bottomRight: Radius.circular(15),
+              return Padding(
+                padding: const EdgeInsets.only(right: 20),
+                child: GestureDetector(
+                  onTap: () {
+                    if (!widget.isLoading && itemId != null) {
+                      widget.onItemSelection(itemId);
+                      setState(() {});
+                    }
+                  },
+                  child: Stack(
+                    children: [
+                      Material(
+                        elevation: 4,
+                        child: Container(
+                          height: 110,
+                          width: 100,
+                          decoration: BoxDecoration(
+                            color: Color(0xff3C2F2F),
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                              left: 10,
+                              right: 10,
+                              top: 20,
+                              bottom: 18,
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                CustomText(
+                                  text: !widget.isLoading && item?.name != null
+                                      ? item!.name
+                                      : "Loading...",
+                                  color: Colors.white,
+                                  fontsize: 12,
+                                ),
+                                Spacer(),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.red,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Icon(
+                                    isSelected ? Icons.remove : Icons.add,
+                                    color: Colors.white,
+                                    size: 20,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                        child: !isLoading
-                            ? Image.network(data.data[index].image, height: 60)
-                            : Image.asset(
-                                "assets/details/pngwing 15.png",
-                                height: 60,
-                                width: 60,
-                              ),
                       ),
-                    ),
-                  ],
+                      Positioned(
+                        left: 0,
+                        right: 0,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(15),
+                              bottomRight: Radius.circular(15),
+                            ),
+                          ),
+                          child: !widget.isLoading && item?.image != null
+                              ? Image.network(
+                                  item!.image,
+                                  height: 60,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Image.asset(
+                                      "assets/details/pngwing 15.png",
+                                      height: 60,
+                                      width: 60,
+                                    );
+                                  },
+                                )
+                              : Image.asset(
+                                  "assets/details/pngwing 15.png",
+                                  height: 60,
+                                  width: 60,
+                                ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            );
-          }),
+              );
+            },
+          ),
         ),
       ),
     );

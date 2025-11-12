@@ -4,9 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hungry_app/core/constants/app_colors.dart';
 import 'package:hungry_app/core/di/dependancy_injection.dart';
 import 'package:hungry_app/features/auth/logout/logic/cubit/logout_cubit.dart';
-import 'package:hungry_app/features/auth/profile/logic/cubit/profile_cubit.dart';
 import 'package:hungry_app/features/auth/profile/logic/cubit/update_profile_cubit.dart';
 import 'package:hungry_app/features/auth/view/profile_view.dart';
+import 'package:hungry_app/features/cart/logic/getCart/get_cart_cubit.dart';
 import 'package:hungry_app/features/cart/views/cart_view.dart';
 import 'package:hungry_app/features/home/views/home_view.dart';
 import 'package:hungry_app/features/orderHistory/views/order_histroy_view.dart';
@@ -19,7 +19,6 @@ class Root extends StatefulWidget {
 }
 
 class _RootState extends State<Root> {
-  late PageController pageController;
   late List<Widget> screens;
 
   int currentPage = 0;
@@ -28,23 +27,18 @@ class _RootState extends State<Root> {
   void initState() {
     super.initState();
     screens = [HomeView(), CartView(), OrderHistroyView(), ProfileView()];
-    pageController = PageController(initialPage: currentPage);
   }
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => getIt<ProfileCubit>()),
         BlocProvider(create: (context) => getIt<UpdateProfileCubit>()),
         BlocProvider(create: (context) => getIt<LogoutCubit>()),
+        BlocProvider(create: (context) => getIt<GetCartCubit>()),
       ],
       child: Scaffold(
-        body: PageView(
-          physics: NeverScrollableScrollPhysics(),
-          controller: pageController,
-          children: screens,
-        ),
+        body: IndexedStack(index: currentPage, children: screens),
         bottomNavigationBar: Container(
           padding: EdgeInsets.all(10),
           decoration: BoxDecoration(
@@ -57,7 +51,6 @@ class _RootState extends State<Root> {
           child: BottomNavigationBar(
             onTap: (value) {
               currentPage = value;
-              pageController.jumpToPage(currentPage);
               setState(() {});
             },
             selectedItemColor: Colors.white,

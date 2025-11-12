@@ -5,7 +5,6 @@ import 'package:hungry_app/core/constants/app_colors.dart';
 import 'package:hungry_app/features/cart/data/models/addToCart/add_to_cart_model.dart';
 import 'package:hungry_app/features/cart/logic/addToCartCubit/add_to_cart_cubit.dart';
 import 'package:hungry_app/features/cart/logic/addToCartCubit/add_to_cart_state.dart';
-import 'package:hungry_app/features/home/views/home_view.dart';
 import 'package:hungry_app/features/product/logic/cubit/side_options_cubit.dart';
 import 'package:hungry_app/features/product/logic/cubit/side_options_state.dart'
     as SideState;
@@ -19,9 +18,14 @@ import 'package:hungry_app/shared/custom_snack_bar.dart';
 import 'package:hungry_app/shared/custom_text.dart';
 
 class ProductDetailsView extends StatefulWidget {
-  const ProductDetailsView({super.key, required this.productId});
+  const ProductDetailsView({
+    super.key,
+    required this.productId,
+    required this.price,
+  });
 
   final int productId;
+  final String price;
 
   @override
   State<ProductDetailsView> createState() => _ProductDetailsViewState();
@@ -72,7 +76,14 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CustomHeaderSpicyDetails(sliderValue: sliderValue),
+              CustomHeaderSpicyDetails(
+                sliderValue: sliderValue,
+                onChanged: (v) {
+                  setState(() {
+                    sliderValue = v;
+                  });
+                },
+              ),
               Gap(20),
               CustomText(
                 text: "Toppings",
@@ -157,7 +168,7 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                   ),
                   Gap(10),
                   CustomText(
-                    text: "\$18.19",
+                    text: "\$ ${widget.price}",
                     color: Colors.black,
                     fontsize: 22,
                     fontWeight: FontWeight.w900,
@@ -166,32 +177,27 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
               ),
               BlocConsumer<AddToCartCubit, AddToCartState>(
                 listener: (context, state) {
-                  state.whenOrNull(
-                    success: (data) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        CustomSnackBar(
-                          "Item Added Successfully",
-                          AppColors.primaryColor,
-                        ),
-                      );
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return HomeView();
-                          },
-                        ),
-                      );
-                    },
-                  );
+                  if (state is Success) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      CustomSnackBar(
+                        "Item Added Successfully",
+                        AppColors.primaryColor,
+                      ),
+                    );
+                    Navigator.pop(context);
+                  }
                 },
                 builder: (context, state) {
                   return CustomMainButton(
-                    text: state is Loading ? "Adding..." : "Add To Cart",
+                    text: state is Loading
+                        ? "Adding..."
+                        : state is Success
+                        ? "Added"
+                        : "Add To Cart",
                     fontSize: 16,
-                    onPressed: () {
+                    onPressed: () async {
                       final cartData = _cartData();
-                      context.read<AddToCartCubit>().addToCart(cartData);
+                      await context.read<AddToCartCubit>().addToCart(cartData);
                     },
                   );
                 },

@@ -50,8 +50,6 @@ class _ProfileViewState extends State<ProfileView> {
 
   @override
   void initState() {
-    context.read<ProfileCubit>().getProfile();
-
     super.initState();
   }
 
@@ -78,8 +76,13 @@ class _ProfileViewState extends State<ProfileView> {
     return BlocConsumer<ProfileCubit, ProfileState>(
       builder: (context, state) {
         if (state is Failure) {
-          return Center(
-            child: Text("internal Server Error.. please Try again later"),
+          return RefreshIndicator(
+            onRefresh: () async {
+              await context.read<ProfileCubit>().getProfile();
+            },
+            child: Center(
+              child: Text("internal Server Error.. please Try again later"),
+            ),
           );
         }
 
@@ -233,23 +236,27 @@ class _ProfileViewState extends State<ProfileView> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     GestureDetector(
-                      onTap: () {
+                      onTap: () async {
                         if (_selectedImageFile != null) {
-                          context.read<UpdateProfileCubit>().updateProfile(
-                            name: _name.text,
-                            email: _email.text,
-                            delivaryAddress: _address.text,
-                            visa: _visa.text,
-                            image: _selectedImageFile,
-                          );
+                          await context
+                              .read<UpdateProfileCubit>()
+                              .updateProfile(
+                                name: _name.text,
+                                email: _email.text,
+                                delivaryAddress: _address.text,
+                                visa: _visa.text,
+                                image: _selectedImageFile,
+                              );
                         } else {
-                          context.read<UpdateProfileCubit>().updateProfile(
-                            name: _name.text,
-                            email: _email.text,
-                            delivaryAddress: _address.text,
-                            visa: _visa.text,
-                            image: null,
-                          );
+                          await context
+                              .read<UpdateProfileCubit>()
+                              .updateProfile(
+                                name: _name.text,
+                                email: _email.text,
+                                delivaryAddress: _address.text,
+                                visa: _visa.text,
+                                image: null,
+                              );
                         }
                         context.read<ProfileCubit>().getProfile();
                         ScaffoldMessenger.of(context).showSnackBar(

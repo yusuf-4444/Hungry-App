@@ -6,7 +6,7 @@ part 'add_to_cart_response_model.g.dart';
 class AddToCartResponseModel {
   final int code;
   final String message;
-  final Map<String, dynamic> data;
+  final Map<String, dynamic>? data;
 
   AddToCartResponseModel({
     required this.code,

@@ -61,7 +61,7 @@ class _CustomCardState extends State<CustomCard> {
                   text: widget.title,
                   color: Colors.black,
                   fontWeight: FontWeight.w600,
-                  fontsize: 16,
+                  fontsize: 14,
                 ),
                 CustomText(
                   text: widget.subTitle,

@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'get_cart_state.dart';
+part of 'delete_item_state.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -12,7 +12,7 @@ part of 'get_cart_state.dart';
 // dart format off
 T _$identity<T>(T value) => value;
 /// @nodoc
-mixin _$GetCartState<T> {
+mixin _$DeleteItemState<T> {
 
 
 
@@ -20,7 +20,7 @@ mixin _$GetCartState<T> {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is GetCartState<T>);
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is DeleteItemState<T>);
 }
 
 
@@ -29,20 +29,20 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'GetCartState<$T>()';
+  return 'DeleteItemState<$T>()';
 }
 
 
 }
 
 /// @nodoc
-class $GetCartStateCopyWith<T,$Res>  {
-$GetCartStateCopyWith(GetCartState<T> _, $Res Function(GetCartState<T>) __);
+class $DeleteItemStateCopyWith<T,$Res>  {
+$DeleteItemStateCopyWith(DeleteItemState<T> _, $Res Function(DeleteItemState<T>) __);
 }
 
 
-/// Adds pattern-matching-related methods to [GetCartState].
-extension GetCartStatePatterns<T> on GetCartState<T> {
+/// Adds pattern-matching-related methods to [DeleteItemState].
+extension DeleteItemStatePatterns<T> on DeleteItemState<T> {
 /// A variant of `map` that fallback to returning `orElse`.
 ///
 /// It is equivalent to doing:
@@ -192,7 +192,7 @@ return failure(_that.error);case _:
 /// @nodoc
 
 
-class _Initial<T> implements GetCartState<T> {
+class _Initial<T> implements DeleteItemState<T> {
   const _Initial();
   
 
@@ -212,7 +212,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'GetCartState<$T>.initial()';
+  return 'DeleteItemState<$T>.initial()';
 }
 
 
@@ -224,7 +224,7 @@ String toString() {
 /// @nodoc
 
 
-class Loading<T> implements GetCartState<T> {
+class Loading<T> implements DeleteItemState<T> {
   const Loading();
   
 
@@ -244,7 +244,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'GetCartState<$T>.loading()';
+  return 'DeleteItemState<$T>.loading()';
 }
 
 
@@ -256,13 +256,13 @@ String toString() {
 /// @nodoc
 
 
-class Success<T> implements GetCartState<T> {
+class Success<T> implements DeleteItemState<T> {
   const Success(this.data);
   
 
  final  T data;
 
-/// Create a copy of GetCartState
+/// Create a copy of DeleteItemState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
@@ -281,14 +281,14 @@ int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(
 
 @override
 String toString() {
-  return 'GetCartState<$T>.success(data: $data)';
+  return 'DeleteItemState<$T>.success(data: $data)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $SuccessCopyWith<T,$Res> implements $GetCartStateCopyWith<T, $Res> {
+abstract mixin class $SuccessCopyWith<T,$Res> implements $DeleteItemStateCopyWith<T, $Res> {
   factory $SuccessCopyWith(Success<T> value, $Res Function(Success<T>) _then) = _$SuccessCopyWithImpl;
 @useResult
 $Res call({
@@ -307,7 +307,7 @@ class _$SuccessCopyWithImpl<T,$Res>
   final Success<T> _self;
   final $Res Function(Success<T>) _then;
 
-/// Create a copy of GetCartState
+/// Create a copy of DeleteItemState
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') $Res call({Object? data = freezed,}) {
   return _then(Success<T>(
@@ -322,13 +322,13 @@ as T,
 /// @nodoc
 
 
-class Failure<T> implements GetCartState<T> {
+class Failure<T> implements DeleteItemState<T> {
   const Failure(this.error);
   
 
  final  String error;
 
-/// Create a copy of GetCartState
+/// Create a copy of DeleteItemState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
@@ -347,14 +347,14 @@ int get hashCode => Object.hash(runtimeType,error);
 
 @override
 String toString() {
-  return 'GetCartState<$T>.failure(error: $error)';
+  return 'DeleteItemState<$T>.failure(error: $error)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $FailureCopyWith<T,$Res> implements $GetCartStateCopyWith<T, $Res> {
+abstract mixin class $FailureCopyWith<T,$Res> implements $DeleteItemStateCopyWith<T, $Res> {
   factory $FailureCopyWith(Failure<T> value, $Res Function(Failure<T>) _then) = _$FailureCopyWithImpl;
 @useResult
 $Res call({
@@ -373,7 +373,7 @@ class _$FailureCopyWithImpl<T,$Res>
   final Failure<T> _self;
   final $Res Function(Failure<T>) _then;
 
-/// Create a copy of GetCartState
+/// Create a copy of DeleteItemState
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') $Res call({Object? error = null,}) {
   return _then(Failure<T>(
