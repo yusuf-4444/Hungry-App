@@ -35,7 +35,18 @@ class CustomFoodHomeWidget extends StatelessWidget {
                 left: 0,
                 child: Image.asset("assets/homeIcons/shadow.png"),
               ),
-              Image.network(image, width: 120, height: 120),
+              Image.network(
+                image,
+                width: 120,
+                height: 120,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return const CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                  );
+                },
+              ),
             ],
           ),
           Gap(10),
@@ -50,13 +61,17 @@ class CustomFoodHomeWidget extends StatelessWidget {
                     maxLines: 1,
                     text: title,
                     color: Color(0xff3C2F2F),
-                    fontsize: 16,
+                    fontsize: 15.5,
                     fontWeight: FontWeight.w600,
                   ),
-                  CustomText(
-                    text: subtitle,
-                    color: Colors.grey.shade900,
-                    maxLines: 2,
+                  Gap(5),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 5),
+                    child: CustomText(
+                      text: subtitle,
+                      color: Colors.grey.shade900,
+                      maxLines: 2,
+                    ),
                   ),
                   Gap(10),
                   Row(

@@ -35,6 +35,7 @@ class _ProfileViewState extends State<ProfileView> {
 
   String? image;
   String visa = "";
+  String editProfile = "Edit Profile";
 
   String? _selectedImageUrl;
   File? _selectedImageFile;
@@ -238,6 +239,7 @@ class _ProfileViewState extends State<ProfileView> {
                     GestureDetector(
                       onTap: () async {
                         if (_selectedImageFile != null) {
+                          editProfile = "Editing...";
                           await context
                               .read<UpdateProfileCubit>()
                               .updateProfile(
@@ -247,7 +249,9 @@ class _ProfileViewState extends State<ProfileView> {
                                 visa: _visa.text,
                                 image: _selectedImageFile,
                               );
+                          setState(() {});
                         } else {
+                          editProfile = "Editing...";
                           await context
                               .read<UpdateProfileCubit>()
                               .updateProfile(
@@ -257,11 +261,23 @@ class _ProfileViewState extends State<ProfileView> {
                                 visa: _visa.text,
                                 image: null,
                               );
+                          setState(() {});
                         }
-                        context.read<ProfileCubit>().getProfile();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          CustomSnackBar("Updated Successfully", Colors.white),
-                        );
+
+                        Future.delayed(Duration(seconds: 5), () {
+                          context.read<ProfileCubit>().getProfile(
+                            forceRefresh: true,
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            CustomSnackBar(
+                              "Updated Successfully",
+                              Colors.white,
+                            ),
+                          );
+                        });
+                        editProfile = "Edit Profile";
+
+                        setState(() {});
                       },
                       child: Container(
                         decoration: BoxDecoration(
@@ -276,7 +292,7 @@ class _ProfileViewState extends State<ProfileView> {
                           child: Row(
                             children: [
                               CustomText(
-                                text: "Edit Profile",
+                                text: editProfile,
                                 color: Colors.white,
                               ),
                               Gap(10),

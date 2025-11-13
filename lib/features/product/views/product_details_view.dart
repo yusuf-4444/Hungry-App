@@ -5,6 +5,7 @@ import 'package:hungry_app/core/constants/app_colors.dart';
 import 'package:hungry_app/features/cart/data/models/addToCart/add_to_cart_model.dart';
 import 'package:hungry_app/features/cart/logic/addToCartCubit/add_to_cart_cubit.dart';
 import 'package:hungry_app/features/cart/logic/addToCartCubit/add_to_cart_state.dart';
+import 'package:hungry_app/features/cart/logic/getCart/get_cart_cubit.dart';
 import 'package:hungry_app/features/product/logic/cubit/side_options_cubit.dart';
 import 'package:hungry_app/features/product/logic/cubit/side_options_state.dart'
     as SideState;
@@ -198,6 +199,9 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                     onPressed: () async {
                       final cartData = _cartData();
                       await context.read<AddToCartCubit>().addToCart(cartData);
+                      await context.read<GetCartCubit>().getCart(
+                        forceRefresh: true,
+                      );
                     },
                   );
                 },

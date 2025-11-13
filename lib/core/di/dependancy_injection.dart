@@ -19,6 +19,8 @@ import 'package:hungry_app/features/cart/data/repo/myCart/cart_repo.dart';
 import 'package:hungry_app/features/cart/logic/addToCartCubit/add_to_cart_cubit.dart';
 import 'package:hungry_app/features/cart/logic/deleteItem/delete_item_cubit.dart';
 import 'package:hungry_app/features/cart/logic/getCart/get_cart_cubit.dart';
+import 'package:hungry_app/features/checkout/data/repo/save_order_repo.dart';
+import 'package:hungry_app/features/checkout/logic/cubit/save_order_cubit.dart';
 import 'package:hungry_app/features/home/data/repo/food_repo.dart';
 import 'package:hungry_app/features/home/logic/cubit/food_cubit.dart';
 import 'package:hungry_app/features/product/data/repo/toppings_side_options_repo.dart';
@@ -56,6 +58,9 @@ Future<void> setUpGetIt() async {
   getIt.registerLazySingleton<DeleteItemRepo>(
     () => DeleteItemRepo(apiServices: getIt()),
   );
+  getIt.registerFactory<SaveOrderRepo>(
+    () => SaveOrderRepo(apiServices: getIt()),
+  );
 
   getIt.registerFactory<FoodCubit>(() => FoodCubit(getIt()));
   getIt.registerFactory<RegisterCubit>(() => RegisterCubit(getIt()));
@@ -73,4 +78,5 @@ Future<void> setUpGetIt() async {
   getIt.registerFactory<GetCartCubit>(() => GetCartCubit(getIt()));
   getIt.registerFactory<AddToCartCubit>(() => AddToCartCubit(getIt()));
   getIt.registerFactory<DeleteItemCubit>(() => DeleteItemCubit(getIt()));
+  getIt.registerFactory<SaveOrderCubit>(() => SaveOrderCubit(getIt()));
 }

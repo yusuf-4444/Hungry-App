@@ -6,7 +6,6 @@ import 'package:gap/gap.dart';
 import 'package:hungry_app/core/constants/app_colors.dart';
 import 'package:hungry_app/features/auth/profile/logic/cubit/profile_cubit.dart';
 import 'package:hungry_app/features/auth/profile/logic/cubit/profile_state.dart';
-import 'package:hungry_app/features/auth/profile/models/profile_model.dart';
 import 'package:hungry_app/shared/custom_text.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -18,19 +17,22 @@ class HeaderProfile extends StatefulWidget {
 }
 
 class _HeaderProfileState extends State<HeaderProfile> {
+  String username = "Guest";
+  String? image;
+
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<ProfileCubit>().getProfile(forceRefresh: true);
+    });
   }
-
-  String username = "";
-  String? image;
 
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<ProfileCubit, ProfileState>(
       listener: (context, state) {
-        if (state is Success<ProfileModel>) {
+        if (state is Success) {
           setState(() {
             username = state.data.data.name;
             image = state.data.data.image;
@@ -66,8 +68,8 @@ class _HeaderProfileState extends State<HeaderProfile> {
                     ? ClipOval(
                         child: Image.network(
                           image!,
-                          width: 40,
-                          height: 40,
+                          width: 50,
+                          height: 50,
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
                             return const Icon(

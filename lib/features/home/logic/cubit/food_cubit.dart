@@ -9,14 +9,21 @@ class FoodCubit extends Cubit<FoodState> {
   FoodCubit(this.foodRepo) : super(FoodState.initial());
 
   List<Data> food = [];
+  bool _hasLoadedData = false;
 
-  Future<void> getFood() async {
+  Future<void> getFood({bool forceRefresh = false}) async {
+    if (_hasLoadedData && !forceRefresh && food.isNotEmpty) {
+      emit(FoodState.success(FoodDataModel(data: food)));
+      return;
+    }
+
     emit(FoodState.loading());
     try {
       final response = await foodRepo.getFoods();
       response.when(
         success: (success) {
           food = success.data;
+          _hasLoadedData = true;
           emit(FoodState.success(success));
         },
         failure: (failure) {
@@ -26,5 +33,14 @@ class FoodCubit extends Cubit<FoodState> {
     } catch (e) {
       emit(FoodState.failure(e.toString()));
     }
+  }
+
+  Future<void> refreshFood() async {
+    await getFood(forceRefresh: true);
+  }
+
+  void clearCache() {
+    food = [];
+    _hasLoadedData = false;
   }
 }

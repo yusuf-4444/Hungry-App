@@ -1,8 +1,17 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class SearchHome extends StatelessWidget {
-  const SearchHome({super.key});
+class SearchHome extends StatefulWidget {
+  const SearchHome({super.key, this.onChanged});
+
+  final void Function(String)? onChanged;
+
+  @override
+  State<SearchHome> createState() => _SearchHomeState();
+}
+
+class _SearchHomeState extends State<SearchHome> {
+  TextEditingController controller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -11,6 +20,8 @@ class SearchHome extends StatelessWidget {
       elevation: 2,
       borderRadius: BorderRadius.circular(15),
       child: TextFormField(
+        onChanged: widget.onChanged,
+        controller: controller,
         style: TextStyle(color: Colors.black),
         cursorColor: Colors.black,
         cursorHeight: 17,

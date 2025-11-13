@@ -6,7 +6,6 @@ import 'package:hungry_app/core/di/dependancy_injection.dart';
 import 'package:hungry_app/features/auth/logout/logic/cubit/logout_cubit.dart';
 import 'package:hungry_app/features/auth/profile/logic/cubit/update_profile_cubit.dart';
 import 'package:hungry_app/features/auth/view/profile_view.dart';
-import 'package:hungry_app/features/cart/logic/getCart/get_cart_cubit.dart';
 import 'package:hungry_app/features/cart/views/cart_view.dart';
 import 'package:hungry_app/features/home/views/home_view.dart';
 import 'package:hungry_app/features/orderHistory/views/order_histroy_view.dart';
@@ -35,7 +34,6 @@ class _RootState extends State<Root> {
       providers: [
         BlocProvider(create: (context) => getIt<UpdateProfileCubit>()),
         BlocProvider(create: (context) => getIt<LogoutCubit>()),
-        BlocProvider(create: (context) => getIt<GetCartCubit>()),
       ],
       child: Scaffold(
         body: IndexedStack(index: currentPage, children: screens),

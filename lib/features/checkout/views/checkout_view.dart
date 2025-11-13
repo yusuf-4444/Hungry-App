@@ -2,18 +2,24 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:hungry_app/core/constants/app_colors.dart';
 import 'package:hungry_app/features/auth/profile/logic/cubit/profile_cubit.dart';
 import 'package:hungry_app/features/auth/profile/logic/cubit/profile_state.dart';
+import 'package:hungry_app/features/checkout/data/models/save_order.dart';
+import 'package:hungry_app/features/checkout/widgets/custom_bottom_sheet.dart';
 import 'package:hungry_app/features/checkout/widgets/custom_order_summary.dart';
-import 'package:hungry_app/shared/custom_main_button.dart';
 import 'package:hungry_app/shared/custom_text.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class CheckoutView extends StatefulWidget {
-  const CheckoutView({super.key, required this.price});
+  const CheckoutView({
+    super.key,
+    required this.price,
+    required this.orderItems,
+  });
 
   final double price;
+
+  final List<OrderItems> orderItems;
 
   @override
   State<CheckoutView> createState() => _CheckoutViewState();
@@ -22,12 +28,14 @@ class CheckoutView extends StatefulWidget {
 class _CheckoutViewState extends State<CheckoutView> {
   String selectedMethod = "Cash";
   bool isChecked = true;
-  dynamic cubit;
 
   @override
   void initState() {
-    context.read<ProfileCubit>().getProfile();
     super.initState();
+  }
+
+  SaveOrder _saveOrder() {
+    return SaveOrder(items: widget.orderItems);
   }
 
   @override
@@ -172,107 +180,9 @@ class _CheckoutViewState extends State<CheckoutView> {
                 ],
               ),
             ),
-            bottomSheet: Container(
-              height: 100,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                ),
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(color: Colors.grey.shade800, blurRadius: 8),
-                ],
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Gap(13),
-                        CustomText(
-                          text: "Total",
-                          color: Colors.black,
-                          fontWeight: FontWeight.w600,
-                          fontsize: 14,
-                        ),
-                        Gap(10),
-                        CustomText(
-                          text: "\$ ${widget.price + 5 + 20.5}",
-                          color: Colors.black,
-                          fontsize: 22,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ],
-                    ),
-                    CustomMainButton(
-                      text: "Pay Now",
-                      fontSize: 16,
-                      onPressed: () {
-                        showDialog(
-                          barrierDismissible: false,
-                          context: context,
-                          builder: (context) {
-                            return Dialog(
-                              insetPadding: EdgeInsets.symmetric(
-                                horizontal: 50,
-                                vertical: 200,
-                              ),
-                              backgroundColor: Colors.white,
-                              child: Column(
-                                children: [
-                                  Gap(15),
-                                  CircleAvatar(
-                                    radius: 33,
-                                    backgroundColor: AppColors.primaryColor,
-                                    child: Icon(
-                                      Icons.check,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w900,
-                                      size: 40,
-                                    ),
-                                  ),
-                                  Gap(30),
-                                  CustomText(
-                                    text: "Success !",
-                                    color: AppColors.primaryColor,
-                                    fontWeight: FontWeight.w700,
-                                    fontsize: 25,
-                                  ),
-                                  Gap(15),
-                                  CustomText(
-                                    text:
-                                        "Your payment was successful\n.A receipt for this purchase has\n been sent to your email.",
-                                    color: Color(0xffBCBBBB),
-                                    fontWeight: FontWeight.w400,
-                                    fontsize: 14,
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  Spacer(),
-                                  CustomMainButton(
-                                    text: "Go Back",
-                                    fontSize: 15,
-                                    width: 200,
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                      Navigator.pop(context);
-                                      Navigator.pop(context);
-                                    },
-                                  ),
-                                  Gap(10),
-                                ],
-                              ),
-                            );
-                          },
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
+            bottomSheet: CustomBottomSheet(
+              totalPrice: widget.price,
+              saveOrder: _saveOrder(),
             ),
           ),
         );

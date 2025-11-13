@@ -9,14 +9,21 @@ class GetCartCubit extends Cubit<GetCartState> {
   GetCartCubit(this.cartRepo) : super(GetCartState.initial());
 
   CartItemsData? cartItemsData;
+  bool _hasLoadedData = false;
 
-  Future<void> getCart() async {
+  Future<void> getCart({bool forceRefresh = false}) async {
+    if (_hasLoadedData && !forceRefresh && cartItemsData != null) {
+      emit(GetCartState.success(CartModel(data: cartItemsData!)));
+      return;
+    }
+
     emit(GetCartState.loading());
     try {
       final response = await cartRepo.myCart();
       response.when(
         success: (success) {
           cartItemsData = success.data;
+          _hasLoadedData = true;
           emit(GetCartState.success(success));
         },
         failure: (failure) => emit(GetCartState.failure(failure)),
@@ -24,5 +31,15 @@ class GetCartCubit extends Cubit<GetCartState> {
     } catch (e) {
       emit(GetCartState.failure(e.toString()));
     }
+  }
+
+  Future<void> refreshCart() async {
+    await getCart(forceRefresh: true);
+  }
+
+  void clearCache() {
+    cartItemsData = null;
+    _hasLoadedData = false;
+    emit(GetCartState.initial());
   }
 }

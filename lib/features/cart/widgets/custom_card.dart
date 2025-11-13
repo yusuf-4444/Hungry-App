@@ -11,6 +11,7 @@ class CustomCard extends StatefulWidget {
     required this.subTitle,
     this.onPressed,
     required this.initialNumber,
+    this.onQuantityChanged,
   });
 
   final String image;
@@ -19,13 +20,33 @@ class CustomCard extends StatefulWidget {
   final int initialNumber;
 
   final void Function()? onPressed;
+  final void Function(int newQuantity)? onQuantityChanged;
 
   @override
   State<CustomCard> createState() => _CustomCardState();
 }
 
 class _CustomCardState extends State<CustomCard> {
+  bool _isRemoving = false;
   late int number;
+
+  Future<void> _removeItem() async {
+    if (widget.onPressed == null) return;
+
+    _isRemoving = true;
+    setState(() {});
+
+    try {
+      widget.onPressed!(); // استدعاء دالة الحذف مع await
+    } finally {
+      // نرجع الحالة لـ "Remove" حتى لو حصل error
+      _isRemoving = false;
+      if (mounted) {
+        setState(() {});
+      }
+    }
+  }
+
   @override
   void initState() {
     number = widget.initialNumber;
@@ -35,12 +56,14 @@ class _CustomCardState extends State<CustomCard> {
   void onAdd() {
     number++;
     setState(() {});
+    widget.onQuantityChanged?.call(number);
   }
 
   void onMinus() {
     if (number > 1) {
       number--;
       setState(() {});
+      widget.onQuantityChanged?.call(number);
     }
   }
 
@@ -56,7 +79,13 @@ class _CustomCardState extends State<CustomCard> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Image.network(widget.image, width: 111, height: 102.18),
+                Image.network(
+                  widget.image,
+                  width: 111,
+                  height: 102.18,
+                  fit: BoxFit.cover,
+                ),
+                const Gap(8),
                 CustomText(
                   text: widget.title,
                   color: Colors.black,
@@ -70,7 +99,7 @@ class _CustomCardState extends State<CustomCard> {
                 ),
               ],
             ),
-            Spacer(),
+            const Spacer(),
             Column(
               children: [
                 Row(
@@ -96,14 +125,13 @@ class _CustomCardState extends State<CustomCard> {
                         ),
                       ),
                     ),
-                    Gap(20),
+                    const Gap(20),
                     CustomText(
                       text: number.toString(),
                       color: Colors.black,
                       fontWeight: FontWeight.bold,
                     ),
-                    Gap(20),
-
+                    const Gap(20),
                     GestureDetector(
                       onTap: onAdd,
                       child: Container(
@@ -127,21 +155,21 @@ class _CustomCardState extends State<CustomCard> {
                     ),
                   ],
                 ),
-                Gap(30),
+                const Gap(30),
                 Container(
                   decoration: BoxDecoration(
                     color: AppColors.primaryColor,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: TextButton(
-                    onPressed: widget.onPressed,
+                    onPressed: _isRemoving ? null : _removeItem,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 10,
                         vertical: 5,
                       ),
                       child: CustomText(
-                        text: "Remove",
+                        text: _isRemoving ? "Removing..." : "Remove",
                         color: Colors.white,
                         fontsize: 18,
                         fontWeight: FontWeight.w500,
