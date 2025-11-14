@@ -7,10 +7,12 @@ class CustomHomeCategory extends StatefulWidget {
     super.key,
     required this.category,
     required this.selectedIndex,
+    this.onTap,
   });
 
   final List category;
   final int selectedIndex;
+  final void Function(int)? onTap;
 
   @override
   State<CustomHomeCategory> createState() => _CustomHomeCategoryState();
@@ -36,6 +38,7 @@ class _CustomHomeCategoryState extends State<CustomHomeCategory> {
             child: GestureDetector(
               onTap: () {
                 selectedIndex = index;
+                widget.onTap;
                 setState(() {});
               },
               child: Material(

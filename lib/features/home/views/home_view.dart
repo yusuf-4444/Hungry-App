@@ -22,7 +22,7 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  List category = ["All", "Combos", "Sliders", "Classic"];
+  List category = ["All", "Combos", "Sliders", "classic"];
   List<Data> filterFood = [];
   int selectedIndex = 0;
 
@@ -100,6 +100,24 @@ class _HomeViewState extends State<HomeView> {
                             CustomHomeCategory(
                               category: category,
                               selectedIndex: selectedIndex,
+                              onTap: (index) {
+                                // ✅ أضف index كمعامل
+                                setState(() {
+                                  selectedIndex =
+                                      index; // ✅ تحديث المؤشر المختار
+
+                                  if (index == 0) {
+                                    filterFood = foods;
+                                  } else {
+                                    String selectedCategory = category[index];
+                                    filterFood = foods.where((food) {
+                                      return food.name.contains(
+                                        selectedCategory.toLowerCase(),
+                                      );
+                                    }).toList();
+                                  }
+                                });
+                              },
                             ),
                           ],
                         ),
