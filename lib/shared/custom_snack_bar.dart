@@ -14,7 +14,7 @@ SnackBar CustomSnackBar(message, color) {
           Icons.info,
           color: color == Colors.white ? Colors.black : Colors.white,
         ),
-        Gap(20),
+        const Gap(20),
         Center(
           child: CustomText(
             text: message,

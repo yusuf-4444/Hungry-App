@@ -6,35 +6,35 @@ import 'package:hungry_app/features/auth/login/logic/cubit/auto_login_state.dart
 
 class AutoLoginCubit extends Cubit<AutoLoginState> {
   final LoginRepo loginRepo;
-  AutoLoginCubit(this.loginRepo) : super(AutoLoginState.initial());
+  AutoLoginCubit(this.loginRepo) : super(const AutoLoginState.initial());
 
   Future<void> checkAuthStatus() async {
-    emit(AutoLoginState.loading());
+    emit(const AutoLoginState.loading());
     final result = await loginRepo.checkAutoLogin();
     result.when(
       success: (isLoggedIn) {
         if (isLoggedIn) {
-          emit(AutoLoginState.authenticated());
+          emit(const AutoLoginState.authenticated());
         } else {
-          emit(AutoLoginState.unAuthenticated());
+          emit(const AutoLoginState.unAuthenticated());
         }
       },
-      failure: (failure) => emit(AutoLoginState.unAuthenticated()),
+      failure: (failure) => emit(const AutoLoginState.unAuthenticated()),
     );
   }
 
   Future<void> enterAsGuest() async {
-    emit(AutoLoginState.loading());
+    emit(const AutoLoginState.loading());
 
     await PrefHelper.setGuestMode(true);
     await PrefHelper.setLoggedIn(false);
     await PrefHelper.removeToken();
 
-    emit(AutoLoginState.guest());
+    emit(const AutoLoginState.guest());
   }
 
   Future<void> logout() async {
     await PrefHelper.removeToken();
-    emit(AutoLoginState.unAuthenticated());
+    emit(const AutoLoginState.unAuthenticated());
   }
 }

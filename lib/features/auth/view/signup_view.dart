@@ -36,16 +36,19 @@ class _SignupViewState extends State<SignupView> {
           key: globalKey,
           child: Column(
             children: [
-              Gap(150),
+              const Gap(150),
               SvgPicture.asset(
                 "assets/logo/Hungry_.svg",
                 color: AppColors.primaryColor,
               ),
-              CustomText(text: "Welcome To Our Food App", color: Colors.black),
-              Gap(50),
+              const CustomText(
+                text: "Welcome To Our Food App",
+                color: Colors.black,
+              ),
+              const Gap(50),
               Expanded(
                 child: Container(
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: AppColors.primaryColor,
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(20),
@@ -57,27 +60,27 @@ class _SignupViewState extends State<SignupView> {
                     child: SingleChildScrollView(
                       child: Column(
                         children: [
-                          Gap(40),
+                          const Gap(40),
                           CustomTextField(
                             controller: _name,
                             hintText: "Name",
                             isPassword: false,
                           ),
-                          Gap(15),
+                          const Gap(15),
                           CustomTextField(
                             controller: _emailAddress,
                             hintText: "Email Address",
                             isPassword: false,
                           ),
-                          Gap(15),
+                          const Gap(15),
                           CustomTextField(
                             controller: _password,
                             hintText: "Password",
                             isPassword: true,
                           ),
-                          Gap(15),
+                          const Gap(15),
 
-                          Gap(15),
+                          const Gap(15),
                           BlocConsumer<RegisterCubit, RegisterState>(
                             listener: (context, state) {
                               state.whenOrNull(
@@ -95,7 +98,7 @@ class _SignupViewState extends State<SignupView> {
                                         return BlocProvider(
                                           create: (context) =>
                                               getIt<LoginCubit>(),
-                                          child: SigninView(),
+                                          child: const SigninView(),
                                         );
                                       },
                                     ),
@@ -111,7 +114,7 @@ class _SignupViewState extends State<SignupView> {
                             builder: (context, state) {
                               final cubit = context.read<RegisterCubit>();
                               if (state is Loading) {
-                                return CupertinoActivityIndicator(
+                                return const CupertinoActivityIndicator(
                                   color: Colors.white,
                                 );
                               } else {
@@ -131,7 +134,7 @@ class _SignupViewState extends State<SignupView> {
                               }
                             },
                           ),
-                          Gap(15),
+                          const Gap(15),
                           CustomAuthButton(
                             isBackgroudnGreen: false,
                             color: Colors.white,
@@ -143,7 +146,7 @@ class _SignupViewState extends State<SignupView> {
                                   builder: (context) {
                                     return BlocProvider(
                                       create: (context) => getIt<LoginCubit>(),
-                                      child: SigninView(),
+                                      child: const SigninView(),
                                     );
                                   },
                                 ),

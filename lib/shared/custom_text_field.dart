@@ -44,21 +44,23 @@ class _CustomTextFieldState extends State<CustomTextField> {
                   setState(() {});
                 },
                 icon: isObsecure == true
-                    ? Icon(Icons.visibility_off)
-                    : Icon(CupertinoIcons.eye),
+                    ? const Icon(Icons.visibility_off)
+                    : const Icon(CupertinoIcons.eye),
               )
             : null,
 
         hintText: widget.hintText,
         fillColor: Colors.white,
         filled: true,
-        enabledBorder: OutlineInputBorder(
+        enabledBorder: const OutlineInputBorder(
           borderSide: BorderSide(color: Colors.white),
         ),
-        focusedBorder: OutlineInputBorder(
+        focusedBorder: const OutlineInputBorder(
           borderSide: BorderSide(color: AppColors.primaryColor),
         ),
-        border: OutlineInputBorder(borderSide: BorderSide(color: Colors.white)),
+        border: const OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.white),
+        ),
       ),
     );
   }

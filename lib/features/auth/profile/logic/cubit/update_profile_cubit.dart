@@ -8,7 +8,7 @@ import 'package:hungry_app/features/auth/profile/logic/cubit/update_profile_stat
 class UpdateProfileCubit extends Cubit<UpdateProfileState> {
   final UpdateProfileRepo updateProfileRepo;
   UpdateProfileCubit(this.updateProfileRepo)
-    : super(UpdateProfileState.initial());
+    : super(const UpdateProfileState.initial());
 
   Future<void> updateProfile({
     required String name,
@@ -17,7 +17,7 @@ class UpdateProfileCubit extends Cubit<UpdateProfileState> {
     required String visa,
     File? image,
   }) async {
-    emit(UpdateProfileState.loading());
+    emit(const UpdateProfileState.loading());
 
     try {
       final response = await updateProfileRepo.updateProfile(

@@ -6,7 +6,7 @@ import 'package:hungry_app/features/cart/logic/getCart/get_cart_state.dart';
 
 class GetCartCubit extends Cubit<GetCartState> {
   final CartRepo cartRepo;
-  GetCartCubit(this.cartRepo) : super(GetCartState.initial());
+  GetCartCubit(this.cartRepo) : super(const GetCartState.initial());
 
   CartItemsData? cartItemsData;
   bool _hasLoadedData = false;
@@ -17,7 +17,7 @@ class GetCartCubit extends Cubit<GetCartState> {
       return;
     }
 
-    emit(GetCartState.loading());
+    emit(const GetCartState.loading());
     try {
       final response = await cartRepo.myCart();
       response.when(
@@ -40,6 +40,6 @@ class GetCartCubit extends Cubit<GetCartState> {
   void clearCache() {
     cartItemsData = null;
     _hasLoadedData = false;
-    emit(GetCartState.initial());
+    emit(const GetCartState.initial());
   }
 }

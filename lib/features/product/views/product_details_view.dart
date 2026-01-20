@@ -68,7 +68,7 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: Icon(Icons.arrow_back, fontWeight: FontWeight.bold),
+          icon: const Icon(Icons.arrow_back, fontWeight: FontWeight.bold),
         ),
       ),
       body: Padding(
@@ -85,14 +85,14 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                   });
                 },
               ),
-              Gap(20),
-              CustomText(
+              const Gap(20),
+              const CustomText(
                 text: "Toppings",
                 color: Color(0xff3C2F2F),
                 fontWeight: FontWeight.w600,
                 fontsize: 18,
               ),
-              Gap(15),
+              const Gap(15),
 
               BlocBuilder<ToppingsCubit, ToppingState.ToppingsState>(
                 builder: (context, state) {
@@ -111,14 +111,14 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                 },
               ),
 
-              Gap(30),
-              CustomText(
+              const Gap(30),
+              const CustomText(
                 text: "Side Options",
                 color: Color(0xff3C2F2F),
                 fontWeight: FontWeight.w600,
                 fontsize: 18,
               ),
-              Gap(15),
+              const Gap(15),
 
               BlocBuilder<SideOptionsCubit, SideState.SideOptionsState>(
                 builder: (context, state) {
@@ -137,7 +137,7 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                 },
               ),
 
-              Gap(120),
+              const Gap(120),
             ],
           ),
         ),
@@ -145,7 +145,7 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
       bottomSheet: Container(
         height: 100,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.only(
+          borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),
           ),
@@ -160,14 +160,14 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Gap(13),
-                  CustomText(
+                  const Gap(13),
+                  const CustomText(
                     text: "Total",
                     color: Colors.black,
                     fontWeight: FontWeight.w600,
                     fontsize: 14,
                   ),
-                  Gap(10),
+                  const Gap(10),
                   CustomText(
                     text: "\$ ${widget.price}",
                     color: Colors.black,

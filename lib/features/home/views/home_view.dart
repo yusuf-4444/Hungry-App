@@ -46,7 +46,7 @@ class _HomeViewState extends State<HomeView> {
                   onPressed: () {
                     context.read<FoodCubit>().refreshFood();
                   },
-                  child: Text("Retry"),
+                  child: const Text("Retry"),
                 ),
               ],
             ),
@@ -83,9 +83,9 @@ class _HomeViewState extends State<HomeView> {
                         toolbarHeight: 230,
                         flexibleSpace: Column(
                           children: [
-                            Gap(25),
-                            HeaderProfile(),
-                            Gap(20),
+                            const Gap(25),
+                            const HeaderProfile(),
+                            const Gap(20),
                             SearchHome(
                               onChanged: (v) {
                                 filterFood = foods.where((food) {
@@ -96,7 +96,7 @@ class _HomeViewState extends State<HomeView> {
                                 setState(() {});
                               },
                             ),
-                            Gap(20),
+                            const Gap(20),
                             CustomHomeCategory(
                               category: category,
                               selectedIndex: selectedIndex,
@@ -127,7 +127,7 @@ class _HomeViewState extends State<HomeView> {
                           childCount: isLoading ? 6 : filterFood.length,
                           (context, index) {
                             if (isLoading) {
-                              return CustomFoodHomeWidget(
+                              return const CustomFoodHomeWidget(
                                 image:
                                     "https://sonic-zdi0.onrender.com/storage/products/cheeseburger.jpg",
                                 title: "Loading...",
@@ -168,12 +168,13 @@ class _HomeViewState extends State<HomeView> {
                             }
                           },
                         ),
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          mainAxisSpacing: 10,
-                          crossAxisSpacing: 10,
-                          childAspectRatio: 0.67,
-                        ),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              mainAxisSpacing: 10,
+                              crossAxisSpacing: 10,
+                              childAspectRatio: 0.67,
+                            ),
                       ),
                     ],
                   ),

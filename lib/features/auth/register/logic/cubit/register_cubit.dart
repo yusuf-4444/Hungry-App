@@ -5,14 +5,14 @@ import 'package:hungry_app/features/auth/register/logic/cubit/register_state.dar
 
 class RegisterCubit extends Cubit<RegisterState> {
   final RegisterRepo registerRepo;
-  RegisterCubit(this.registerRepo) : super(RegisterState.initial());
+  RegisterCubit(this.registerRepo) : super(const RegisterState.initial());
 
   Future<void> register({
     required String name,
     required String email,
     required String password,
   }) async {
-    emit(RegisterState.loading());
+    emit(const RegisterState.loading());
     try {
       final response = await registerRepo.register(
         name: name,

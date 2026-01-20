@@ -40,20 +40,20 @@ class _SigninViewState extends State<SigninView> {
             key: globalKey,
             child: Column(
               children: [
-                Gap(150),
+                const Gap(150),
                 SvgPicture.asset(
                   "assets/logo/Hungry_.svg",
                   color: AppColors.primaryColor,
                 ),
-                Gap(7),
-                CustomText(
+                const Gap(7),
+                const CustomText(
                   text: "Welcome Back, Discover The Fast Food",
                   color: AppColors.primaryColor,
                 ),
-                Gap(100),
+                const Gap(100),
                 Expanded(
                   child: Container(
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: AppColors.primaryColor,
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(20),
@@ -65,19 +65,19 @@ class _SigninViewState extends State<SigninView> {
                       child: SingleChildScrollView(
                         child: Column(
                           children: [
-                            Gap(20),
+                            const Gap(20),
                             CustomTextField(
                               controller: _emailAddress,
                               hintText: "Email Address",
                               isPassword: false,
                             ),
-                            Gap(20),
+                            const Gap(20),
                             CustomTextField(
                               controller: _password,
                               hintText: "Password",
                               isPassword: true,
                             ),
-                            Gap(30),
+                            const Gap(30),
                             BlocConsumer<LoginCubit, LoginState>(
                               listener: (context, state) {
                                 state.whenOrNull(
@@ -92,7 +92,7 @@ class _SigninViewState extends State<SigninView> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) {
-                                          return Root();
+                                          return const Root();
                                         },
                                       ),
                                     );
@@ -110,7 +110,7 @@ class _SigninViewState extends State<SigninView> {
                               builder: (context, state) {
                                 final cubit = context.read<LoginCubit>();
                                 if (state is Loading) {
-                                  return CupertinoActivityIndicator(
+                                  return const CupertinoActivityIndicator(
                                     color: Colors.white,
                                   );
                                 }
@@ -129,7 +129,7 @@ class _SigninViewState extends State<SigninView> {
                                 );
                               },
                             ),
-                            Gap(10),
+                            const Gap(10),
                             CustomAuthButton(
                               isBackgroudnGreen: false,
                               color: Colors.white,
@@ -142,26 +142,26 @@ class _SigninViewState extends State<SigninView> {
                                       return BlocProvider(
                                         create: (context) =>
                                             getIt<RegisterCubit>(),
-                                        child: SignupView(),
+                                        child: const SignupView(),
                                       );
                                     },
                                   ),
                                 );
                               },
                             ),
-                            Gap(10),
+                            const Gap(10),
                             TextButton(
                               onPressed: () {
                                 Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) {
-                                      return Root();
+                                      return const Root();
                                     },
                                   ),
                                 );
                               },
-                              child: CustomText(
+                              child: const CustomText(
                                 text: "Continue as a Guest ?",
                                 color: Colors.white,
                               ),

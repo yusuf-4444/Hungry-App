@@ -81,7 +81,7 @@ class _ProfileViewState extends State<ProfileView> {
             onRefresh: () async {
               await context.read<ProfileCubit>().getProfile();
             },
-            child: Center(
+            child: const Center(
               child: Text("internal Server Error.. please Try again later"),
             ),
           );
@@ -100,23 +100,23 @@ class _ProfileViewState extends State<ProfileView> {
                 actions: [
                   IconButton(
                     onPressed: () {},
-                    icon: Icon(Icons.settings, color: Colors.white),
+                    icon: const Icon(Icons.settings, color: Colors.white),
                   ),
                 ],
                 backgroundColor: AppColors.primaryColor,
                 leading: IconButton(
                   onPressed: () {},
-                  icon: Icon(Icons.arrow_back, color: Colors.white),
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
                 ),
               ),
 
               body: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15.0),
                 child: SingleChildScrollView(
-                  physics: BouncingScrollPhysics(),
+                  physics: const BouncingScrollPhysics(),
                   child: Column(
                     children: [
-                      Gap(10),
+                      const Gap(10),
                       Center(
                         child: Container(
                           height: 120,
@@ -151,7 +151,7 @@ class _ProfileViewState extends State<ProfileView> {
                           ),
                         ),
                       ),
-                      Gap(10),
+                      const Gap(10),
                       CustomMainButton(
                         onPressed: () {
                           uploadImage();
@@ -165,38 +165,38 @@ class _ProfileViewState extends State<ProfileView> {
                         fontSize: 12,
                         width: 200,
                       ),
-                      Gap(10),
+                      const Gap(10),
                       CustomTextFormField(controller: _name, labelText: 'Name'),
-                      Gap(20),
+                      const Gap(20),
                       CustomTextFormField(
                         controller: _email,
                         labelText: 'Email',
                       ),
-                      Gap(20),
+                      const Gap(20),
                       CustomTextFormField(
                         controller: _address,
                         labelText: 'Delivary Address',
                       ),
-                      Gap(20),
+                      const Gap(20),
 
-                      Gap(20),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      const Gap(20),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 20.0),
                         child: Divider(),
                       ),
-                      Gap(20),
+                      const Gap(20),
                       CustomTextFormField(
                         textInputType: TextInputType.number,
                         controller: _visa,
                         labelText: visa == "" ? "Add Visa" : 'Edit Visa',
                       ),
 
-                      Gap(20),
+                      const Gap(20),
 
                       visa == ""
-                          ? SizedBox.shrink()
+                          ? const SizedBox.shrink()
                           : ListTile(
-                              contentPadding: EdgeInsets.symmetric(
+                              contentPadding: const EdgeInsets.symmetric(
                                 vertical: 6,
                                 horizontal: 16,
                               ),
@@ -208,7 +208,7 @@ class _ProfileViewState extends State<ProfileView> {
                                 "assets/profileIcons/image 13.png",
                               ),
                               horizontalTitleGap: 30,
-                              title: CustomText(
+                              title: const CustomText(
                                 text: "Debit card",
                                 color: Colors.black,
                                 fontWeight: FontWeight.w700,
@@ -220,19 +220,19 @@ class _ProfileViewState extends State<ProfileView> {
                                     : "3566 **** **** 0505",
                                 color: Colors.black,
                               ),
-                              trailing: CustomText(
+                              trailing: const CustomText(
                                 text: "Default",
                                 color: Colors.black,
                               ),
                             ),
-                      Gap(100),
+                      const Gap(100),
                     ],
                   ),
                 ),
               ),
               bottomSheet: Container(
                 height: 70,
-                decoration: BoxDecoration(color: Colors.white),
+                decoration: const BoxDecoration(color: Colors.white),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -264,7 +264,7 @@ class _ProfileViewState extends State<ProfileView> {
                           setState(() {});
                         }
 
-                        Future.delayed(Duration(seconds: 5), () {
+                        Future.delayed(const Duration(seconds: 5), () {
                           context.read<ProfileCubit>().getProfile(
                             forceRefresh: true,
                           );
@@ -295,8 +295,8 @@ class _ProfileViewState extends State<ProfileView> {
                                 text: editProfile,
                                 color: Colors.white,
                               ),
-                              Gap(10),
-                              Icon(Icons.edit, color: Colors.white),
+                              const Gap(10),
+                              const Icon(Icons.edit, color: Colors.white),
                             ],
                           ),
                         ),
@@ -316,7 +316,7 @@ class _ProfileViewState extends State<ProfileView> {
                           context,
                           MaterialPageRoute(
                             builder: (context) {
-                              return SigninView();
+                              return const SigninView();
                             },
                           ),
                         );
@@ -327,8 +327,8 @@ class _ProfileViewState extends State<ProfileView> {
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(color: Colors.black),
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(
                             horizontal: 20,
                             vertical: 10,
                           ),

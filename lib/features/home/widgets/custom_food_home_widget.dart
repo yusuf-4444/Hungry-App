@@ -26,7 +26,7 @@ class CustomFoodHomeWidget extends StatelessWidget {
       color: Colors.white,
       child: Column(
         children: [
-          Gap(10),
+          const Gap(10),
           Stack(
             children: [
               Positioned(
@@ -49,7 +49,7 @@ class CustomFoodHomeWidget extends StatelessWidget {
               ),
             ],
           ),
-          Gap(10),
+          const Gap(10),
           Align(
             alignment: Alignment.centerLeft,
             child: Padding(
@@ -60,11 +60,11 @@ class CustomFoodHomeWidget extends StatelessWidget {
                   CustomText(
                     maxLines: 1,
                     text: title,
-                    color: Color(0xff3C2F2F),
+                    color: const Color(0xff3C2F2F),
                     fontsize: 15.5,
                     fontWeight: FontWeight.w600,
                   ),
-                  Gap(5),
+                  const Gap(5),
                   Padding(
                     padding: const EdgeInsets.only(right: 5),
                     child: CustomText(
@@ -73,20 +73,20 @@ class CustomFoodHomeWidget extends StatelessWidget {
                       maxLines: 2,
                     ),
                   ),
-                  Gap(10),
+                  const Gap(10),
                   Row(
                     children: [
                       SvgPicture.asset("assets/homeIcons/star.svg"),
-                      Gap(5),
+                      const Gap(5),
                       CustomText(
                         text: ratings.toString(),
-                        color: Color(0xff3C2F2F),
+                        color: const Color(0xff3C2F2F),
                         fontWeight: FontWeight.w600,
                         fontsize: 16,
                       ),
-                      Spacer(),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      const Spacer(),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10.0),
                         child: Icon(
                           Icons.favorite,
                           color: AppColors.primaryColor,

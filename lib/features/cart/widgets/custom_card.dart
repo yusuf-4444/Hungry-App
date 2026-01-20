@@ -111,8 +111,8 @@ class _CustomCardState extends State<CustomCard> {
                           color: AppColors.primaryColor,
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(
                             horizontal: 15,
                             vertical: 5,
                           ),
@@ -139,8 +139,8 @@ class _CustomCardState extends State<CustomCard> {
                           color: AppColors.primaryColor,
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(
                             horizontal: 15,
                             vertical: 5,
                           ),

@@ -6,10 +6,10 @@ import 'package:hungry_app/features/cart/logic/deleteItem/delete_item_state.dart
 class DeleteItemCubit extends Cubit<DeleteItemState> {
   final DeleteItemRepo deleteItemRepo;
 
-  DeleteItemCubit(this.deleteItemRepo) : super(DeleteItemState.initial());
+  DeleteItemCubit(this.deleteItemRepo) : super(const DeleteItemState.initial());
 
   Future<void> deleteItem(int id) async {
-    emit(DeleteItemState.loading());
+    emit(const DeleteItemState.loading());
     try {
       final response = await deleteItemRepo.deleteItem(id);
       response.when(

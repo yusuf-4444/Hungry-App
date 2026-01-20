@@ -5,10 +5,10 @@ import 'package:hungry_app/features/auth/login/logic/cubit/login_state.dart';
 
 class LoginCubit extends Cubit<LoginState> {
   final LoginRepo loginRepo;
-  LoginCubit(this.loginRepo) : super(LoginState.initial());
+  LoginCubit(this.loginRepo) : super(const LoginState.initial());
 
   Future<void> login({required String email, required String password}) async {
-    emit(LoginState.loading());
+    emit(const LoginState.loading());
 
     try {
       final response = await loginRepo.login(email: email, password: password);

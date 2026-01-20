@@ -6,7 +6,7 @@ import 'package:hungry_app/features/home/logic/cubit/food_state.dart';
 
 class FoodCubit extends Cubit<FoodState> {
   final FoodRepo foodRepo;
-  FoodCubit(this.foodRepo) : super(FoodState.initial());
+  FoodCubit(this.foodRepo) : super(const FoodState.initial());
 
   List<Data> food = [];
   bool _hasLoadedData = false;
@@ -17,7 +17,7 @@ class FoodCubit extends Cubit<FoodState> {
       return;
     }
 
-    emit(FoodState.loading());
+    emit(const FoodState.loading());
     try {
       final response = await foodRepo.getFoods();
       response.when(

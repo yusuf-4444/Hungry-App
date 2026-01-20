@@ -6,10 +6,10 @@ import 'package:hungry_app/features/cart/logic/addToCartCubit/add_to_cart_state.
 
 class AddToCartCubit extends Cubit<AddToCartState> {
   final AddToCartRepo addToCartRepo;
-  AddToCartCubit(this.addToCartRepo) : super(AddToCartState.initial());
+  AddToCartCubit(this.addToCartRepo) : super(const AddToCartState.initial());
 
   Future<void> addToCart(CartItems cartData) async {
-    emit(AddToCartState.loading());
+    emit(const AddToCartState.loading());
     try {
       final response = await addToCartRepo.addToCart(cartData);
       response.when(

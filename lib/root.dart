@@ -25,7 +25,12 @@ class _RootState extends State<Root> {
   @override
   void initState() {
     super.initState();
-    screens = [HomeView(), CartView(), OrderHistroyView(), ProfileView()];
+    screens = [
+      const HomeView(),
+      const CartView(),
+      const OrderHistroyView(),
+      const ProfileView(),
+    ];
   }
 
   @override
@@ -38,8 +43,8 @@ class _RootState extends State<Root> {
       child: Scaffold(
         body: IndexedStack(index: currentPage, children: screens),
         bottomNavigationBar: Container(
-          padding: EdgeInsets.all(10),
-          decoration: BoxDecoration(
+          padding: const EdgeInsets.all(10),
+          decoration: const BoxDecoration(
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(30),
               topRight: Radius.circular(30),
@@ -58,7 +63,7 @@ class _RootState extends State<Root> {
             currentIndex: currentPage,
             type: BottomNavigationBarType.fixed,
 
-            items: [
+            items: const [
               BottomNavigationBarItem(
                 icon: Icon(CupertinoIcons.home),
                 label: "Home",

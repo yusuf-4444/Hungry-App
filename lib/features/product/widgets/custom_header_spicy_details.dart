@@ -30,10 +30,10 @@ class _CustomHeaderSpicyDetailsState extends State<CustomHeaderSpicyDetails> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Image.asset("assets/details/sandwitch_detail.png", height: 220),
-        Spacer(),
+        const Spacer(),
         Column(
           children: [
-            Text.rich(
+            const Text.rich(
               TextSpan(
                 children: [
                   TextSpan(
@@ -47,8 +47,8 @@ class _CustomHeaderSpicyDetailsState extends State<CustomHeaderSpicyDetails> {
                 ],
               ),
             ),
-            Gap(15),
-            Align(
+            const Gap(15),
+            const Align(
               alignment: Alignment.centerLeft,
               child: CustomText(
                 text: "Spicy",
@@ -63,7 +63,7 @@ class _CustomHeaderSpicyDetailsState extends State<CustomHeaderSpicyDetails> {
               value: widget.sliderValue,
               onChanged: widget.onChanged,
             ),
-            Row(children: [Text("🥶"), Gap(115), Text("🌶️")]),
+            const Row(children: [Text("🥶"), Gap(115), Text("🌶️")]),
           ],
         ),
       ],

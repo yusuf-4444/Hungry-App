@@ -5,10 +5,10 @@ import 'package:hungry_app/features/auth/logout/logic/cubit/logout_state.dart';
 
 class LogoutCubit extends Cubit<LogoutState> {
   final LogoutRepo logoutRepo;
-  LogoutCubit(this.logoutRepo) : super(LogoutState.initial());
+  LogoutCubit(this.logoutRepo) : super(const LogoutState.initial());
 
   Future<void> logout() async {
-    emit(LogoutState.loading());
+    emit(const LogoutState.loading());
 
     try {
       final response = await logoutRepo.logout();

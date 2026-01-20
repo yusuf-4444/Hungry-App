@@ -48,7 +48,7 @@ class _CustomHomeCategoryState extends State<CustomHomeCategory> {
                   decoration: BoxDecoration(
                     color: selectedIndex == index
                         ? AppColors.primaryColor
-                        : Color(0xffF3F4F6),
+                        : const Color(0xffF3F4F6),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Padding(

@@ -6,10 +6,10 @@ import 'package:hungry_app/features/checkout/logic/cubit/save_order_state.dart';
 
 class SaveOrderCubit extends Cubit<SaveOrderState> {
   final SaveOrderRepo saveOrderRepo;
-  SaveOrderCubit(this.saveOrderRepo) : super(SaveOrderState.initial());
+  SaveOrderCubit(this.saveOrderRepo) : super(const SaveOrderState.initial());
 
   Future<void> saveOrder(SaveOrder saveOrder) async {
-    emit(SaveOrderState.loading());
+    emit(const SaveOrderState.loading());
     try {
       final response = await saveOrderRepo.saveOrder(saveOrder);
       response.when(

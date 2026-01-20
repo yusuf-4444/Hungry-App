@@ -16,7 +16,7 @@ class OrderHistroyView extends StatelessWidget {
       body: ListView.builder(
         itemCount: 5,
         itemBuilder: (context, item) {
-          return CustomCardOrderHistory(
+          return const CustomCardOrderHistory(
             image: "assets/test/test.png",
             title: "HumBurger HumBurger",
             quantity: 3,

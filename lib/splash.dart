@@ -43,11 +43,11 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
               child: BlocBuilder<AutoLoginCubit, AutoLoginState>(
                 builder: (context, state) {
                   if (state is Authenticated) {
-                    return Root();
+                    return const Root();
                   } else if (state is UnAuthenticated) {
-                    return SigninView();
+                    return const SigninView();
                   } else {
-                    return SigninView();
+                    return const SigninView();
                   }
                 },
               ),

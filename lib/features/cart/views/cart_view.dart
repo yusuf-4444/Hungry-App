@@ -56,7 +56,7 @@ class _CartViewState extends State<CartView> {
                     onPressed: () {
                       context.read<GetCartCubit>().getCart();
                     },
-                    child: Text("Retry"),
+                    child: const Text("Retry"),
                   ),
                 ],
               ),
@@ -104,7 +104,7 @@ class _CartViewState extends State<CartView> {
                   right: 8,
                 ),
                 child: displayItems.isEmpty && !isLoading
-                    ? Center(
+                    ? const Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -160,11 +160,11 @@ class _CartViewState extends State<CartView> {
                       ),
               ),
               bottomSheet: (items.isEmpty && !isLoading)
-                  ? SizedBox()
+                  ? const SizedBox()
                   : Container(
                       height: 80,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.only(
+                        borderRadius: const BorderRadius.only(
                           topLeft: Radius.circular(20),
                           topRight: Radius.circular(20),
                         ),
@@ -181,14 +181,14 @@ class _CartViewState extends State<CartView> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Gap(13),
-                                CustomText(
+                                const Gap(13),
+                                const CustomText(
                                   text: "Total",
                                   color: Colors.black,
                                   fontWeight: FontWeight.w600,
                                   fontsize: 14,
                                 ),
-                                Gap(10),
+                                const Gap(10),
                                 CustomText(
                                   text: "\$ $checkoutPrice",
                                   color: Colors.black,

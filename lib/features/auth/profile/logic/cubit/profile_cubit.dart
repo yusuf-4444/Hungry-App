@@ -6,7 +6,7 @@ import 'package:hungry_app/features/auth/profile/models/profile_model.dart';
 
 class ProfileCubit extends Cubit<ProfileState> {
   final ProfileRepo profileRepo;
-  ProfileCubit(this.profileRepo) : super(ProfileState.initial());
+  ProfileCubit(this.profileRepo) : super(const ProfileState.initial());
 
   ProfileModel? cachedProfile;
   bool _hasLoadedData = false;
@@ -17,7 +17,7 @@ class ProfileCubit extends Cubit<ProfileState> {
       return;
     }
 
-    emit(ProfileState.loading());
+    emit(const ProfileState.loading());
 
     try {
       final response = await profileRepo.getProfile();
@@ -47,6 +47,6 @@ class ProfileCubit extends Cubit<ProfileState> {
   void clearCache() {
     cachedProfile = null;
     _hasLoadedData = false;
-    emit(ProfileState.initial());
+    emit(const ProfileState.initial());
   }
 }

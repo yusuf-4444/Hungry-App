@@ -22,17 +22,17 @@ class CustomOrderSummary extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 15.0),
       child: Column(
         children: [
-          Gap(15),
+          const Gap(15),
           customCheckout("Order", "\$ $order", false, false),
-          Gap(10),
+          const Gap(10),
           customCheckout("Taxes", "\$ $taxes", false, false),
-          Gap(10),
+          const Gap(10),
           customCheckout("Delivery Fees", "\$ $deliveryFees", false, false),
-          Gap(10),
-          Divider(),
-          Gap(15),
+          const Gap(10),
+          const Divider(),
+          const Gap(15),
           customCheckout("Total: ", "\$ $total", true, false),
-          Gap(20),
+          const Gap(20),
           customCheckout(
             "Estimated delivery time: ",
             "15 - 30 mins",
@@ -51,13 +51,13 @@ Widget customCheckout(text, price, isBold, isSmall) {
     children: [
       CustomText(
         text: text,
-        color: isBold ? Colors.black : Color(0xff7d7d7d),
+        color: isBold ? Colors.black : const Color(0xff7d7d7d),
         fontWeight: isBold ? FontWeight.w600 : FontWeight.w400,
         fontsize: isSmall ? 11 : 15,
       ),
       CustomText(
         text: price.toString(),
-        color: isBold ? Colors.black : Color(0xff7d7d7d),
+        color: isBold ? Colors.black : const Color(0xff7d7d7d),
         fontWeight: isBold ? FontWeight.w600 : FontWeight.w400,
         fontsize: isSmall ? 11 : 15,
       ),

@@ -6,7 +6,8 @@ import 'package:hungry_app/features/product/logic/cubit/toppings_state.dart';
 
 class ToppingsCubit extends Cubit<ToppingsState> {
   final ToppingsSideOptionsRepo toppingsSideOptionsRepo;
-  ToppingsCubit(this.toppingsSideOptionsRepo) : super(ToppingsState.initial());
+  ToppingsCubit(this.toppingsSideOptionsRepo)
+    : super(const ToppingsState.initial());
 
   bool _hasData = false;
   ToppingsModel? toppingSuccess;
@@ -16,7 +17,7 @@ class ToppingsCubit extends Cubit<ToppingsState> {
       emit(ToppingsState.success(toppingSuccess!));
       return;
     }
-    emit(ToppingsState.loading());
+    emit(const ToppingsState.loading());
     try {
       final response = await toppingsSideOptionsRepo.getToppings();
       response.when(

@@ -55,7 +55,7 @@ class _CustomToppingsSideOptionsWidgetState
                           height: 110,
                           width: 100,
                           decoration: BoxDecoration(
-                            color: Color(0xff3C2F2F),
+                            color: const Color(0xff3C2F2F),
                             borderRadius: BorderRadius.circular(15),
                           ),
                           child: Padding(
@@ -75,7 +75,7 @@ class _CustomToppingsSideOptionsWidgetState
                                   color: Colors.white,
                                   fontsize: 12,
                                 ),
-                                Spacer(),
+                                const Spacer(),
                                 Container(
                                   decoration: BoxDecoration(
                                     color: Colors.red,
@@ -96,7 +96,7 @@ class _CustomToppingsSideOptionsWidgetState
                         left: 0,
                         right: 0,
                         child: Container(
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.only(
                               bottomLeft: Radius.circular(15),

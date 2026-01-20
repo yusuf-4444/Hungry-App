@@ -7,7 +7,7 @@ import 'package:hungry_app/features/product/logic/cubit/side_options_state.dart'
 class SideOptionsCubit extends Cubit<SideOptionsState> {
   final ToppingsSideOptionsRepo toppingsSideOptionsRepo;
   SideOptionsCubit(this.toppingsSideOptionsRepo)
-    : super(SideOptionsState.initial());
+    : super(const SideOptionsState.initial());
 
   bool _hasLoadedData = false;
   SideOptionsModel? successModel;
@@ -17,7 +17,7 @@ class SideOptionsCubit extends Cubit<SideOptionsState> {
       emit(SideOptionsState.success(successModel!));
       return;
     }
-    emit(SideOptionsState.loading());
+    emit(const SideOptionsState.loading());
 
     try {
       final response = await toppingsSideOptionsRepo.getSideOptions();

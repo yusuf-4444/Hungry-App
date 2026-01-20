@@ -30,7 +30,7 @@ class CustomCardOrderHistory extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Image.asset("assets/test/test.png", width: 111, height: 102.18),
-                Column(
+                const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     CustomText(
@@ -45,7 +45,7 @@ class CustomCardOrderHistory extends StatelessWidget {
                 ),
               ],
             ),
-            Gap(10),
+            const Gap(10),
             CustomMainButton(
               text: "Order Again",
               fontSize: 15,

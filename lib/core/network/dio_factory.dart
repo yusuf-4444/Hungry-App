@@ -7,7 +7,7 @@ class DioFactory {
 
   static Dio? dio;
   static Dio getDio() {
-    Duration timeOut = Duration(seconds: 120);
+    Duration timeOut = const Duration(seconds: 120);
     if (dio == null) {
       dio = Dio();
       dio!..options.connectTimeout = timeOut;
