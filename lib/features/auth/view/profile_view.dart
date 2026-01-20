@@ -1,14 +1,22 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:hungry_app/core/constants/app_colors.dart';
+import 'package:hungry_app/core/network/pref_helper.dart';
+import 'package:hungry_app/features/auth/logout/logic/cubit/logout_cubit.dart';
+import 'package:hungry_app/features/auth/profile/logic/cubit/profile_cubit.dart';
+import 'package:hungry_app/features/auth/profile/logic/cubit/profile_state.dart';
+import 'package:hungry_app/features/auth/profile/logic/cubit/update_profile_cubit.dart';
+import 'package:hungry_app/features/auth/profile/models/profile_model.dart';
 import 'package:hungry_app/features/auth/view/signin_view.dart';
 import 'package:hungry_app/features/auth/widgets/custom_text_form_field.dart';
 import 'package:hungry_app/shared/custom_main_button.dart';
 import 'package:hungry_app/shared/custom_snack_bar.dart';
 import 'package:hungry_app/shared/custom_text.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -23,20 +31,27 @@ class _ProfileViewState extends State<ProfileView> {
   final TextEditingController _address = TextEditingController();
   final TextEditingController _visa = TextEditingController();
 
-  String? _selectedImageUrl;
-  File? _selectedImageFile;
+  ProfileModel? profileModel;
+
+  String? image;
   String visa = "";
   String editProfile = "Edit Profile";
-  bool _isLoading = false;
+
+  String? _selectedImageUrl;
+  File? _selectedImageFile;
 
   Future<void> uploadImage() async {
     final image = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (image != null) {
-      setState(() {
-        _selectedImageFile = File(image.path);
-        _selectedImageUrl = null;
-      });
+      _selectedImageFile = File(image.path);
+      _selectedImageUrl = null;
+      setState(() {});
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   String _formatVisaNumber(String visa) {
@@ -57,274 +72,300 @@ class _ProfileViewState extends State<ProfileView> {
     }
   }
 
-  Future<void> _editProfile() async {
-    setState(() {
-      _isLoading = true;
-      editProfile = "Editing...";
-    });
-
-    try {
-      // TODO: هنا هتتعامل مع الـ API مباشرة
-      await Future.delayed(const Duration(seconds: 2)); // Simulate API call
-
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(CustomSnackBar("Updated Successfully", Colors.white));
-    } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(CustomSnackBar("Update failed", Colors.red));
-    } finally {
-      setState(() {
-        _isLoading = false;
-        editProfile = "Edit Profile";
-      });
-    }
-  }
-
-  Future<void> _logout() async {
-    // TODO: هنا هتتعامل مع الـ logout API مباشرة
-    await Future.delayed(const Duration(seconds: 1)); // Simulate API call
-
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(CustomSnackBar("LOGGED OUT SUCCESSFULLY", Colors.white));
-
-    // TODO: هنا هتشيل التوكن من الـ SharedPreferences
-    // PrefHelper.removeToken();
-
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const SigninView()),
-    );
-  }
-
-  Future<void> _loadProfileData() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      // TODO: هنا هتجيب البيانات من الـ API مباشرة
-      await Future.delayed(const Duration(seconds: 2)); // Simulate API call
-
-      // Sample data - replace with actual API response
-      _name.text = "John Doe";
-      _email.text = "john@example.com";
-      _address.text = "123 Main Street, Cairo";
-      _visa.text = "1234567890123456";
-      visa = _visa.text;
-      _selectedImageUrl = "https://example.com/profile.jpg";
-      _selectedImageFile = null;
-    } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(CustomSnackBar("Failed to load profile", Colors.red));
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _loadProfileData();
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.primaryColor,
-      appBar: AppBar(
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.settings, color: Colors.white),
-          ),
-        ],
-        backgroundColor: AppColors.primaryColor,
-        leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-        ),
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: Colors.white))
-          : Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15.0),
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                child: Column(
-                  children: [
-                    const Gap(10),
-                    Center(
-                      child: Container(
-                        height: 120,
-                        width: 120,
-                        decoration: BoxDecoration(
-                          border: Border.all(width: 3, color: Colors.white),
-                          shape: BoxShape.circle,
+    return BlocConsumer<ProfileCubit, ProfileState>(
+      builder: (context, state) {
+        if (state is Failure) {
+          return RefreshIndicator(
+            onRefresh: () async {
+              await context.read<ProfileCubit>().getProfile();
+            },
+            child: const Center(
+              child: Text("internal Server Error.. please Try again later"),
+            ),
+          );
+        }
+
+        final isLoading = state is Loading;
+        return Skeletonizer(
+          enabled: isLoading,
+          child: RefreshIndicator(
+            onRefresh: () async {
+              await context.read<ProfileCubit>().getProfile();
+            },
+            child: Scaffold(
+              backgroundColor: AppColors.primaryColor,
+              appBar: AppBar(
+                actions: [
+                  IconButton(
+                    onPressed: () {},
+                    icon: const Icon(Icons.settings, color: Colors.white),
+                  ),
+                ],
+                backgroundColor: AppColors.primaryColor,
+                leading: IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                ),
+              ),
+
+              body: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: Column(
+                    children: [
+                      const Gap(10),
+                      Center(
+                        child: Container(
+                          height: 120,
+                          width: 120,
+                          decoration: BoxDecoration(
+                            border: Border.all(width: 3, color: Colors.white),
+                            shape: BoxShape.circle,
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(60),
+                            child: _selectedImageFile != null
+                                ? Image.file(
+                                    _selectedImageFile!,
+                                    fit: BoxFit.cover,
+                                  )
+                                : (_selectedImageUrl != null &&
+                                      _selectedImageUrl!.isNotEmpty)
+                                ? Image.network(
+                                    _selectedImageUrl!,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Image.network(
+                                        "https://tse4.mm.bing.net/th/id/OIP.hGSCbXlcOjL_9mmzerqAbQHaHa?pid=Api&P=0&h=220",
+                                        fit: BoxFit.cover,
+                                      );
+                                    },
+                                  )
+                                : Image.network(
+                                    "https://tse4.mm.bing.net/th/id/OIP.hGSCbXlcOjL_9mmzerqAbQHaHa?pid=Api&P=0&h=220",
+                                    fit: BoxFit.cover,
+                                  ),
+                          ),
                         ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(60),
-                          child: _selectedImageFile != null
-                              ? Image.file(
-                                  _selectedImageFile!,
-                                  fit: BoxFit.cover,
-                                )
-                              : (_selectedImageUrl != null &&
-                                    _selectedImageUrl!.isNotEmpty)
-                              ? Image.network(
-                                  _selectedImageUrl!,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Image.network(
-                                      "https://tse4.mm.bing.net/th/id/OIP.hGSCbXlcOjL_9mmzerqAbQHaHa?pid=Api&P=0&h=220",
-                                      fit: BoxFit.cover,
-                                    );
-                                  },
-                                )
-                              : Image.network(
-                                  "https://tse4.mm.bing.net/th/id/OIP.hGSCbXlcOjL_9mmzerqAbQHaHa?pid=Api&P=0&h=220",
-                                  fit: BoxFit.cover,
-                                ),
+                      ),
+                      const Gap(10),
+                      CustomMainButton(
+                        onPressed: () {
+                          uploadImage();
+                        },
+                        text:
+                            _selectedImageFile == null &&
+                                (_selectedImageUrl == null ||
+                                    _selectedImageUrl!.isEmpty)
+                            ? "Upload Image"
+                            : "Change Image",
+                        fontSize: 12,
+                        width: 200,
+                      ),
+                      const Gap(10),
+                      CustomTextFormField(controller: _name, labelText: 'Name'),
+                      const Gap(20),
+                      CustomTextFormField(
+                        controller: _email,
+                        labelText: 'Email',
+                      ),
+                      const Gap(20),
+                      CustomTextFormField(
+                        controller: _address,
+                        labelText: 'Delivary Address',
+                      ),
+                      const Gap(20),
+
+                      const Gap(20),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 20.0),
+                        child: Divider(),
+                      ),
+                      const Gap(20),
+                      CustomTextFormField(
+                        textInputType: TextInputType.number,
+                        controller: _visa,
+                        labelText: visa == "" ? "Add Visa" : 'Edit Visa',
+                      ),
+
+                      const Gap(20),
+
+                      visa == ""
+                          ? const SizedBox.shrink()
+                          : ListTile(
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 6,
+                                horizontal: 16,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadiusGeometry.circular(14),
+                              ),
+                              tileColor: Colors.white,
+                              leading: Image.asset(
+                                "assets/profileIcons/image 13.png",
+                              ),
+                              horizontalTitleGap: 30,
+                              title: const CustomText(
+                                text: "Debit card",
+                                color: Colors.black,
+                                fontWeight: FontWeight.w700,
+                                fontsize: 14,
+                              ),
+                              subtitle: CustomText(
+                                text: visa.isNotEmpty
+                                    ? _formatVisaNumber(visa)
+                                    : "3566 **** **** 0505",
+                                color: Colors.black,
+                              ),
+                              trailing: const CustomText(
+                                text: "Default",
+                                color: Colors.black,
+                              ),
+                            ),
+                      const Gap(100),
+                    ],
+                  ),
+                ),
+              ),
+              bottomSheet: Container(
+                height: 70,
+                decoration: const BoxDecoration(color: Colors.white),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    GestureDetector(
+                      onTap: () async {
+                        if (_selectedImageFile != null) {
+                          editProfile = "Editing...";
+                          await context
+                              .read<UpdateProfileCubit>()
+                              .updateProfile(
+                                name: _name.text,
+                                email: _email.text,
+                                delivaryAddress: _address.text,
+                                visa: _visa.text,
+                                image: _selectedImageFile,
+                              );
+                          setState(() {});
+                        } else {
+                          editProfile = "Editing...";
+                          await context
+                              .read<UpdateProfileCubit>()
+                              .updateProfile(
+                                name: _name.text,
+                                email: _email.text,
+                                delivaryAddress: _address.text,
+                                visa: _visa.text,
+                                image: null,
+                              );
+                          setState(() {});
+                        }
+
+                        Future.delayed(const Duration(seconds: 5), () {
+                          context.read<ProfileCubit>().getProfile(
+                            forceRefresh: true,
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            CustomSnackBar(
+                              "Updated Successfully",
+                              Colors.white,
+                            ),
+                          );
+                        });
+                        editProfile = "Edit Profile";
+
+                        setState(() {});
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryColor,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 10,
+                          ),
+                          child: Row(
+                            children: [
+                              CustomText(
+                                text: editProfile,
+                                color: Colors.white,
+                              ),
+                              const Gap(10),
+                              const Icon(Icons.edit, color: Colors.white),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                    const Gap(10),
-                    CustomMainButton(
-                      onPressed: uploadImage,
-                      text:
-                          _selectedImageFile == null &&
-                              (_selectedImageUrl == null ||
-                                  _selectedImageUrl!.isEmpty)
-                          ? "Upload Image"
-                          : "Change Image",
-                      fontSize: 12,
-                      width: 200,
-                    ),
-                    const Gap(10),
-                    CustomTextFormField(controller: _name, labelText: 'Name'),
-                    const Gap(20),
-                    CustomTextFormField(controller: _email, labelText: 'Email'),
-                    const Gap(20),
-                    CustomTextFormField(
-                      controller: _address,
-                      labelText: 'Delivery Address',
-                    ),
-                    const Gap(20),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20.0),
-                      child: Divider(color: Colors.white),
-                    ),
-                    const Gap(20),
-                    CustomTextFormField(
-                      textInputType: TextInputType.number,
-                      controller: _visa,
-                      labelText: visa.isEmpty ? "Add Visa" : 'Edit Visa',
-                    ),
-                    const Gap(20),
-                    visa.isEmpty
-                        ? const SizedBox.shrink()
-                        : ListTile(
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical: 6,
-                              horizontal: 16,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadiusGeometry.circular(14),
-                            ),
-                            tileColor: Colors.white,
-                            leading: Image.asset(
-                              "assets/profileIcons/image_13.png", // Fixed asset path
-                              width: 40,
-                              height: 40,
-                            ),
-                            horizontalTitleGap: 30,
-                            title: const CustomText(
-                              text: "Debit card",
-                              color: Colors.black,
-                              fontWeight: FontWeight.w700,
-                              fontsize: 14,
-                            ),
-                            subtitle: CustomText(
-                              text: visa.isNotEmpty
-                                  ? _formatVisaNumber(visa)
-                                  : "3566 **** **** 0505",
-                              color: Colors.black,
-                            ),
-                            trailing: const CustomText(
-                              text: "Default",
-                              color: Colors.black,
-                            ),
+                    GestureDetector(
+                      onTap: () async {
+                        await context.read<LogoutCubit>().logout();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          CustomSnackBar(
+                            "LOGGED OUT SUCCESSFULLY",
+                            Colors.white,
                           ),
-                    const Gap(100),
+                        );
+                        PrefHelper.removeToken();
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return const SigninView();
+                            },
+                          ),
+                        );
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.black),
+                        ),
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 10,
+                          ),
+                          child: Row(
+                            children: [
+                              CustomText(text: "Logout", color: Colors.black),
+                              Gap(10),
+                              Icon(Icons.logout, color: Colors.black),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
-      bottomSheet: Container(
-        height: 70,
-        decoration: const BoxDecoration(color: Colors.white),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            GestureDetector(
-              onTap: _isLoading ? null : _editProfile,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: _isLoading ? Colors.grey : AppColors.primaryColor,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
-                  ),
-                  child: Row(
-                    children: [
-                      CustomText(text: editProfile, color: Colors.white),
-                      const Gap(10),
-                      _isLoading
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                          : const Icon(Icons.edit, color: Colors.white),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            GestureDetector(
-              onTap: _logout,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.black),
-                ),
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: Row(
-                    children: [
-                      CustomText(text: "Logout", color: Colors.black),
-                      Gap(10),
-                      Icon(Icons.logout, color: Colors.black),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
+      listener: (context, state) async {
+        if (state is Success) {
+          profileModel = state.data;
+          if (profileModel != null) {
+            _name.text = profileModel!.data.name;
+            _email.text = profileModel!.data.email;
+            _address.text = profileModel!.data.address ?? "none";
+            _visa.text = profileModel!.data.visa ?? "";
+            visa = _visa.text;
+            _selectedImageUrl = profileModel!.data.image?.toString();
+            _selectedImageFile = null;
+            if (mounted) {
+              setState(() {});
+            }
+          }
+        }
+      },
     );
   }
 }

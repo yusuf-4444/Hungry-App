@@ -7,7 +7,6 @@ import 'package:hungry_app/core/constants/app_colors.dart';
 import 'package:hungry_app/features/auth/profile/logic/cubit/profile_cubit.dart';
 import 'package:hungry_app/features/auth/profile/logic/cubit/profile_state.dart';
 import 'package:hungry_app/shared/custom_text.dart';
-import 'package:skeletonizer/skeletonizer.dart';
 
 class HeaderProfile extends StatefulWidget {
   const HeaderProfile({super.key});
@@ -17,9 +16,6 @@ class HeaderProfile extends StatefulWidget {
 }
 
 class _HeaderProfileState extends State<HeaderProfile> {
-  String username = "Guest";
-  String? image;
-
   @override
   void initState() {
     super.initState();
@@ -30,70 +26,101 @@ class _HeaderProfileState extends State<HeaderProfile> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<ProfileCubit, ProfileState>(
-      listener: (context, state) {
-        if (state is Success) {
-          setState(() {
-            username = state.data.data.name;
-            image = state.data.data.image;
-          });
-        }
-      },
+    return BlocBuilder<ProfileCubit, ProfileState>(
       builder: (context, state) {
-        return Skeletonizer(
-          enabled: state is Loading,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SvgPicture.asset(
-                    "assets/logo/Hungry_.svg",
-                    color: AppColors.primaryColor,
-                    height: 35,
-                  ),
-                  const Gap(5),
-                  CustomText(
-                    text: "Hello, $username",
-                    color: Colors.grey.shade600,
-                  ),
-                ],
-              ),
-              const Spacer(),
-              CircleAvatar(
-                radius: 25,
-                backgroundColor: AppColors.primaryColor,
-                child: image != null && image!.isNotEmpty
-                    ? ClipOval(
-                        child: Image.network(
-                          image!,
-                          width: 50,
-                          height: 50,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return const Icon(
-                              CupertinoIcons.person,
-                              color: Colors.white,
-                            );
-                          },
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return const CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                Colors.white,
-                              ),
-                            );
-                          },
-                        ),
-                      )
-                    : const Icon(CupertinoIcons.person, color: Colors.white),
-              ),
-            ],
-          ),
-        );
+        return _buildHeader(state);
       },
     );
+  }
+
+  Widget _buildHeader(ProfileState state) {
+    final username = _getUsername(state);
+    final imageUrl = _getImageUrl(state);
+    final isLoading = state is Loading;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildWelcomeSection(username),
+        const Spacer(),
+        _buildAvatar(imageUrl, isLoading),
+      ],
+    );
+  }
+
+  Widget _buildWelcomeSection(String username) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SvgPicture.asset(
+          "assets/logo/Hungry_.svg",
+          color: AppColors.primaryColor,
+          height: 35,
+        ),
+        const Gap(5),
+        CustomText(text: "Hello, $username", color: Colors.grey.shade600),
+      ],
+    );
+  }
+
+  Widget _buildAvatar(String? imageUrl, bool isLoading) {
+    return CircleAvatar(
+      radius: 25,
+      backgroundColor: AppColors.primaryColor,
+      child: _buildAvatarContent(imageUrl, isLoading),
+    );
+  }
+
+  Widget _buildAvatarContent(String? imageUrl, bool isLoading) {
+    if (isLoading) {
+      return const SizedBox(
+        width: 20,
+        height: 20,
+        child: CircularProgressIndicator(
+          strokeWidth: 2,
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+        ),
+      );
+    }
+
+    if (imageUrl != null && imageUrl.isNotEmpty) {
+      return ClipOval(
+        child: Image.network(
+          imageUrl,
+          width: 50,
+          height: 50,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => _buildDefaultIcon(),
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return const CircularProgressIndicator(
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            );
+          },
+        ),
+      );
+    }
+
+    return _buildDefaultIcon();
+  }
+
+  Widget _buildDefaultIcon() {
+    return const Icon(CupertinoIcons.person, color: Colors.white);
+  }
+
+  // Data Extractors
+  String _getUsername(ProfileState state) {
+    if (state is Success) {
+      return state.data.data.name;
+    }
+    return "Guest";
+  }
+
+  String? _getImageUrl(ProfileState state) {
+    if (state is Success) {
+      return state.data.data.image;
+    }
+    return null;
   }
 }

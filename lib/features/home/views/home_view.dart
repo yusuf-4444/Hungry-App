@@ -12,7 +12,6 @@ import 'package:hungry_app/features/home/widgets/custom_home_category.dart';
 import 'package:hungry_app/features/home/widgets/custom_home_search.dart';
 import 'package:hungry_app/features/home/widgets/header_profile_widget.dart';
 import 'package:hungry_app/features/product/views/product_details_view.dart';
-import 'package:skeletonizer/skeletonizer.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -22,168 +21,177 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  List category = ["All", "Combos", "Sliders", "classic"];
-  List<Data> filterFood = [];
-  int selectedIndex = 0;
+  final List<String> _categories = ["All", "Combos", "Sliders", "classic"];
+  List<Data> _filteredFood = [];
+  int _selectedCategoryIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<FoodCubit, FoodState>(
       builder: (context, state) {
-        final foods = context.read<FoodCubit>().food;
-        if (filterFood.isEmpty && foods.isNotEmpty) {
-          filterFood = foods;
-        }
-        final isLoading = state is Loading;
-
-        if (state is Failure && (foods.isEmpty)) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(state.error.toString()),
-                ElevatedButton(
-                  onPressed: () {
-                    context.read<FoodCubit>().refreshFood();
-                  },
-                  child: const Text("Retry"),
-                ),
-              ],
-            ),
-          );
-        }
-
-        return GestureDetector(
-          onTap: FocusScope.of(context).unfocus,
-          child: RefreshIndicator(
-            onRefresh: () async {
-              await context.read<FoodCubit>().refreshFood();
-              await context.read<ProfileCubit>().refreshProfile();
-            },
-            child: Skeletonizer(
-              enabled: isLoading,
-              child: Scaffold(
-                appBar: AppBar(
-                  toolbarHeight: 0,
-                  backgroundColor: Colors.white,
-                  elevation: 0,
-                  surfaceTintColor: Colors.white,
-                ),
-                body: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                  child: CustomScrollView(
-                    slivers: [
-                      SliverAppBar(
-                        backgroundColor: Colors.white,
-                        pinned: true,
-                        elevation: 0,
-                        automaticallyImplyLeading: false,
-                        surfaceTintColor: Colors.white,
-                        scrolledUnderElevation: 0,
-                        toolbarHeight: 230,
-                        flexibleSpace: Column(
-                          children: [
-                            const Gap(25),
-                            const HeaderProfile(),
-                            const Gap(20),
-                            SearchHome(
-                              onChanged: (v) {
-                                filterFood = foods.where((food) {
-                                  final title = food.name.toLowerCase();
-                                  final input = v.toLowerCase();
-                                  return title.contains(input);
-                                }).toList();
-                                setState(() {});
-                              },
-                            ),
-                            const Gap(20),
-                            CustomHomeCategory(
-                              category: category,
-                              selectedIndex: selectedIndex,
-                              onTap: (index) {
-                                // ✅ أضف index كمعامل
-                                setState(() {
-                                  selectedIndex =
-                                      index; // ✅ تحديث المؤشر المختار
-
-                                  if (index == 0) {
-                                    filterFood = foods;
-                                  } else {
-                                    String selectedCategory = category[index];
-                                    filterFood = foods.where((food) {
-                                      return food.name.contains(
-                                        selectedCategory.toLowerCase(),
-                                      );
-                                    }).toList();
-                                  }
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                      SliverGrid(
-                        delegate: SliverChildBuilderDelegate(
-                          childCount: isLoading ? 6 : filterFood.length,
-                          (context, index) {
-                            if (isLoading) {
-                              return const CustomFoodHomeWidget(
-                                image:
-                                    "https://sonic-zdi0.onrender.com/storage/products/cheeseburger.jpg",
-                                title: "Loading...",
-                                subtitle: "Loading...",
-                                ratings: 0.0,
-                              );
-                            } else {
-                              final food = filterFood[index];
-                              return GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) {
-                                        return MultiBlocProvider(
-                                          providers: [
-                                            BlocProvider(
-                                              create: (context) =>
-                                                  getIt<AddToCartCubit>(),
-                                            ),
-                                          ],
-                                          child: ProductDetailsView(
-                                            productId: food.id,
-                                            price: food.price,
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  );
-                                },
-                                child: CustomFoodHomeWidget(
-                                  image: food.image,
-                                  title: food.name,
-                                  subtitle: food.description,
-                                  ratings: double.parse(food.rating),
-                                ),
-                              );
-                            }
-                          },
-                        ),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              mainAxisSpacing: 10,
-                              crossAxisSpacing: 10,
-                              childAspectRatio: 0.67,
-                            ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
+        return _buildContent(state);
       },
+    );
+  }
+
+  Widget _buildContent(FoodState state) {
+    if (state is Failure && _filteredFood.isEmpty) {
+      return _buildErrorView(state.error);
+    }
+
+    final foods = context.read<FoodCubit>().food;
+    if (_filteredFood.isEmpty && foods.isNotEmpty) {
+      _filteredFood = foods;
+    }
+
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: RefreshIndicator(
+        onRefresh: _handleRefresh,
+        child: _buildScaffold(state is Loading, foods),
+      ),
+    );
+  }
+
+  Widget _buildErrorView(String error) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(error),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () => context.read<FoodCubit>().refreshFood(),
+            child: const Text("Retry"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildScaffold(bool isLoading, List<Data> foods) {
+    return Scaffold(
+      appBar: AppBar(
+        toolbarHeight: 0,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        surfaceTintColor: Colors.white,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 15.0),
+        child: CustomScrollView(
+          slivers: [_buildStickyHeader(), _buildFoodGrid(isLoading, foods)],
+        ),
+      ),
+    );
+  }
+
+  SliverAppBar _buildStickyHeader() {
+    return SliverAppBar(
+      backgroundColor: Colors.white,
+      pinned: true,
+      elevation: 0,
+      automaticallyImplyLeading: false,
+      surfaceTintColor: Colors.white,
+      scrolledUnderElevation: 0,
+      toolbarHeight: 230,
+      flexibleSpace: Column(
+        children: [
+          const Gap(25),
+          const HeaderProfile(),
+          const Gap(20),
+          SearchHome(onChanged: _handleSearch),
+          const Gap(20),
+          CustomHomeCategory(
+            category: _categories,
+            selectedIndex: _selectedCategoryIndex,
+            onTap: _handleCategorySelection,
+          ),
+        ],
+      ),
+    );
+  }
+
+  SliverGrid _buildFoodGrid(bool isLoading, List<Data> foods) {
+    return SliverGrid(
+      delegate: SliverChildBuilderDelegate(
+        childCount: isLoading ? 6 : _filteredFood.length,
+        (context, index) => _buildFoodItem(isLoading, index),
+      ),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 10,
+        crossAxisSpacing: 10,
+        childAspectRatio: 0.67,
+      ),
+    );
+  }
+
+  Widget _buildFoodItem(bool isLoading, int index) {
+    if (isLoading) {
+      return const CustomFoodHomeWidget(
+        image:
+            "https://sonic-zdi0.onrender.com/storage/products/cheeseburger.jpg",
+        title: "Loading...",
+        subtitle: "Loading...",
+        ratings: 0.0,
+      );
+    }
+
+    final food = _filteredFood[index];
+    return GestureDetector(
+      onTap: () => _navigateToProductDetails(food),
+      child: CustomFoodHomeWidget(
+        image: food.image,
+        title: food.name,
+        subtitle: food.description,
+        ratings: double.parse(food.rating),
+      ),
+    );
+  }
+
+  // Event Handlers
+  void _handleSearch(String query) {
+    final foods = context.read<FoodCubit>().food;
+    setState(() {
+      _filteredFood = foods.where((food) {
+        return food.name.toLowerCase().contains(query.toLowerCase());
+      }).toList();
+    });
+  }
+
+  void _handleCategorySelection(int index) {
+    final foods = context.read<FoodCubit>().food;
+    setState(() {
+      _selectedCategoryIndex = index;
+
+      if (index == 0) {
+        _filteredFood = foods;
+      } else {
+        final selectedCategory = _categories[index];
+        _filteredFood = foods.where((food) {
+          return food.name.toLowerCase().contains(
+            selectedCategory.toLowerCase(),
+          );
+        }).toList();
+      }
+    });
+  }
+
+  Future<void> _handleRefresh() async {
+    await context.read<FoodCubit>().refreshFood();
+    await context.read<ProfileCubit>().refreshProfile();
+  }
+
+  void _navigateToProductDetails(Data food) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MultiBlocProvider(
+          providers: [BlocProvider(create: (_) => getIt<AddToCartCubit>())],
+          child: ProductDetailsView(productId: food.id, price: food.price),
+        ),
+      ),
     );
   }
 }
