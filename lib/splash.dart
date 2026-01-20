@@ -1,14 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:hungry_app/core/constants/app_colors.dart';
-import 'package:hungry_app/core/di/dependancy_injection.dart';
-import 'package:hungry_app/features/auth/login/logic/cubit/auto_login_cubit.dart';
-import 'package:hungry_app/features/auth/login/logic/cubit/auto_login_state.dart';
-import 'package:hungry_app/features/auth/login/logic/cubit/login_cubit.dart';
 import 'package:hungry_app/features/auth/view/signin_view.dart';
-import 'package:hungry_app/root.dart';
 
 class SplashView extends StatefulWidget {
   const SplashView({super.key});
@@ -36,24 +30,7 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
     Future.delayed(const Duration(seconds: 4), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (context) {
-            return BlocProvider(
-              create: (context) => getIt<LoginCubit>(),
-              child: BlocBuilder<AutoLoginCubit, AutoLoginState>(
-                builder: (context, state) {
-                  if (state is Authenticated) {
-                    return const Root();
-                  } else if (state is UnAuthenticated) {
-                    return const SigninView();
-                  } else {
-                    return const SigninView();
-                  }
-                },
-              ),
-            );
-          },
-        ),
+        MaterialPageRoute(builder: (context) => const SigninView()),
       );
     });
     super.initState();

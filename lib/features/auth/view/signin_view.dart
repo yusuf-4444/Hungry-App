@@ -1,17 +1,10 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:hungry_app/core/constants/app_colors.dart';
-import 'package:hungry_app/core/di/dependancy_injection.dart';
-import 'package:hungry_app/features/auth/login/logic/cubit/login_cubit.dart';
-import 'package:hungry_app/features/auth/login/logic/cubit/login_state.dart';
-import 'package:hungry_app/features/auth/register/logic/cubit/register_cubit.dart';
 import 'package:hungry_app/features/auth/view/signup_view.dart';
 import 'package:hungry_app/features/auth/widgets/custom_button.dart';
 import 'package:hungry_app/root.dart';
-import 'package:hungry_app/shared/custom_snack_bar.dart';
 import 'package:hungry_app/shared/custom_text.dart';
 import 'package:hungry_app/shared/custom_text_field.dart';
 
@@ -78,55 +71,20 @@ class _SigninViewState extends State<SigninView> {
                               isPassword: true,
                             ),
                             const Gap(30),
-                            BlocConsumer<LoginCubit, LoginState>(
-                              listener: (context, state) {
-                                state.whenOrNull(
-                                  success: (data) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      CustomSnackBar(
-                                        "Success!",
-                                        AppColors.primaryColor,
-                                      ),
-                                    );
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) {
-                                          return const Root();
-                                        },
-                                      ),
-                                    );
-                                  },
-                                  failure: (error) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      CustomSnackBar(
-                                        error,
-                                        Colors.red.shade800,
-                                      ),
-                                    );
-                                  },
-                                );
-                              },
-                              builder: (context, state) {
-                                final cubit = context.read<LoginCubit>();
-                                if (state is Loading) {
-                                  return const CupertinoActivityIndicator(
-                                    color: Colors.white,
+                            CustomAuthButton(
+                              isBackgroudnGreen: true,
+                              color: AppColors.primaryColor,
+                              text: "Login",
+                              onPressed: () {
+                                if (globalKey.currentState!.validate()) {
+                                  // TODO: Add login logic
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const Root(),
+                                    ),
                                   );
                                 }
-                                return CustomAuthButton(
-                                  isBackgroudnGreen: true,
-                                  color: AppColors.primaryColor,
-                                  text: "Login",
-                                  onPressed: () {
-                                    if (globalKey.currentState!.validate()) {
-                                      cubit.login(
-                                        email: _emailAddress.text,
-                                        password: _password.text,
-                                      );
-                                    }
-                                  },
-                                );
                               },
                             ),
                             const Gap(10),
@@ -138,13 +96,7 @@ class _SigninViewState extends State<SigninView> {
                                 Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) {
-                                      return BlocProvider(
-                                        create: (context) =>
-                                            getIt<RegisterCubit>(),
-                                        child: const SignupView(),
-                                      );
-                                    },
+                                    builder: (context) => const SignupView(),
                                   ),
                                 );
                               },
@@ -155,9 +107,7 @@ class _SigninViewState extends State<SigninView> {
                                 Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) {
-                                      return const Root();
-                                    },
+                                    builder: (context) => const Root(),
                                   ),
                                 );
                               },

@@ -2,17 +2,7 @@ import 'package:device_preview/device_preview.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hungry_app/core/di/dependancy_injection.dart';
-import 'package:hungry_app/features/auth/login/logic/cubit/auto_login_cubit.dart';
-import 'package:hungry_app/features/auth/login/logic/cubit/login_cubit.dart';
-import 'package:hungry_app/features/auth/profile/logic/cubit/profile_cubit.dart';
-import 'package:hungry_app/features/cart/logic/deleteItem/delete_item_cubit.dart';
-import 'package:hungry_app/features/cart/logic/getCart/get_cart_cubit.dart';
-import 'package:hungry_app/features/checkout/logic/cubit/save_order_cubit.dart';
-import 'package:hungry_app/features/home/logic/cubit/food_cubit.dart';
-import 'package:hungry_app/features/product/logic/cubit/side_options_cubit.dart';
-import 'package:hungry_app/features/product/logic/cubit/toppings_cubit.dart';
 import 'package:hungry_app/splash.dart';
 
 void main() async {
@@ -32,35 +22,17 @@ class HungryApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (context) => getIt<FoodCubit>()..getFood()),
-        BlocProvider(create: (context) => getIt<LoginCubit>()),
-        BlocProvider(create: (context) => getIt<AutoLoginCubit>()),
-        BlocProvider(create: (context) => getIt<DeleteItemCubit>()),
-        BlocProvider(create: (context) => getIt<ProfileCubit>()..getProfile()),
-        BlocProvider(
-          create: (context) => getIt<ToppingsCubit>()..getToppings(),
-        ),
-        BlocProvider(
-          create: (context) => getIt<SideOptionsCubit>()..getSideOptions(),
-        ),
-        BlocProvider(create: (context) => getIt<GetCartCubit>()..getCart()),
-        BlocProvider(create: (context) => getIt<SaveOrderCubit>()),
-      ],
-      child: MaterialApp(
-        theme: ThemeData(
-          scaffoldBackgroundColor: Colors.white,
-          splashColor: Colors.transparent,
-        ),
-        title: "Hungry App",
-        debugShowCheckedModeBanner: false,
-        useInheritedMediaQuery: true,
-        locale: DevicePreview.locale(context),
-        builder: DevicePreview.appBuilder,
-        darkTheme: ThemeData.dark(),
-        home: const SplashView(),
+    return MaterialApp(
+      theme: ThemeData(
+        scaffoldBackgroundColor: Colors.white,
+        splashColor: Colors.transparent,
       ),
+      title: "Hungry App",
+      debugShowCheckedModeBanner: false,
+      locale: DevicePreview.locale(context),
+      builder: DevicePreview.appBuilder,
+      darkTheme: ThemeData.dark(),
+      home: const SplashView(),
     );
   }
 }

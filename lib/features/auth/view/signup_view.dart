@@ -1,16 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:hungry_app/core/constants/app_colors.dart';
-import 'package:hungry_app/core/di/dependancy_injection.dart';
-import 'package:hungry_app/features/auth/login/logic/cubit/login_cubit.dart';
-import 'package:hungry_app/features/auth/register/logic/cubit/register_cubit.dart';
-import 'package:hungry_app/features/auth/register/logic/cubit/register_state.dart';
 import 'package:hungry_app/features/auth/view/signin_view.dart';
 import 'package:hungry_app/features/auth/widgets/custom_button.dart';
-import 'package:hungry_app/shared/custom_snack_bar.dart';
 import 'package:hungry_app/shared/custom_text.dart';
 import 'package:hungry_app/shared/custom_text_field.dart';
 
@@ -79,57 +72,18 @@ class _SignupViewState extends State<SignupView> {
                             isPassword: true,
                           ),
                           const Gap(15),
-
                           const Gap(15),
-                          BlocConsumer<RegisterCubit, RegisterState>(
-                            listener: (context, state) {
-                              state.whenOrNull(
-                                success: (data) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    CustomSnackBar(
-                                      "Account Created Successfully",
-                                      AppColors.primaryColor,
-                                    ),
-                                  );
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) {
-                                        return BlocProvider(
-                                          create: (context) =>
-                                              getIt<LoginCubit>(),
-                                          child: const SigninView(),
-                                        );
-                                      },
-                                    ),
-                                  );
-                                },
-                                failure: (error) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    CustomSnackBar(error, Colors.red.shade800),
-                                  );
-                                },
-                              );
-                            },
-                            builder: (context, state) {
-                              final cubit = context.read<RegisterCubit>();
-                              if (state is Loading) {
-                                return const CupertinoActivityIndicator(
-                                  color: Colors.white,
-                                );
-                              } else {
-                                return CustomAuthButton(
-                                  isBackgroudnGreen: true,
-                                  text: "Sign Up",
-                                  onPressed: () {
-                                    if (globalKey.currentState!.validate()) {
-                                      cubit.register(
-                                        name: _name.text,
-                                        email: _emailAddress.text,
-                                        password: _password.text,
-                                      );
-                                    }
-                                  },
+                          CustomAuthButton(
+                            isBackgroudnGreen: true,
+                            text: "Sign Up",
+                            onPressed: () {
+                              if (globalKey.currentState!.validate()) {
+                                // TODO: Add register logic
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const SigninView(),
+                                  ),
                                 );
                               }
                             },
@@ -143,12 +97,7 @@ class _SignupViewState extends State<SignupView> {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) {
-                                    return BlocProvider(
-                                      create: (context) => getIt<LoginCubit>(),
-                                      child: const SigninView(),
-                                    );
-                                  },
+                                  builder: (context) => const SigninView(),
                                 ),
                               );
                             },
