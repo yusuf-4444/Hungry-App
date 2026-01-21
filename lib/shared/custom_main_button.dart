@@ -31,7 +31,7 @@ class CustomMainButton extends StatelessWidget {
           child: CustomText(
             text: text,
             color: Colors.white,
-            fontsize: fontSize,
+            fontSize: fontSize,
           ),
         ),
       ),

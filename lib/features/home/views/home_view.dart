@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:hungry_app/core/di/dependancy_injection.dart';
-import 'package:hungry_app/features/auth/profile/logic/cubit/profile_cubit.dart';
 import 'package:hungry_app/features/cart/logic/addToCartCubit/add_to_cart_cubit.dart';
-import 'package:hungry_app/features/home/data/models/food_data_model.dart';
 import 'package:hungry_app/features/home/logic/cubit/food_cubit.dart';
 import 'package:hungry_app/features/home/logic/cubit/food_state.dart';
 import 'package:hungry_app/features/home/widgets/custom_food_home_widget.dart';
 import 'package:hungry_app/features/home/widgets/custom_home_category.dart';
-import 'package:hungry_app/features/home/widgets/custom_home_search.dart';
 import 'package:hungry_app/features/home/widgets/header_profile_widget.dart';
 import 'package:hungry_app/features/product/views/product_details_view.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -21,175 +20,147 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  final List<String> _categories = ["All", "Combos", "Sliders", "classic"];
-  List<Data> _filteredFood = [];
-  int _selectedCategoryIndex = 0;
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<FoodCubit, FoodState>(
-      builder: (context, state) {
-        return _buildContent(state);
+    final List<String> dummyCategories = [
+      "All",
+      "Combos",
+      "Sliders",
+      "Classic",
+    ];
+    final List<Map<String, dynamic>> dummyFoods = [
+      {
+        'id': 1,
+        'name': 'Cheeseburger',
+        'description': 'Delicious burger',
+        'image':
+            'https://sonic-zdi0.onrender.com/storage/products/cheeseburger.jpg',
+        'price': '50.00',
+        'rating': '4.5',
       },
-    );
-  }
+      {
+        'id': 2,
+        'name': 'Chicken Slider',
+        'description': 'Tasty slider',
+        'image':
+            'https://sonic-zdi0.onrender.com/storage/products/cheeseburger.jpg',
+        'price': '35.00',
+        'rating': '4.2',
+      },
+    ];
 
-  Widget _buildContent(FoodState state) {
-    if (state is Failure && _filteredFood.isEmpty) {
-      return _buildErrorView(state.error);
-    }
-
-    final foods = context.read<FoodCubit>().food;
-    if (_filteredFood.isEmpty && foods.isNotEmpty) {
-      _filteredFood = foods;
-    }
-
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      child: RefreshIndicator(
-        onRefresh: _handleRefresh,
-        child: _buildScaffold(state is Loading, foods),
-      ),
-    );
-  }
-
-  Widget _buildErrorView(String error) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(error),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () => context.read<FoodCubit>().refreshFood(),
-            child: const Text("Retry"),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildScaffold(bool isLoading, List<Data> foods) {
     return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 0,
-        backgroundColor: Colors.white,
-        elevation: 0,
-        surfaceTintColor: Colors.white,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15.0),
-        child: CustomScrollView(
-          slivers: [_buildStickyHeader(), _buildFoodGrid(isLoading, foods)],
+      body: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.w),
+          child: CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(
+                child: Column(
+                  children: [
+                    SizedBox(height: 16.h),
+                    const HeaderProfile(),
+                    SizedBox(height: 24.h),
+                    CustomHomeCategory(
+                      category: dummyCategories,
+                      selectedIndex: 0,
+                      onTap: (index) {},
+                    ),
+                    Gap(24.h),
+                  ],
+                ),
+              ),
+              BlocBuilder<FoodCubit, FoodState>(
+                bloc: getIt<FoodCubit>(),
+                buildWhen: (previous, current) =>
+                    current is Loading ||
+                    current is Success ||
+                    current is Failure,
+                builder: (context, state) {
+                  if (state is Loading) {
+                    return SliverGrid(
+                      delegate: SliverChildBuilderDelegate(childCount: 6, (
+                        context,
+                        index,
+                      ) {
+                        return const Skeletonizer(
+                          child: CustomFoodHomeWidget(
+                            image: '',
+                            title: 'Loading food name here',
+                            subtitle:
+                                'Loading description text here for the food item',
+                            ratings: 4.5,
+                          ),
+                        );
+                      }),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 10.h,
+                        crossAxisSpacing: 10.w,
+                        childAspectRatio: 0.70,
+                      ),
+                    );
+                  } else if (state is Failure) {
+                    return SliverToBoxAdapter(
+                      child: Center(child: Text('Error: ${state.error}')),
+                    );
+                  } else if (state is Success) {
+                    return SliverGrid(
+                      delegate: SliverChildBuilderDelegate(
+                        childCount: state.data.length,
+                        (context, index) {
+                          final food = state.data[index];
+                          return GestureDetector(
+                            onTap: () {
+                              _navigateToDetails(context, food);
+                            },
+                            child: CustomFoodHomeWidget(
+                              image: food.image,
+                              title: food.name,
+                              subtitle: food.description,
+                              ratings: double.parse(food.rating),
+                            ),
+                          );
+                        },
+                      ),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 10.h,
+                        crossAxisSpacing: 10.w,
+                        childAspectRatio: 0.70,
+                      ),
+                    );
+                  } else {
+                    return const SliverToBoxAdapter(
+                      child: Center(child: Text('No data available')),
+                    );
+                  }
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  SliverAppBar _buildStickyHeader() {
-    return SliverAppBar(
-      backgroundColor: Colors.white,
-      pinned: true,
-      elevation: 0,
-      automaticallyImplyLeading: false,
-      surfaceTintColor: Colors.white,
-      scrolledUnderElevation: 0,
-      toolbarHeight: 230,
-      flexibleSpace: Column(
-        children: [
-          const Gap(25),
-          const HeaderProfile(),
-          const Gap(20),
-          SearchHome(onChanged: _handleSearch),
-          const Gap(20),
-          CustomHomeCategory(
-            category: _categories,
-            selectedIndex: _selectedCategoryIndex,
-            onTap: _handleCategorySelection,
-          ),
-        ],
-      ),
-    );
-  }
-
-  SliverGrid _buildFoodGrid(bool isLoading, List<Data> foods) {
-    return SliverGrid(
-      delegate: SliverChildBuilderDelegate(
-        childCount: isLoading ? 6 : _filteredFood.length,
-        (context, index) => _buildFoodItem(isLoading, index),
-      ),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: 10,
-        crossAxisSpacing: 10,
-        childAspectRatio: 0.67,
-      ),
-    );
-  }
-
-  Widget _buildFoodItem(bool isLoading, int index) {
-    if (isLoading) {
-      return const CustomFoodHomeWidget(
-        image:
-            "https://sonic-zdi0.onrender.com/storage/products/cheeseburger.jpg",
-        title: "Loading...",
-        subtitle: "Loading...",
-        ratings: 0.0,
-      );
-    }
-
-    final food = _filteredFood[index];
-    return GestureDetector(
-      onTap: () => _navigateToProductDetails(food),
-      child: CustomFoodHomeWidget(
-        image: food.image,
-        title: food.name,
-        subtitle: food.description,
-        ratings: double.parse(food.rating),
-      ),
-    );
-  }
-
-  // Event Handlers
-  void _handleSearch(String query) {
-    final foods = context.read<FoodCubit>().food;
-    setState(() {
-      _filteredFood = foods.where((food) {
-        return food.name.toLowerCase().contains(query.toLowerCase());
-      }).toList();
-    });
-  }
-
-  void _handleCategorySelection(int index) {
-    final foods = context.read<FoodCubit>().food;
-    setState(() {
-      _selectedCategoryIndex = index;
-
-      if (index == 0) {
-        _filteredFood = foods;
-      } else {
-        final selectedCategory = _categories[index];
-        _filteredFood = foods.where((food) {
-          return food.name.toLowerCase().contains(
-            selectedCategory.toLowerCase(),
-          );
-        }).toList();
-      }
-    });
-  }
-
-  Future<void> _handleRefresh() async {
-    await context.read<FoodCubit>().refreshFood();
-    await context.read<ProfileCubit>().refreshProfile();
-  }
-
-  void _navigateToProductDetails(Data food) {
+  void _navigateToDetails(BuildContext context, Map<String, dynamic> food) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => MultiBlocProvider(
-          providers: [BlocProvider(create: (_) => getIt<AddToCartCubit>())],
-          child: ProductDetailsView(productId: food.id, price: food.price),
+          providers: [
+            BlocProvider(create: (context) => getIt<AddToCartCubit>()),
+          ],
+          child: ProductDetailsView(
+            productId: food['id'],
+            price: food['price'],
+          ),
         ),
       ),
     );

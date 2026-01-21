@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:hungry_app/core/constants/app_colors.dart';
-import 'package:hungry_app/features/auth/view/signin_view.dart';
+import 'package:hungry_app/core/route/app_routes.dart';
+import 'package:hungry_app/features/auth/register/logic/cubit/register_cubit.dart';
+import 'package:hungry_app/features/auth/register/logic/cubit/register_state.dart';
 import 'package:hungry_app/features/auth/widgets/custom_button.dart';
+import 'package:hungry_app/shared/custom_snack_bar.dart';
 import 'package:hungry_app/shared/custom_text.dart';
 import 'package:hungry_app/shared/custom_text_field.dart';
 
@@ -73,19 +77,47 @@ class _SignupViewState extends State<SignupView> {
                           ),
                           const Gap(15),
                           const Gap(15),
-                          CustomAuthButton(
-                            isBackgroudnGreen: true,
-                            text: "Sign Up",
-                            onPressed: () {
-                              if (globalKey.currentState!.validate()) {
-                                // TODO: Add register logic
-                                Navigator.pushReplacement(
+                          BlocConsumer<RegisterCubit, RegisterState>(
+                            listenWhen: (previous, current) =>
+                                current is Failure || current is Success,
+                            listener: (context, state) {
+                              if (state is Success) {
+                                Navigator.pushNamedAndRemoveUntil(
                                   context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const SigninView(),
-                                  ),
+                                  AppRoutes.login,
+                                  (_) => false,
+                                );
+                              } else if (state is Failure) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  CustomSnackBar(state.error, Colors.red),
                                 );
                               }
+                            },
+                            buildWhen: (previous, current) =>
+                                current is Loading ||
+                                current is Failure ||
+                                current is Success,
+                            builder: (context, state) {
+                              if (state is Loading) {
+                                return const CustomAuthButton(
+                                  onPressed: null,
+                                  text: "Signing Up...",
+                                  isBackgroudnGreen: true,
+                                );
+                              }
+                              return CustomAuthButton(
+                                isBackgroudnGreen: true,
+                                text: "Sign Up",
+                                onPressed: () {
+                                  if (globalKey.currentState!.validate()) {
+                                    context.read<RegisterCubit>().register(
+                                      name: _name.text,
+                                      email: _emailAddress.text,
+                                      password: _password.text,
+                                    );
+                                  }
+                                },
+                              );
                             },
                           ),
                           const Gap(15),
@@ -94,11 +126,13 @@ class _SignupViewState extends State<SignupView> {
                             color: Colors.white,
                             text: "Go To Login ?",
                             onPressed: () {
-                              Navigator.pushReplacement(
+                              _emailAddress.clear();
+                              _password.clear();
+                              _name.clear();
+                              Navigator.pushNamedAndRemoveUntil(
                                 context,
-                                MaterialPageRoute(
-                                  builder: (context) => const SigninView(),
-                                ),
+                                AppRoutes.login,
+                                (_) => false,
                               );
                             },
                           ),

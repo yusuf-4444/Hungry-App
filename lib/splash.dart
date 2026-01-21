@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:hungry_app/core/constants/app_colors.dart';
-import 'package:hungry_app/features/auth/view/signin_view.dart';
+import 'package:hungry_app/core/network/pref_helper.dart';
+import 'package:hungry_app/core/route/app_routes.dart';
 
 class SplashView extends StatefulWidget {
   const SplashView({super.key});
@@ -24,18 +25,29 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
   late Animation<double> _burgerRotationAnimation;
 
   late Animation<double> _shimmerAnimation;
+  String? _token;
 
   @override
   void initState() {
-    Future.delayed(const Duration(seconds: 4), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const SigninView()),
-      );
-    });
     super.initState();
 
-    // Logo Animation Controller
+    _initAnimations();
+
+    _startAnimations();
+
+    Future.delayed(const Duration(seconds: 4), () async {
+      if (mounted) {
+        _token = await PrefHelper.getToken();
+        if (_token != null && _token!.isNotEmpty) {
+          Navigator.pushReplacementNamed(context, AppRoutes.root);
+        } else {
+          Navigator.pushReplacementNamed(context, AppRoutes.login);
+        }
+      }
+    });
+  }
+
+  void _initAnimations() {
     _logoController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1200),
@@ -90,19 +102,19 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
     _shimmerAnimation = Tween<double>(begin: -1.0, end: 2.0).animate(
       CurvedAnimation(parent: _shimmerController, curve: Curves.easeInOut),
     );
-
-    // Start animations
-    _startAnimations();
   }
 
   void _startAnimations() async {
     await Future.delayed(const Duration(milliseconds: 300));
+    if (!mounted) return;
     _logoController.forward();
 
     await Future.delayed(const Duration(milliseconds: 600));
+    if (!mounted) return;
     _burgerController.forward();
 
     await Future.delayed(const Duration(milliseconds: 1200));
+    if (!mounted) return;
     _shimmerController.forward();
   }
 
@@ -122,7 +134,7 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
         child: Column(
           children: [
             const Gap(150),
-            // Animated Logo
+            // Animated Logo with Shimmer Effect
             AnimatedBuilder(
               animation: _logoController,
               builder: (context, child) {
@@ -133,7 +145,6 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
                     child: Stack(
                       children: [
                         SvgPicture.asset("assets/logo/Hungry_.svg"),
-                        // Shimmer Effect
                         AnimatedBuilder(
                           animation: _shimmerAnimation,
                           builder: (context, child) {
@@ -170,7 +181,7 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
               },
             ),
             const Spacer(),
-            // Animated Burger
+            // Animated Burger Image
             AnimatedBuilder(
               animation: _burgerController,
               builder: (context, child) {
@@ -184,6 +195,7 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
                         "assets/splash/image 1.png",
                         width: 400,
                         height: 250,
+                        fit: BoxFit.contain,
                       ),
                     ),
                   ),

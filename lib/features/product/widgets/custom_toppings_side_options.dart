@@ -73,7 +73,7 @@ class _CustomToppingsSideOptionsWidgetState
                                       ? item!.name
                                       : "Loading...",
                                   color: Colors.white,
-                                  fontsize: 12,
+                                  fontSize: 12,
                                 ),
                                 const Spacer(),
                                 Container(

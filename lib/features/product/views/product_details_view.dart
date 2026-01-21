@@ -1,17 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:hungry_app/core/constants/app_colors.dart';
 import 'package:hungry_app/features/cart/data/models/addToCart/add_to_cart_model.dart';
-import 'package:hungry_app/features/cart/logic/addToCartCubit/add_to_cart_cubit.dart';
-import 'package:hungry_app/features/cart/logic/addToCartCubit/add_to_cart_state.dart';
-import 'package:hungry_app/features/cart/logic/getCart/get_cart_cubit.dart';
-import 'package:hungry_app/features/product/logic/cubit/side_options_cubit.dart';
-import 'package:hungry_app/features/product/logic/cubit/side_options_state.dart'
-    as SideState;
-import 'package:hungry_app/features/product/logic/cubit/toppings_cubit.dart';
-import 'package:hungry_app/features/product/logic/cubit/toppings_state.dart'
-    as ToppingState;
+import 'package:hungry_app/features/home/data/models/side_options_model.dart';
+import 'package:hungry_app/features/home/data/models/toppings_model.dart';
 import 'package:hungry_app/features/product/widgets/custom_header_spicy_details.dart';
 import 'package:hungry_app/features/product/widgets/custom_toppings_side_options.dart';
 import 'package:hungry_app/shared/custom_main_button.dart';
@@ -37,11 +29,98 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
   List<int> toppings = [];
   List<int> sideOptions = [];
 
+  // TODO: Add your state management here
+  bool isToppingsLoading = false;
+  bool isSideOptionsLoading = false;
+  bool isAddingToCart = false;
+
+  ToppingsModel? toppingsData;
+  SideOptionsModel? sideOptionsData;
+
+  String? toppingsError;
+  String? sideOptionsError;
+
   @override
   void initState() {
-    context.read<ToppingsCubit>().getToppings();
-    context.read<SideOptionsCubit>().getSideOptions();
     super.initState();
+    // TODO: Call your data fetching methods here
+    // _fetchToppings();
+    // _fetchSideOptions();
+  }
+
+  Future<void> _fetchToppings() async {
+    setState(() {
+      isToppingsLoading = true;
+      toppingsError = null;
+    });
+
+    try {
+      // TODO: Fetch toppings data
+      // final data = await yourService.getToppings();
+      // setState(() {
+      //   toppingsData = data;
+      //   isToppingsLoading = false;
+      // });
+    } catch (e) {
+      setState(() {
+        toppingsError = e.toString();
+        isToppingsLoading = false;
+      });
+    }
+  }
+
+  Future<void> _fetchSideOptions() async {
+    setState(() {
+      isSideOptionsLoading = true;
+      sideOptionsError = null;
+    });
+
+    try {
+      // TODO: Fetch side options data
+      // final data = await yourService.getSideOptions();
+      // setState(() {
+      //   sideOptionsData = data;
+      //   isSideOptionsLoading = false;
+      // });
+    } catch (e) {
+      setState(() {
+        sideOptionsError = e.toString();
+        isSideOptionsLoading = false;
+      });
+    }
+  }
+
+  Future<void> _addToCart() async {
+    setState(() {
+      isAddingToCart = true;
+    });
+
+    try {
+      final cartData = _cartData();
+
+      // TODO: Add to cart logic
+      // await yourService.addToCart(cartData);
+      // await yourService.refreshCart();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          CustomSnackBar("Item Added Successfully", AppColors.primaryColor),
+        );
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          CustomSnackBar("Failed to add item: ${e.toString()}", Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          isAddingToCart = false;
+        });
+      }
+    }
   }
 
   CartItems _cartData() {
@@ -90,24 +169,23 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                 text: "Toppings",
                 color: Color(0xff3C2F2F),
                 fontWeight: FontWeight.w600,
-                fontsize: 18,
+                fontSize: 18,
               ),
               const Gap(15),
 
-              BlocBuilder<ToppingsCubit, ToppingState.ToppingsState>(
-                builder: (context, state) {
-                  return CustomToppingsSideOptionsWidget(
-                    isLoading: state is ToppingState.Loading,
-                    data: state is ToppingState.Success ? state.data : null,
-                    selectedItems: toppings,
-                    onItemSelection: (value) {
-                      if (toppings.contains(value)) {
-                        toppings.remove(value);
-                      } else {
-                        toppings.add(value);
-                      }
-                    },
-                  );
+              // Toppings Section
+              CustomToppingsSideOptionsWidget(
+                isLoading: isToppingsLoading,
+                data: toppingsData,
+                selectedItems: toppings,
+                onItemSelection: (value) {
+                  setState(() {
+                    if (toppings.contains(value)) {
+                      toppings.remove(value);
+                    } else {
+                      toppings.add(value);
+                    }
+                  });
                 },
               ),
 
@@ -116,24 +194,23 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                 text: "Side Options",
                 color: Color(0xff3C2F2F),
                 fontWeight: FontWeight.w600,
-                fontsize: 18,
+                fontSize: 18,
               ),
               const Gap(15),
 
-              BlocBuilder<SideOptionsCubit, SideState.SideOptionsState>(
-                builder: (context, state) {
-                  return CustomToppingsSideOptionsWidget(
-                    isLoading: state is SideState.Loading,
-                    data: state is SideState.Success ? state.data : null,
-                    selectedItems: sideOptions,
-                    onItemSelection: (value) {
-                      if (sideOptions.contains(value)) {
-                        sideOptions.remove(value);
-                      } else {
-                        sideOptions.add(value);
-                      }
-                    },
-                  );
+              // Side Options Section
+              CustomToppingsSideOptionsWidget(
+                isLoading: isSideOptionsLoading,
+                data: sideOptionsData,
+                selectedItems: sideOptions,
+                onItemSelection: (value) {
+                  setState(() {
+                    if (sideOptions.contains(value)) {
+                      sideOptions.remove(value);
+                    } else {
+                      sideOptions.add(value);
+                    }
+                  });
                 },
               ),
 
@@ -165,46 +242,21 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                     text: "Total",
                     color: Colors.black,
                     fontWeight: FontWeight.w600,
-                    fontsize: 14,
+                    fontSize: 14,
                   ),
                   const Gap(10),
                   CustomText(
                     text: "\$ ${widget.price}",
                     color: Colors.black,
-                    fontsize: 22,
+                    fontSize: 22,
                     fontWeight: FontWeight.w900,
                   ),
                 ],
               ),
-              BlocConsumer<AddToCartCubit, AddToCartState>(
-                listener: (context, state) {
-                  if (state is Success) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      CustomSnackBar(
-                        "Item Added Successfully",
-                        AppColors.primaryColor,
-                      ),
-                    );
-                    Navigator.pop(context);
-                  }
-                },
-                builder: (context, state) {
-                  return CustomMainButton(
-                    text: state is Loading
-                        ? "Adding..."
-                        : state is Success
-                        ? "Added"
-                        : "Add To Cart",
-                    fontSize: 16,
-                    onPressed: () async {
-                      final cartData = _cartData();
-                      await context.read<AddToCartCubit>().addToCart(cartData);
-                      await context.read<GetCartCubit>().getCart(
-                        forceRefresh: true,
-                      );
-                    },
-                  );
-                },
+              CustomMainButton(
+                text: isAddingToCart ? "Adding..." : "Add To Cart",
+                fontSize: 16,
+                onPressed: isAddingToCart ? null : _addToCart,
               ),
             ],
           ),

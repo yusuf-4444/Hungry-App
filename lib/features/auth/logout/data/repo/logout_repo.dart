@@ -2,16 +2,19 @@ import 'package:dio/dio.dart';
 import 'package:hungry_app/core/network/api_exceptions.dart';
 import 'package:hungry_app/core/network/api_result.dart';
 import 'package:hungry_app/core/network/api_services.dart';
+import 'package:hungry_app/core/network/pref_helper.dart';
 import 'package:hungry_app/features/auth/logout/models/logout_model.dart';
 
 class LogoutRepo {
   final ApiServices apiServices;
+  final PrefHelper prefHelper = PrefHelper();
 
   LogoutRepo({required this.apiServices});
 
   Future<ApiResult<LogoutModel>> logout() async {
     try {
       final response = await apiServices.logout();
+      PrefHelper.removeToken();
       return ApiResult.success(response);
     } on DioException catch (e) {
       final error = ApiExceptions.fromDioException(e);

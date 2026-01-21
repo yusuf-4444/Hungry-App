@@ -21,19 +21,34 @@ class CustomHomeCategory extends StatelessWidget {
       child: Row(
         children: List.generate(
           category.length,
-          (index) => _buildCategoryChip(index),
+          (index) => _CategoryChip(
+            categoryName: category[index],
+            isSelected: selectedIndex == index,
+            onTap: () => onTap?.call(index),
+          ),
         ),
       ),
     );
   }
+}
 
-  Widget _buildCategoryChip(int index) {
-    final isSelected = selectedIndex == index;
+class _CategoryChip extends StatelessWidget {
+  const _CategoryChip({
+    required this.categoryName,
+    required this.isSelected,
+    required this.onTap,
+  });
 
+  final String categoryName;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(right: 10),
       child: GestureDetector(
-        onTap: () => onTap?.call(index),
+        onTap: onTap,
         child: Material(
           elevation: isSelected ? 5 : 0,
           borderRadius: BorderRadius.circular(25),
@@ -47,9 +62,9 @@ class CustomHomeCategory extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
               child: CustomText(
-                text: category[index],
+                text: categoryName,
                 color: isSelected ? Colors.white : Colors.grey.shade700,
-                fontsize: 16,
+                fontSize: 16,
               ),
             ),
           ),

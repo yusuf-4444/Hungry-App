@@ -4,13 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:hungry_app/core/constants/app_colors.dart';
-import 'package:hungry_app/core/network/pref_helper.dart';
+import 'package:hungry_app/core/route/app_routes.dart';
 import 'package:hungry_app/features/auth/logout/logic/cubit/logout_cubit.dart';
-import 'package:hungry_app/features/auth/profile/logic/cubit/profile_cubit.dart';
-import 'package:hungry_app/features/auth/profile/logic/cubit/profile_state.dart';
-import 'package:hungry_app/features/auth/profile/logic/cubit/update_profile_cubit.dart';
 import 'package:hungry_app/features/auth/profile/models/profile_model.dart';
-import 'package:hungry_app/features/auth/view/signin_view.dart';
 import 'package:hungry_app/features/auth/widgets/custom_text_form_field.dart';
 import 'package:hungry_app/shared/custom_main_button.dart';
 import 'package:hungry_app/shared/custom_snack_bar.dart';
@@ -40,18 +36,149 @@ class _ProfileViewState extends State<ProfileView> {
   String? _selectedImageUrl;
   File? _selectedImageFile;
 
-  Future<void> uploadImage() async {
-    final image = await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      _selectedImageFile = File(image.path);
-      _selectedImageUrl = null;
-      setState(() {});
-    }
-  }
+  // TODO: Add your state management here
+  bool isLoading = false;
+  bool isUpdating = false;
+  bool isLoggingOut = false;
+  String? errorMessage;
 
   @override
   void initState() {
     super.initState();
+    _fetchProfile();
+  }
+
+  Future<void> _fetchProfile() async {
+    setState(() {
+      isLoading = true;
+      errorMessage = null;
+    });
+
+    try {
+      // TODO: Fetch profile data
+      // final data = await ProfileService.getProfile();
+      // _updateProfileData(data);
+
+      setState(() {
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        errorMessage = e.toString();
+        isLoading = false;
+      });
+    }
+  }
+
+  void _updateProfileData(ProfileModel data) {
+    setState(() {
+      profileModel = data;
+      _name.text = data.data.name;
+      _email.text = data.data.email;
+      _address.text = data.data.address ?? "none";
+      _visa.text = data.data.visa ?? "";
+      visa = _visa.text;
+      _selectedImageUrl = data.data.image?.toString();
+      _selectedImageFile = null;
+    });
+  }
+
+  Future<void> uploadImage() async {
+    final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      setState(() {
+        _selectedImageFile = File(image.path);
+        _selectedImageUrl = null;
+      });
+    }
+  }
+
+  Future<void> _updateProfile() async {
+    setState(() {
+      isUpdating = true;
+      editProfile = "Editing...";
+    });
+
+    try {
+      // TODO: Update profile logic
+      // if (_selectedImageFile != null) {
+      //   await ProfileService.updateProfile(
+      //     name: _name.text,
+      //     email: _email.text,
+      //     address: _address.text,
+      //     visa: _visa.text,
+      //     image: _selectedImageFile,
+      //   );
+      // } else {
+      //   await ProfileService.updateProfile(
+      //     name: _name.text,
+      //     email: _email.text,
+      //     address: _address.text,
+      //     visa: _visa.text,
+      //   );
+      // }
+
+      // Refresh profile after update
+      await Future.delayed(const Duration(seconds: 2));
+      await _fetchProfile();
+
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(CustomSnackBar("Updated Successfully", Colors.white));
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          CustomSnackBar("Update Failed: ${e.toString()}", Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          isUpdating = false;
+          editProfile = "Edit Profile";
+        });
+      }
+    }
+  }
+
+  Future<void> _logout() async {
+    final bloc = context.read<LogoutCubit>();
+
+    setState(() {
+      isLoggingOut = true;
+    });
+
+    try {
+      // TODO: Logout logic
+      // await AuthService.logout();
+      // await PrefHelper.removeToken();
+
+      if (mounted) {
+        await bloc.logout();
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(CustomSnackBar("LOGGED OUT SUCCESSFULLY", Colors.white));
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          AppRoutes.login,
+          (_) => false,
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          CustomSnackBar("Logout Failed: ${e.toString()}", Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoggingOut = false;
+        });
+      }
+    }
   }
 
   String _formatVisaNumber(String visa) {
@@ -74,298 +201,221 @@ class _ProfileViewState extends State<ProfileView> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<ProfileCubit, ProfileState>(
-      builder: (context, state) {
-        if (state is Failure) {
-          return RefreshIndicator(
-            onRefresh: () async {
-              await context.read<ProfileCubit>().getProfile();
-            },
-            child: const Center(
-              child: Text("internal Server Error.. please Try again later"),
-            ),
-          );
-        }
-
-        final isLoading = state is Loading;
-        return Skeletonizer(
-          enabled: isLoading,
-          child: RefreshIndicator(
-            onRefresh: () async {
-              await context.read<ProfileCubit>().getProfile();
-            },
-            child: Scaffold(
-              backgroundColor: AppColors.primaryColor,
-              appBar: AppBar(
-                actions: [
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.settings, color: Colors.white),
-                  ),
-                ],
-                backgroundColor: AppColors.primaryColor,
-                leading: IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
-                ),
+    // Error State
+    if (errorMessage != null && !isLoading) {
+      return RefreshIndicator(
+        onRefresh: _fetchProfile,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text("Internal Server Error.. please Try again later"),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: _fetchProfile,
+                child: const Text("Retry"),
               ),
+            ],
+          ),
+        ),
+      );
+    }
 
-              body: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                child: SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  child: Column(
-                    children: [
-                      const Gap(10),
-                      Center(
-                        child: Container(
-                          height: 120,
-                          width: 120,
-                          decoration: BoxDecoration(
-                            border: Border.all(width: 3, color: Colors.white),
-                            shape: BoxShape.circle,
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(60),
-                            child: _selectedImageFile != null
-                                ? Image.file(
-                                    _selectedImageFile!,
-                                    fit: BoxFit.cover,
-                                  )
-                                : (_selectedImageUrl != null &&
-                                      _selectedImageUrl!.isNotEmpty)
-                                ? Image.network(
-                                    _selectedImageUrl!,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Image.network(
-                                        "https://tse4.mm.bing.net/th/id/OIP.hGSCbXlcOjL_9mmzerqAbQHaHa?pid=Api&P=0&h=220",
-                                        fit: BoxFit.cover,
-                                      );
-                                    },
-                                  )
-                                : Image.network(
+    return Skeletonizer(
+      enabled: isLoading,
+      child: RefreshIndicator(
+        onRefresh: _fetchProfile,
+        child: Scaffold(
+          backgroundColor: AppColors.primaryColor,
+          appBar: AppBar(
+            actions: [
+              IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.settings, color: Colors.white),
+              ),
+            ],
+            backgroundColor: AppColors.primaryColor,
+            leading: IconButton(
+              onPressed: () {},
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+            ),
+          ),
+          body: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15.0),
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                children: [
+                  const Gap(10),
+                  Center(
+                    child: Container(
+                      height: 120,
+                      width: 120,
+                      decoration: BoxDecoration(
+                        border: Border.all(width: 3, color: Colors.white),
+                        shape: BoxShape.circle,
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(60),
+                        child: _selectedImageFile != null
+                            ? Image.file(_selectedImageFile!, fit: BoxFit.cover)
+                            : (_selectedImageUrl != null &&
+                                  _selectedImageUrl!.isNotEmpty)
+                            ? Image.network(
+                                _selectedImageUrl!,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Image.network(
                                     "https://tse4.mm.bing.net/th/id/OIP.hGSCbXlcOjL_9mmzerqAbQHaHa?pid=Api&P=0&h=220",
                                     fit: BoxFit.cover,
-                                  ),
-                          ),
-                        ),
-                      ),
-                      const Gap(10),
-                      CustomMainButton(
-                        onPressed: () {
-                          uploadImage();
-                        },
-                        text:
-                            _selectedImageFile == null &&
-                                (_selectedImageUrl == null ||
-                                    _selectedImageUrl!.isEmpty)
-                            ? "Upload Image"
-                            : "Change Image",
-                        fontSize: 12,
-                        width: 200,
-                      ),
-                      const Gap(10),
-                      CustomTextFormField(controller: _name, labelText: 'Name'),
-                      const Gap(20),
-                      CustomTextFormField(
-                        controller: _email,
-                        labelText: 'Email',
-                      ),
-                      const Gap(20),
-                      CustomTextFormField(
-                        controller: _address,
-                        labelText: 'Delivary Address',
-                      ),
-                      const Gap(20),
-
-                      const Gap(20),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 20.0),
-                        child: Divider(),
-                      ),
-                      const Gap(20),
-                      CustomTextFormField(
-                        textInputType: TextInputType.number,
-                        controller: _visa,
-                        labelText: visa == "" ? "Add Visa" : 'Edit Visa',
-                      ),
-
-                      const Gap(20),
-
-                      visa == ""
-                          ? const SizedBox.shrink()
-                          : ListTile(
-                              contentPadding: const EdgeInsets.symmetric(
-                                vertical: 6,
-                                horizontal: 16,
+                                  );
+                                },
+                              )
+                            : Image.network(
+                                "https://tse4.mm.bing.net/th/id/OIP.hGSCbXlcOjL_9mmzerqAbQHaHa?pid=Api&P=0&h=220",
+                                fit: BoxFit.cover,
                               ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadiusGeometry.circular(14),
-                              ),
-                              tileColor: Colors.white,
-                              leading: Image.asset(
-                                "assets/profileIcons/image 13.png",
-                              ),
-                              horizontalTitleGap: 30,
-                              title: const CustomText(
-                                text: "Debit card",
-                                color: Colors.black,
-                                fontWeight: FontWeight.w700,
-                                fontsize: 14,
-                              ),
-                              subtitle: CustomText(
-                                text: visa.isNotEmpty
-                                    ? _formatVisaNumber(visa)
-                                    : "3566 **** **** 0505",
-                                color: Colors.black,
-                              ),
-                              trailing: const CustomText(
-                                text: "Default",
-                                color: Colors.black,
-                              ),
-                            ),
-                      const Gap(100),
-                    ],
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              bottomSheet: Container(
-                height: 70,
-                decoration: const BoxDecoration(color: Colors.white),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    GestureDetector(
-                      onTap: () async {
-                        if (_selectedImageFile != null) {
-                          editProfile = "Editing...";
-                          await context
-                              .read<UpdateProfileCubit>()
-                              .updateProfile(
-                                name: _name.text,
-                                email: _email.text,
-                                delivaryAddress: _address.text,
-                                visa: _visa.text,
-                                image: _selectedImageFile,
-                              );
-                          setState(() {});
-                        } else {
-                          editProfile = "Editing...";
-                          await context
-                              .read<UpdateProfileCubit>()
-                              .updateProfile(
-                                name: _name.text,
-                                email: _email.text,
-                                delivaryAddress: _address.text,
-                                visa: _visa.text,
-                                image: null,
-                              );
-                          setState(() {});
-                        }
-
-                        Future.delayed(const Duration(seconds: 5), () {
-                          context.read<ProfileCubit>().getProfile(
-                            forceRefresh: true,
-                          );
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            CustomSnackBar(
-                              "Updated Successfully",
-                              Colors.white,
-                            ),
-                          );
-                        });
-                        editProfile = "Edit Profile";
-
-                        setState(() {});
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryColor,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 10,
+                  const Gap(10),
+                  CustomMainButton(
+                    onPressed: uploadImage,
+                    text:
+                        _selectedImageFile == null &&
+                            (_selectedImageUrl == null ||
+                                _selectedImageUrl!.isEmpty)
+                        ? "Upload Image"
+                        : "Change Image",
+                    fontSize: 12,
+                    width: 200,
+                  ),
+                  const Gap(10),
+                  CustomTextFormField(controller: _name, labelText: 'Name'),
+                  const Gap(20),
+                  CustomTextFormField(controller: _email, labelText: 'Email'),
+                  const Gap(20),
+                  CustomTextFormField(
+                    controller: _address,
+                    labelText: 'Delivery Address',
+                  ),
+                  const Gap(20),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20.0),
+                    child: Divider(),
+                  ),
+                  const Gap(20),
+                  CustomTextFormField(
+                    textInputType: TextInputType.number,
+                    controller: _visa,
+                    labelText: visa == "" ? "Add Visa" : 'Edit Visa',
+                  ),
+                  const Gap(20),
+                  visa == ""
+                      ? const SizedBox.shrink()
+                      : ListTile(
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 6,
+                            horizontal: 16,
                           ),
-                          child: Row(
-                            children: [
-                              CustomText(
-                                text: editProfile,
-                                color: Colors.white,
-                              ),
-                              const Gap(10),
-                              const Icon(Icons.edit, color: Colors.white),
-                            ],
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadiusGeometry.circular(14),
+                          ),
+                          tileColor: Colors.white,
+                          leading: Image.asset(
+                            "assets/profileIcons/image 13.png",
+                          ),
+                          horizontalTitleGap: 30,
+                          title: const CustomText(
+                            text: "Debit card",
+                            color: Colors.black,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 14,
+                          ),
+                          subtitle: CustomText(
+                            text: visa.isNotEmpty
+                                ? _formatVisaNumber(visa)
+                                : "3566 **** **** 0505",
+                            color: Colors.black,
+                          ),
+                          trailing: const CustomText(
+                            text: "Default",
+                            color: Colors.black,
                           ),
                         ),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () async {
-                        await context.read<LogoutCubit>().logout();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          CustomSnackBar(
-                            "LOGGED OUT SUCCESSFULLY",
-                            Colors.white,
-                          ),
-                        );
-                        PrefHelper.removeToken();
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return const SigninView();
-                            },
-                          ),
-                        );
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Colors.black),
-                        ),
-                        child: const Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 10,
-                          ),
-                          child: Row(
-                            children: [
-                              CustomText(text: "Logout", color: Colors.black),
-                              Gap(10),
-                              Icon(Icons.logout, color: Colors.black),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                  const Gap(100),
+                ],
               ),
             ),
           ),
-        );
-      },
-      listener: (context, state) async {
-        if (state is Success) {
-          profileModel = state.data;
-          if (profileModel != null) {
-            _name.text = profileModel!.data.name;
-            _email.text = profileModel!.data.email;
-            _address.text = profileModel!.data.address ?? "none";
-            _visa.text = profileModel!.data.visa ?? "";
-            visa = _visa.text;
-            _selectedImageUrl = profileModel!.data.image?.toString();
-            _selectedImageFile = null;
-            if (mounted) {
-              setState(() {});
-            }
-          }
-        }
-      },
+          bottomSheet: Container(
+            height: 70,
+            decoration: const BoxDecoration(color: Colors.white),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                GestureDetector(
+                  onTap: isUpdating ? null : _updateProfile,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryColor,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
+                      child: Row(
+                        children: [
+                          CustomText(text: editProfile, color: Colors.white),
+                          const Gap(10),
+                          const Icon(Icons.edit, color: Colors.white),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: isLoggingOut ? null : _logout,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.black),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
+                      child: Row(
+                        children: [
+                          CustomText(
+                            text: isLoggingOut ? "Logging out..." : "Logout",
+                            color: Colors.black,
+                          ),
+                          const Gap(10),
+                          const Icon(Icons.logout, color: Colors.black),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
+  }
+
+  @override
+  void dispose() {
+    _name.dispose();
+    _email.dispose();
+    _address.dispose();
+    _visa.dispose();
+    super.dispose();
   }
 }

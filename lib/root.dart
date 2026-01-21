@@ -1,8 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hungry_app/core/constants/app_colors.dart';
+import 'package:hungry_app/core/di/dependancy_injection.dart';
+import 'package:hungry_app/features/auth/logout/logic/cubit/logout_cubit.dart';
 import 'package:hungry_app/features/auth/view/profile_view.dart';
 import 'package:hungry_app/features/cart/views/cart_view.dart';
+import 'package:hungry_app/features/home/logic/cubit/food_cubit.dart';
 import 'package:hungry_app/features/home/views/home_view.dart';
 import 'package:hungry_app/features/orderHistory/views/order_histroy_view.dart';
 
@@ -25,7 +29,10 @@ class _RootState extends State<Root> {
       const HomeView(),
       const CartView(),
       const OrderHistroyView(),
-      const ProfileView(),
+      BlocProvider(
+        create: (context) => getIt<LogoutCubit>(),
+        child: const ProfileView(),
+      ),
     ];
   }
 

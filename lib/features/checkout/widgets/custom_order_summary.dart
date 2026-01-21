@@ -53,13 +53,13 @@ Widget customCheckout(text, price, isBold, isSmall) {
         text: text,
         color: isBold ? Colors.black : const Color(0xff7d7d7d),
         fontWeight: isBold ? FontWeight.w600 : FontWeight.w400,
-        fontsize: isSmall ? 11 : 15,
+        fontSize: isSmall ? 11 : 15,
       ),
       CustomText(
         text: price.toString(),
         color: isBold ? Colors.black : const Color(0xff7d7d7d),
         fontWeight: isBold ? FontWeight.w600 : FontWeight.w400,
-        fontsize: isSmall ? 11 : 15,
+        fontSize: isSmall ? 11 : 15,
       ),
     ],
   );

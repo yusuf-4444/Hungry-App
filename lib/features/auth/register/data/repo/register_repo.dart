@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:hungry_app/core/network/api_exceptions.dart';
 import 'package:hungry_app/core/network/api_result.dart';
 import 'package:hungry_app/core/network/api_services.dart';
+import 'package:hungry_app/core/network/pref_helper.dart';
 import 'package:hungry_app/features/auth/register/models/register_model.dart';
 
 class RegisterRepo {
@@ -20,6 +21,9 @@ class RegisterRepo {
         "email": email,
         "password": password,
       });
+      PrefHelper.saveToken(response.data.token);
+      print('Token Saved: ${response.data.token}');
+      PrefHelper.setLoggedIn(true);
       return ApiResult.success(response);
     } on DioException catch (e) {
       final error = ApiExceptions.fromDioException(e);

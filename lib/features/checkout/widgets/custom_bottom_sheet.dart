@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:hungry_app/core/constants/app_colors.dart';
 import 'package:hungry_app/features/checkout/data/models/save_order.dart';
-import 'package:hungry_app/features/checkout/logic/cubit/save_order_cubit.dart';
-import 'package:hungry_app/features/checkout/logic/cubit/save_order_state.dart';
 import 'package:hungry_app/root.dart';
 import 'package:hungry_app/shared/custom_main_button.dart';
 import 'package:hungry_app/shared/custom_text.dart';
@@ -24,6 +21,105 @@ class CustomBottomSheet extends StatefulWidget {
 }
 
 class _CustomBottomSheetState extends State<CustomBottomSheet> {
+  // TODO: Add your state management here
+  bool isProcessing = false;
+
+  Future<void> _processPayment() async {
+    if (isProcessing) return;
+
+    setState(() {
+      isProcessing = true;
+    });
+
+    try {
+      // TODO: Save order logic
+      // await OrderService.saveOrder(widget.saveOrder);
+
+      // Simulate API call
+      await Future.delayed(const Duration(seconds: 2));
+
+      if (mounted) {
+        _showSuccessDialog();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Payment failed: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          isProcessing = false;
+        });
+      }
+    }
+  }
+
+  void _showSuccessDialog() {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) {
+        return Dialog(
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 50,
+            vertical: 170,
+          ),
+          backgroundColor: Colors.white,
+          child: Column(
+            children: [
+              const Gap(15),
+              const CircleAvatar(
+                radius: 33,
+                backgroundColor: AppColors.primaryColor,
+                child: Icon(
+                  Icons.check,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w900,
+                  size: 40,
+                ),
+              ),
+              const Gap(30),
+              const CustomText(
+                text: "Success !",
+                color: AppColors.primaryColor,
+                fontWeight: FontWeight.w700,
+                fontSize: 25,
+              ),
+              const Gap(15),
+              const CustomText(
+                text:
+                    "Your payment was successful\n.A receipt for this purchase has\n been sent to your email.",
+                color: Color(0xffBCBBBB),
+                fontWeight: FontWeight.w400,
+                fontSize: 14,
+                textAlign: TextAlign.center,
+              ),
+              const Gap(10),
+              const Spacer(),
+              CustomMainButton(
+                text: "Go Back",
+                fontSize: 15,
+                width: 200,
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const Root()),
+                  );
+                },
+              ),
+              const Gap(20),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -49,92 +145,21 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
                   text: "Total",
                   color: Colors.black,
                   fontWeight: FontWeight.w600,
-                  fontsize: 14,
+                  fontSize: 14,
                 ),
                 const Gap(10),
                 CustomText(
                   text: "\$ ${widget.totalPrice + 5 + 20.5}",
                   color: Colors.black,
-                  fontsize: 22,
+                  fontSize: 22,
                   fontWeight: FontWeight.w900,
                 ),
               ],
             ),
-            BlocBuilder<SaveOrderCubit, SaveOrderState>(
-              builder: (context, state) {
-                return CustomMainButton(
-                  text: state is Loading ? "Please Wait..." : "Pay Now",
-                  fontSize: 16,
-                  onPressed: () async {
-                    final cubit = context.read<SaveOrderCubit>();
-                    await cubit.saveOrder(widget.saveOrder);
-                    if (state is Success) {
-                      showDialog(
-                        barrierDismissible: false,
-                        context: context,
-                        builder: (context) {
-                          return Dialog(
-                            insetPadding: const EdgeInsets.symmetric(
-                              horizontal: 50,
-                              vertical: 170,
-                            ),
-                            backgroundColor: Colors.white,
-                            child: Column(
-                              children: [
-                                const Gap(15),
-                                const CircleAvatar(
-                                  radius: 33,
-                                  backgroundColor: AppColors.primaryColor,
-                                  child: Icon(
-                                    Icons.check,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w900,
-                                    size: 40,
-                                  ),
-                                ),
-                                const Gap(30),
-                                const CustomText(
-                                  text: "Success !",
-                                  color: AppColors.primaryColor,
-                                  fontWeight: FontWeight.w700,
-                                  fontsize: 25,
-                                ),
-                                const Gap(15),
-                                const CustomText(
-                                  text:
-                                      "Your payment was successful\n.A receipt for this purchase has\n been sent to your email.",
-                                  color: Color(0xffBCBBBB),
-                                  fontWeight: FontWeight.w400,
-                                  fontsize: 14,
-                                  textAlign: TextAlign.center,
-                                ),
-                                const Gap(10),
-                                const Spacer(),
-                                CustomMainButton(
-                                  text: "Go Back",
-                                  fontSize: 15,
-                                  width: 200,
-                                  onPressed: () {
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) {
-                                          return const Root();
-                                        },
-                                      ),
-                                    );
-                                  },
-                                ),
-                                const Gap(20),
-                              ],
-                            ),
-                          );
-                        },
-                      );
-                    }
-                  },
-                );
-              },
+            CustomMainButton(
+              text: isProcessing ? "Please Wait..." : "Pay Now",
+              fontSize: 16,
+              onPressed: isProcessing ? null : _processPayment,
             ),
           ],
         ),

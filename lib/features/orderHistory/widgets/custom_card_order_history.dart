@@ -37,7 +37,7 @@ class CustomCardOrderHistory extends StatelessWidget {
                       text: "HumBurger HumBurger",
                       color: Colors.black,
                       fontWeight: FontWeight.w500,
-                      fontsize: 16,
+                      fontSize: 16,
                     ),
                     CustomText(text: "Qty: x3", color: Colors.black),
                     CustomText(text: "Price: \$20", color: Colors.black),

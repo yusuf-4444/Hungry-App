@@ -24,13 +24,16 @@ class AutoLoginCubit extends Cubit<AutoLoginState> {
   }
 
   Future<void> enterAsGuest() async {
+    if (isClosed) return;
     emit(const AutoLoginState.loading());
 
     await PrefHelper.setGuestMode(true);
     await PrefHelper.setLoggedIn(false);
     await PrefHelper.removeToken();
 
-    emit(const AutoLoginState.guest());
+    if (!isClosed) {
+      emit(const AutoLoginState.guest());
+    }
   }
 
   Future<void> logout() async {

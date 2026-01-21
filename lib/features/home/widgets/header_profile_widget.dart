@@ -19,8 +19,11 @@ class _HeaderProfileState extends State<HeaderProfile> {
   @override
   void initState() {
     super.initState();
+    // ✅ استخدم mounted check
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ProfileCubit>().getProfile(forceRefresh: true);
+      if (mounted) {
+        context.read<ProfileCubit>().getProfile(forceRefresh: true);
+      }
     });
   }
 
@@ -28,23 +31,19 @@ class _HeaderProfileState extends State<HeaderProfile> {
   Widget build(BuildContext context) {
     return BlocBuilder<ProfileCubit, ProfileState>(
       builder: (context, state) {
-        return _buildHeader(state);
+        final username = _getUsername(state);
+        final imageUrl = _getImageUrl(state);
+        final isLoading = state is Loading;
+
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildWelcomeSection(username),
+            const Spacer(),
+            _buildAvatar(imageUrl, isLoading),
+          ],
+        );
       },
-    );
-  }
-
-  Widget _buildHeader(ProfileState state) {
-    final username = _getUsername(state);
-    final imageUrl = _getImageUrl(state);
-    final isLoading = state is Loading;
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildWelcomeSection(username),
-        const Spacer(),
-        _buildAvatar(imageUrl, isLoading),
-      ],
     );
   }
 
@@ -109,7 +108,6 @@ class _HeaderProfileState extends State<HeaderProfile> {
     return const Icon(CupertinoIcons.person, color: Colors.white);
   }
 
-  // Data Extractors
   String _getUsername(ProfileState state) {
     if (state is Success) {
       return state.data.data.name;

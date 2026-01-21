@@ -30,39 +30,42 @@ class _CustomCardState extends State<CustomCard> {
   bool _isRemoving = false;
   late int number;
 
-  Future<void> _removeItem() async {
-    if (widget.onPressed == null) return;
-
-    _isRemoving = true;
-    setState(() {});
-
-    try {
-      widget.onPressed!(); // استدعاء دالة الحذف مع await
-    } finally {
-      // نرجع الحالة لـ "Remove" حتى لو حصل error
-      _isRemoving = false;
-      if (mounted) {
-        setState(() {});
-      }
-    }
-  }
-
   @override
   void initState() {
     number = widget.initialNumber;
     super.initState();
   }
 
+  Future<void> _removeItem() async {
+    if (widget.onPressed == null) return;
+
+    setState(() {
+      _isRemoving = true;
+    });
+
+    try {
+      widget.onPressed!();
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isRemoving = false;
+        });
+      }
+    }
+  }
+
   void onAdd() {
-    number++;
-    setState(() {});
+    setState(() {
+      number++;
+    });
     widget.onQuantityChanged?.call(number);
   }
 
   void onMinus() {
     if (number > 1) {
-      number--;
-      setState(() {});
+      setState(() {
+        number--;
+      });
       widget.onQuantityChanged?.call(number);
     }
   }
@@ -90,7 +93,7 @@ class _CustomCardState extends State<CustomCard> {
                   text: widget.title,
                   color: Colors.black,
                   fontWeight: FontWeight.w600,
-                  fontsize: 14,
+                  fontSize: 14,
                 ),
                 CustomText(
                   text: widget.subTitle,
@@ -117,7 +120,7 @@ class _CustomCardState extends State<CustomCard> {
                             vertical: 5,
                           ),
                           child: CustomText(
-                            fontsize: 20,
+                            fontSize: 20,
                             text: "-",
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -145,7 +148,7 @@ class _CustomCardState extends State<CustomCard> {
                             vertical: 5,
                           ),
                           child: CustomText(
-                            fontsize: 20,
+                            fontSize: 20,
                             text: "+",
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -171,7 +174,7 @@ class _CustomCardState extends State<CustomCard> {
                       child: CustomText(
                         text: _isRemoving ? "Removing..." : "Remove",
                         color: Colors.white,
-                        fontsize: 18,
+                        fontSize: 18,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
