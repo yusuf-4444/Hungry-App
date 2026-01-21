@@ -9,11 +9,15 @@ class FoodCubit extends Cubit<FoodState> {
   FoodCubit(this.foodRepo) : super(const FoodState.initial());
 
   List<Data> food = [];
+  List<Data> filteredFood = [];
   bool _hasLoadedData = false;
+
+  String currentSearchQuery = '';
+  String currentCategory = 'All';
 
   Future<void> getFood({bool forceRefresh = false}) async {
     if (_hasLoadedData && !forceRefresh && food.isNotEmpty) {
-      emit(FoodState.success(FoodDataModel(data: food)));
+      _applyFilters();
       return;
     }
 
@@ -23,8 +27,9 @@ class FoodCubit extends Cubit<FoodState> {
       response.when(
         success: (success) {
           food = success.data;
+          filteredFood = List.from(food);
           _hasLoadedData = true;
-          emit(FoodState.success(success));
+          emit(FoodState.success(FoodDataModel(data: filteredFood)));
         },
         failure: (failure) {
           emit(FoodState.failure(failure));
@@ -35,12 +40,42 @@ class FoodCubit extends Cubit<FoodState> {
     }
   }
 
+  void searchFood(String query) {
+    currentSearchQuery = query.toLowerCase();
+    _applyFilters();
+  }
+
+  void filterByCategory(String category) {
+    currentCategory = category;
+    _applyFilters();
+  }
+
+  void _applyFilters() {
+    filteredFood = food.where((item) {
+      final matchesSearch =
+          currentSearchQuery.isEmpty ||
+          item.name.toLowerCase().contains(currentSearchQuery) ||
+          item.description.toLowerCase().contains(currentSearchQuery);
+
+      final matchesCategory =
+          currentCategory == 'All' ||
+          item.name.toLowerCase().contains(currentCategory.toLowerCase());
+
+      return matchesSearch && matchesCategory;
+    }).toList();
+
+    emit(FoodState.success(FoodDataModel(data: filteredFood)));
+  }
+
   Future<void> refreshFood() async {
     await getFood(forceRefresh: true);
   }
 
   void clearCache() {
     food = [];
+    filteredFood = [];
     _hasLoadedData = false;
+    currentSearchQuery = '';
+    currentCategory = 'All';
   }
 }

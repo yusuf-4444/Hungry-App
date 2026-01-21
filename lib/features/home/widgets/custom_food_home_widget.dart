@@ -30,7 +30,6 @@ class CustomFoodHomeWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // الصورة مع الظل
           Stack(
             children: [
               Positioned(
@@ -70,34 +69,34 @@ class CustomFoodHomeWidget extends StatelessWidget {
           ),
           Gap(10.h),
 
-          // العنوان والوصف
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 12.w),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Gap(5.h),
                 CustomText(
                   maxLines: 1,
                   text: title,
                   color: const Color(0xff3C2F2F),
                   fontSize: 15.5.sp,
                   fontWeight: FontWeight.w600,
+                  textAlign: TextAlign.center,
                 ),
-                Gap(5.h),
+                Gap(15.h),
                 CustomText(
                   text: subtitle,
                   color: Colors.grey.shade900,
                   maxLines: 2,
+                  overFlow: TextOverflow.ellipsis,
                   fontSize: 12.sp,
                 ),
               ],
             ),
           ),
 
-          // مساحة فارغة لدفع الـ Row إلى الأسفل
           const Spacer(),
 
-          // الـ Row الموجود في نهاية الـ Card
           Container(
             padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
             decoration: BoxDecoration(

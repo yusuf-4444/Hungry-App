@@ -9,12 +9,11 @@ class SideOptionsCubit extends Cubit<SideOptionsState> {
   SideOptionsCubit(this.toppingsSideOptionsRepo)
     : super(const SideOptionsState.initial());
 
-  bool _hasLoadedData = false;
   SideOptionsModel? successModel;
 
   Future<void> getSideOptions() async {
-    if (_hasLoadedData && successModel != null) {
-      emit(SideOptionsState.success(successModel!));
+    if (sideOptionsModel.data.isNotEmpty) {
+      emit(SideOptionsState.success(sideOptionsModel));
       return;
     }
     emit(const SideOptionsState.loading());
@@ -23,8 +22,7 @@ class SideOptionsCubit extends Cubit<SideOptionsState> {
       final response = await toppingsSideOptionsRepo.getSideOptions();
       response.when(
         success: (success) {
-          _hasLoadedData = true;
-          successModel = success;
+          sideOptionsModel = success;
           emit(SideOptionsState.success(success));
         },
         failure: (error) => emit(SideOptionsState.failure(error)),

@@ -23,3 +23,5 @@ class Data {
   factory Data.fromJson(Map<String, dynamic> json) => _$DataFromJson(json);
   Map<String, dynamic> toJson() => _$DataToJson(this);
 }
+
+ToppingsModel toppingsModel = ToppingsModel(data: []);

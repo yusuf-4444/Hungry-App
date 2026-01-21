@@ -8,7 +8,11 @@ import 'package:hungry_app/features/auth/register/logic/cubit/register_cubit.dar
 import 'package:hungry_app/features/auth/view/profile_view.dart';
 import 'package:hungry_app/features/auth/view/signin_view.dart';
 import 'package:hungry_app/features/auth/view/signup_view.dart';
+import 'package:hungry_app/features/cart/logic/addToCartCubit/add_to_cart_cubit.dart';
 import 'package:hungry_app/features/home/views/home_view.dart';
+import 'package:hungry_app/features/product/logic/cubit/side_options_cubit.dart';
+import 'package:hungry_app/features/product/logic/cubit/toppings_cubit.dart';
+import 'package:hungry_app/features/product/views/product_details_view.dart';
 import 'package:hungry_app/root.dart';
 import 'package:hungry_app/splash.dart';
 
@@ -40,6 +44,29 @@ class AppRouter {
           builder: (_) => BlocProvider(
             create: (context) => getIt<RegisterCubit>(),
             child: const SignupView(),
+          ),
+        );
+      case AppRoutes.productDetails:
+        final foodItem = settings.arguments as Map<String, dynamic>;
+        return CupertinoPageRoute(
+          settings: settings,
+          builder: (_) => MultiBlocProvider(
+            providers: [
+              BlocProvider(create: (context) => getIt<AddToCartCubit>()),
+              BlocProvider(
+                create: (context) =>
+                    getIt<SideOptionsCubit>()..getSideOptions(),
+                lazy: true,
+              ),
+              BlocProvider(
+                create: (context) => getIt<ToppingsCubit>()..getToppings(),
+                lazy: true,
+              ),
+            ],
+            child: ProductDetailsView(
+              productId: foodItem['productId'],
+              price: foodItem['price'],
+            ),
           ),
         );
       default:

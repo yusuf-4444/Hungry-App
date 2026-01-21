@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hungry_app/shared/custom_text.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -104,16 +105,24 @@ class _CustomToppingsSideOptionsWidgetState
                             ),
                           ),
                           child: !widget.isLoading && item?.image != null
-                              ? Image.network(
-                                  item!.image,
+                              ? CachedNetworkImage(
+                                  imageUrl: item!.image,
                                   height: 60,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Image.asset(
-                                      "assets/details/pngwing 15.png",
-                                      height: 60,
-                                      width: 60,
-                                    );
-                                  },
+                                  width: 60,
+                                  fit: BoxFit.contain,
+                                  errorWidget: (context, url, error) =>
+                                      const Icon(
+                                        Icons.error,
+                                        color: Colors.red,
+                                      ),
+                                  placeholder: (context, url) => const Center(
+                                    child: CircularProgressIndicator.adaptive(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.black,
+                                      ),
+                                    ),
+                                  ),
                                 )
                               : Image.asset(
                                   "assets/details/pngwing 15.png",

@@ -1,14 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:hungry_app/core/constants/app_colors.dart';
+import 'package:hungry_app/core/route/app_routes.dart';
 import 'package:hungry_app/features/cart/data/models/addToCart/add_to_cart_model.dart';
 import 'package:hungry_app/features/home/data/models/side_options_model.dart';
 import 'package:hungry_app/features/home/data/models/toppings_model.dart';
+import 'package:hungry_app/features/product/logic/cubit/side_options_cubit.dart';
+import 'package:hungry_app/features/product/logic/cubit/side_options_state.dart'
+    as side_options_state;
+import 'package:hungry_app/features/product/logic/cubit/toppings_cubit.dart';
+import 'package:hungry_app/features/product/logic/cubit/toppings_state.dart';
 import 'package:hungry_app/features/product/widgets/custom_header_spicy_details.dart';
 import 'package:hungry_app/features/product/widgets/custom_toppings_side_options.dart';
 import 'package:hungry_app/shared/custom_main_button.dart';
 import 'package:hungry_app/shared/custom_snack_bar.dart';
 import 'package:hungry_app/shared/custom_text.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class ProductDetailsView extends StatefulWidget {
   const ProductDetailsView({
@@ -43,9 +51,6 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
   @override
   void initState() {
     super.initState();
-    // TODO: Call your data fetching methods here
-    // _fetchToppings();
-    // _fetchSideOptions();
   }
 
   Future<void> _fetchToppings() async {
@@ -61,6 +66,11 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
       //   toppingsData = data;
       //   isToppingsLoading = false;
       // });
+      // final data = await context.read<ToppingsCubit>().getToppings();
+      setState(() {
+        //toppingsData = data;
+        isToppingsLoading = false;
+      });
     } catch (e) {
       setState(() {
         toppingsError = e.toString();
@@ -145,7 +155,7 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
         backgroundColor: Colors.white,
         leading: IconButton(
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.popAndPushNamed(context, AppRoutes.root);
           },
           icon: const Icon(Icons.arrow_back, fontWeight: FontWeight.bold),
         ),
@@ -174,18 +184,54 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
               const Gap(15),
 
               // Toppings Section
-              CustomToppingsSideOptionsWidget(
-                isLoading: isToppingsLoading,
-                data: toppingsData,
-                selectedItems: toppings,
-                onItemSelection: (value) {
-                  setState(() {
-                    if (toppings.contains(value)) {
-                      toppings.remove(value);
-                    } else {
-                      toppings.add(value);
-                    }
-                  });
+              BlocBuilder<ToppingsCubit, ToppingsState>(
+                bloc: context.read<ToppingsCubit>(),
+                buildWhen: (previous, current) =>
+                    current is Loading ||
+                    current is Success ||
+                    current is Failure,
+                builder: (context, state) {
+                  if (state is Loading) {
+                    return Skeletonizer(
+                      enabled: true,
+                      child: CustomToppingsSideOptionsWidget(
+                        isLoading: true,
+                        data: null,
+                        selectedItems: const [],
+                        onItemSelection: (value) {},
+                      ),
+                    );
+                  } else if (state is Failure) {
+                    return Center(
+                      child: CustomText(
+                        text: "Error: ${state.error}",
+                        color: Colors.red,
+                      ),
+                    );
+                  } else if (state is Success) {
+                    toppingsData = state.data;
+                    isToppingsLoading = false;
+                    return CustomToppingsSideOptionsWidget(
+                      isLoading: false,
+                      data: toppingsData,
+                      selectedItems: toppings,
+                      onItemSelection: (value) {
+                        setState(() {
+                          if (toppings.contains(value)) {
+                            toppings.remove(value);
+                          } else {
+                            toppings.add(value);
+                          }
+                        });
+                      },
+                    );
+                  }
+                  return CustomToppingsSideOptionsWidget(
+                    isLoading: true,
+                    data: null,
+                    selectedItems: const [],
+                    onItemSelection: (value) {},
+                  );
                 },
               ),
 
@@ -199,18 +245,65 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
               const Gap(15),
 
               // Side Options Section
-              CustomToppingsSideOptionsWidget(
-                isLoading: isSideOptionsLoading,
-                data: sideOptionsData,
-                selectedItems: sideOptions,
-                onItemSelection: (value) {
-                  setState(() {
-                    if (sideOptions.contains(value)) {
-                      sideOptions.remove(value);
-                    } else {
-                      sideOptions.add(value);
-                    }
-                  });
+              BlocBuilder<
+                SideOptionsCubit,
+                side_options_state.SideOptionsState
+              >(
+                bloc: context.read<SideOptionsCubit>(),
+                buildWhen: (previous, current) =>
+                    current is side_options_state.Loading ||
+                    current is side_options_state.Success ||
+                    current is side_options_state.Failure,
+                builder: (context, state) {
+                  if (state is side_options_state.Loading) {
+                    return Skeletonizer(
+                      enabled: true,
+                      child: CustomToppingsSideOptionsWidget(
+                        isLoading: true,
+                        data: null,
+                        selectedItems: const [],
+                        onItemSelection: (value) {},
+                      ),
+                    );
+                  } else if (state is side_options_state.Failure) {
+                    return Center(
+                      child: CustomText(
+                        text: "Error: ${state.error}",
+                        color: Colors.red,
+                      ),
+                    );
+                  } else if (state is side_options_state.Success) {
+                    sideOptionsData = state.data;
+                    isSideOptionsLoading = false;
+                    return CustomToppingsSideOptionsWidget(
+                      isLoading: false,
+                      data: sideOptionsData,
+                      selectedItems: sideOptions,
+                      onItemSelection: (value) {
+                        setState(() {
+                          if (sideOptions.contains(value)) {
+                            sideOptions.remove(value);
+                          } else {
+                            sideOptions.add(value);
+                          }
+                        });
+                      },
+                    );
+                  }
+                  return CustomToppingsSideOptionsWidget(
+                    isLoading: isSideOptionsLoading,
+                    data: sideOptionsData,
+                    selectedItems: sideOptions,
+                    onItemSelection: (value) {
+                      setState(() {
+                        if (sideOptions.contains(value)) {
+                          sideOptions.remove(value);
+                        } else {
+                          sideOptions.add(value);
+                        }
+                      });
+                    },
+                  );
                 },
               ),
 

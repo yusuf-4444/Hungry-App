@@ -13,7 +13,7 @@ class ToppingsCubit extends Cubit<ToppingsState> {
   ToppingsModel? toppingSuccess;
 
   Future<void> getToppings() async {
-    if (_hasData == true && toppingSuccess != null) {
+    if (_hasData == true && toppingsModel != null) {
       emit(ToppingsState.success(toppingSuccess!));
       return;
     }
@@ -22,9 +22,9 @@ class ToppingsCubit extends Cubit<ToppingsState> {
       final response = await toppingsSideOptionsRepo.getToppings();
       response.when(
         success: (success) {
-          emit(ToppingsState.success(success));
           _hasData = true;
-          toppingSuccess = success;
+          toppingsModel = success;
+          emit(ToppingsState.success(success));
         },
         failure: (error) => emit(ToppingsState.failure(error)),
       );
