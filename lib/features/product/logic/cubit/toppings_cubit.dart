@@ -9,21 +9,34 @@ class ToppingsCubit extends Cubit<ToppingsState> {
   ToppingsCubit(this.toppingsSideOptionsRepo)
     : super(const ToppingsState.initial());
 
-  bool _hasData = false;
-  ToppingsModel? toppingSuccess;
+  // الداتا المحفوظة
+  ToppingsModel? _cachedToppings;
 
-  Future<void> getToppings() async {
-    if (_hasData == true && toppingsModel != null) {
-      emit(ToppingsState.success(toppingSuccess!));
+  // فلاج للتأكد إننا جبنا الداتا قبل كده
+  bool _hasLoadedData = false;
+
+  Future<void> getToppings({bool forceRefresh = false}) async {
+    // لو عندنا الداتا محفوظة ومش عايزين نعمل refresh، نرجع الداتا المحفوظة
+    if (_hasLoadedData && _cachedToppings != null && !forceRefresh) {
+      emit(ToppingsState.success(_cachedToppings!));
       return;
     }
+
+    // لو مفيش داتا أو عايزين نعمل refresh، نجيب من الـ API
     emit(const ToppingsState.loading());
+
     try {
       final response = await toppingsSideOptionsRepo.getToppings();
+
       response.when(
         success: (success) {
-          _hasData = true;
+          // نحفظ الداتا
+          _cachedToppings = success;
+          _hasLoadedData = true;
+
+          // نحدث الـ global variable كمان (اختياري)
           toppingsModel = success;
+
           emit(ToppingsState.success(success));
         },
         failure: (error) => emit(ToppingsState.failure(error)),
@@ -31,5 +44,17 @@ class ToppingsCubit extends Cubit<ToppingsState> {
     } catch (e) {
       emit(ToppingsState.failure(e.toString()));
     }
+  }
+
+  // دالة للـ refresh لو احتجناها
+  Future<void> refreshToppings() async {
+    await getToppings(forceRefresh: true);
+  }
+
+  // دالة لمسح الـ cache لو احتجناها
+  void clearCache() {
+    _cachedToppings = null;
+    _hasLoadedData = false;
+    emit(const ToppingsState.initial());
   }
 }

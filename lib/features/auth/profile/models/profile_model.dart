@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'profile_model.g.dart';
@@ -11,6 +12,10 @@ class ProfileModel {
   factory ProfileModel.fromJson(Map<String, dynamic> json) =>
       _$ProfileModelFromJson(json);
   Map<String, dynamic> toJson() => _$ProfileModelToJson(this);
+
+  ProfileModel copyWith({Data? data}) {
+    return ProfileModel(data: data ?? this.data);
+  }
 }
 
 @JsonSerializable()
@@ -30,4 +35,20 @@ class Data {
   });
   factory Data.fromJson(Map<String, dynamic> json) => _$DataFromJson(json);
   Map<String, dynamic> toJson() => _$DataToJson(this);
+
+  Data copyWith({
+    String? name,
+    String? email,
+    String? image,
+    String? address,
+    String? visa,
+  }) {
+    return Data(
+      name: name ?? this.name,
+      email: email ?? this.email,
+      image: image ?? this.image,
+      address: address ?? this.address,
+      visa: visa ?? this.visa,
+    );
+  }
 }

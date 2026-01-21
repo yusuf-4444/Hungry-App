@@ -4,6 +4,8 @@ import 'package:hungry_app/core/di/dependancy_injection.dart';
 import 'package:hungry_app/core/route/app_routes.dart';
 import 'package:hungry_app/features/auth/login/logic/cubit/auto_login_cubit.dart';
 import 'package:hungry_app/features/auth/logout/logic/cubit/logout_cubit.dart';
+import 'package:hungry_app/features/auth/profile/logic/cubit/profile_cubit.dart';
+import 'package:hungry_app/features/auth/profile/logic/cubit/update_profile_cubit.dart';
 import 'package:hungry_app/features/auth/register/logic/cubit/register_cubit.dart';
 import 'package:hungry_app/features/auth/view/profile_view.dart';
 import 'package:hungry_app/features/auth/view/signin_view.dart';
@@ -32,8 +34,12 @@ class AppRouter {
         );
       case AppRoutes.profile:
         return CupertinoPageRoute(
-          builder: (_) => BlocProvider(
-            create: (context) => getIt<LogoutCubit>(),
+          builder: (_) => MultiBlocProvider(
+            providers: [
+              BlocProvider(create: (context) => getIt<LogoutCubit>()),
+              BlocProvider.value(value: getIt<ProfileCubit>()..getProfile()),
+              BlocProvider(create: (context) => getIt<UpdateProfileCubit>()),
+            ],
             child: const ProfileView(),
           ),
         );
@@ -53,15 +59,10 @@ class AppRouter {
           builder: (_) => MultiBlocProvider(
             providers: [
               BlocProvider(create: (context) => getIt<AddToCartCubit>()),
-              BlocProvider(
-                create: (context) =>
-                    getIt<SideOptionsCubit>()..getSideOptions(),
-                lazy: true,
+              BlocProvider.value(
+                value: getIt<SideOptionsCubit>()..getSideOptions(),
               ),
-              BlocProvider(
-                create: (context) => getIt<ToppingsCubit>()..getToppings(),
-                lazy: true,
-              ),
+              BlocProvider.value(value: getIt<ToppingsCubit>()..getToppings()),
             ],
             child: ProductDetailsView(
               productId: foodItem['productId'],

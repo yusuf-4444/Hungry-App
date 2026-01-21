@@ -30,10 +30,12 @@ import 'package:hungry_app/features/product/logic/cubit/toppings_cubit.dart';
 GetIt getIt = GetIt.instance;
 
 Future<void> setUpGetIt() async {
+  // Network
   Dio dio = DioFactory.getDio();
   getIt.registerLazySingleton<Dio>(() => dio);
   getIt.registerLazySingleton<ApiServices>(() => ApiServices(dio));
 
+  // Repositories
   getIt.registerLazySingleton<FoodRepo>(() => FoodRepo(apiServices: getIt()));
   getIt.registerLazySingleton<RegisterRepo>(
     () => RegisterRepo(apiServices: getIt()),
@@ -62,10 +64,11 @@ Future<void> setUpGetIt() async {
     () => SaveOrderRepo(apiServices: getIt()),
   );
 
+  // Cubits
   getIt.registerFactory<FoodCubit>(() => FoodCubit(getIt()));
   getIt.registerFactory<RegisterCubit>(() => RegisterCubit(getIt()));
   getIt.registerFactory<LoginCubit>(() => LoginCubit(getIt()));
-  getIt.registerFactory<ProfileCubit>(() => ProfileCubit(getIt()));
+  getIt.registerLazySingleton<ProfileCubit>(() => ProfileCubit(getIt()));
   getIt.registerFactory<UpdateProfileCubit>(() => UpdateProfileCubit(getIt()));
   getIt.registerFactory<LogoutCubit>(() => LogoutCubit(getIt()));
 
@@ -73,8 +76,11 @@ Future<void> setUpGetIt() async {
     () => AutoLoginCubit(getIt<LoginRepo>())..checkAuthStatus(),
   );
 
-  getIt.registerFactory<ToppingsCubit>(() => ToppingsCubit(getIt()));
-  getIt.registerFactory<SideOptionsCubit>(() => SideOptionsCubit(getIt()));
+  getIt.registerLazySingleton<ToppingsCubit>(() => ToppingsCubit(getIt()));
+  getIt.registerLazySingleton<SideOptionsCubit>(
+    () => SideOptionsCubit(getIt()),
+  );
+
   getIt.registerFactory<GetCartCubit>(() => GetCartCubit(getIt()));
   getIt.registerFactory<AddToCartCubit>(() => AddToCartCubit(getIt()));
   getIt.registerFactory<DeleteItemCubit>(() => DeleteItemCubit(getIt()));

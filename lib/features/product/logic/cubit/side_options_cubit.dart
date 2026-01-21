@@ -9,20 +9,28 @@ class SideOptionsCubit extends Cubit<SideOptionsState> {
   SideOptionsCubit(this.toppingsSideOptionsRepo)
     : super(const SideOptionsState.initial());
 
-  SideOptionsModel? successModel;
+  SideOptionsModel? _cachedSideOptions;
 
-  Future<void> getSideOptions() async {
-    if (sideOptionsModel.data.isNotEmpty) {
-      emit(SideOptionsState.success(sideOptionsModel));
+  bool _hasLoadedData = false;
+
+  Future<void> getSideOptions({bool forceRefresh = false}) async {
+    if (_hasLoadedData && _cachedSideOptions != null && !forceRefresh) {
+      emit(SideOptionsState.success(_cachedSideOptions!));
       return;
     }
+
     emit(const SideOptionsState.loading());
 
     try {
       final response = await toppingsSideOptionsRepo.getSideOptions();
+
       response.when(
         success: (success) {
+          _cachedSideOptions = success;
+          _hasLoadedData = true;
+
           sideOptionsModel = success;
+
           emit(SideOptionsState.success(success));
         },
         failure: (error) => emit(SideOptionsState.failure(error)),
@@ -30,5 +38,15 @@ class SideOptionsCubit extends Cubit<SideOptionsState> {
     } catch (e) {
       emit(SideOptionsState.failure(e.toString()));
     }
+  }
+
+  Future<void> refreshSideOptions() async {
+    await getSideOptions(forceRefresh: true);
+  }
+
+  void clearCache() {
+    _cachedSideOptions = null;
+    _hasLoadedData = false;
+    emit(const SideOptionsState.initial());
   }
 }

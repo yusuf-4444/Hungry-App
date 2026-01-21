@@ -31,7 +31,7 @@ class HungryApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => getIt<FoodCubit>()..getFood()),
-        BlocProvider(create: (context) => getIt<ProfileCubit>()),
+        BlocProvider.value(value: getIt<ProfileCubit>()..getProfile()),
         BlocProvider(create: (context) => getIt<LoginCubit>()),
       ],
       child: ScreenUtilInit(
