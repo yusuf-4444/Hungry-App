@@ -1,12 +1,15 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:hungry_app/core/constants/app_colors.dart';
 import 'package:hungry_app/features/auth/profile/logic/cubit/profile_cubit.dart';
 import 'package:hungry_app/features/auth/profile/logic/cubit/profile_state.dart';
 import 'package:hungry_app/shared/custom_text.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class HeaderProfile extends StatefulWidget {
   const HeaderProfile({super.key});
@@ -19,7 +22,6 @@ class _HeaderProfileState extends State<HeaderProfile> {
   @override
   void initState() {
     super.initState();
-    // ✅ استخدم mounted check
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         context.read<ProfileCubit>().getProfile(forceRefresh: true);
@@ -35,13 +37,16 @@ class _HeaderProfileState extends State<HeaderProfile> {
         final imageUrl = _getImageUrl(state);
         final isLoading = state is Loading;
 
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildWelcomeSection(username),
-            const Spacer(),
-            _buildAvatar(imageUrl, isLoading),
-          ],
+        return Skeletonizer(
+          enabled: isLoading,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildWelcomeSection(username),
+              const Spacer(),
+              _buildAvatar(imageUrl, isLoading),
+            ],
+          ),
         );
       },
     );
@@ -54,17 +59,23 @@ class _HeaderProfileState extends State<HeaderProfile> {
         SvgPicture.asset(
           "assets/logo/Hungry_.svg",
           color: AppColors.primaryColor,
-          height: 35,
+          height: 35.h, // استخدم .h من ScreenUtil
         ),
-        const Gap(5),
-        CustomText(text: "Hello, $username", color: Colors.grey.shade600),
+        Gap(5.h), // استخدم .h من ScreenUtil
+        Skeleton.leaf(
+          // أضف Skeleton للنص
+          child: CustomText(
+            text: "Hello, $username",
+            color: Colors.grey.shade600,
+          ),
+        ),
       ],
     );
   }
 
   Widget _buildAvatar(String? imageUrl, bool isLoading) {
     return CircleAvatar(
-      radius: 25,
+      radius: 25.r,
       backgroundColor: AppColors.primaryColor,
       child: _buildAvatarContent(imageUrl, isLoading),
     );
@@ -72,10 +83,10 @@ class _HeaderProfileState extends State<HeaderProfile> {
 
   Widget _buildAvatarContent(String? imageUrl, bool isLoading) {
     if (isLoading) {
-      return const SizedBox(
-        width: 20,
-        height: 20,
-        child: CircularProgressIndicator(
+      return SizedBox(
+        width: 20.w,
+        height: 20.h,
+        child: const CircularProgressIndicator(
           strokeWidth: 2,
           valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
         ),
@@ -84,19 +95,14 @@ class _HeaderProfileState extends State<HeaderProfile> {
 
     if (imageUrl != null && imageUrl.isNotEmpty) {
       return ClipOval(
-        child: Image.network(
-          imageUrl,
-          width: 50,
-          height: 50,
+        child: CachedNetworkImage(
+          imageUrl: imageUrl,
+          width: 50.w,
+          height: 50.h,
           fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => _buildDefaultIcon(),
-          loadingBuilder: (context, child, loadingProgress) {
-            if (loadingProgress == null) return child;
-            return const CircularProgressIndicator(
-              strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-            );
-          },
+          placeholder: (context, url) =>
+              const CircularProgressIndicator.adaptive(),
+          errorWidget: (context, url, error) => _buildDefaultIcon(),
         ),
       );
     }
@@ -105,7 +111,11 @@ class _HeaderProfileState extends State<HeaderProfile> {
   }
 
   Widget _buildDefaultIcon() {
-    return const Icon(CupertinoIcons.person, color: Colors.white);
+    return Icon(
+      CupertinoIcons.person,
+      color: Colors.white,
+      size: 24.sp, // استخدم .sp من ScreenUtil
+    );
   }
 
   String _getUsername(ProfileState state) {

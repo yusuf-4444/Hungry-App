@@ -76,7 +76,7 @@ class _HomeViewState extends State<HomeView> {
                 ),
               ),
               BlocBuilder<FoodCubit, FoodState>(
-                bloc: getIt<FoodCubit>(),
+                bloc: context.read<FoodCubit>(),
                 buildWhen: (previous, current) =>
                     current is Loading ||
                     current is Success ||
@@ -110,11 +110,12 @@ class _HomeViewState extends State<HomeView> {
                       child: Center(child: Text('Error: ${state.error}')),
                     );
                   } else if (state is Success) {
+                    final foods = state.data.data;
                     return SliverGrid(
                       delegate: SliverChildBuilderDelegate(
-                        childCount: state.data.length,
+                        childCount: foods.length,
                         (context, index) {
-                          final food = state.data[index];
+                          final food = foods[index];
                           return GestureDetector(
                             onTap: () {
                               _navigateToDetails(context, food);
