@@ -306,30 +306,17 @@ Future<void> setUpGetIt() async {
 - [ ] Multi-language support
 - [ ] Social media authentication
 
-## 🐛 Known Issues
+## Author
 
-- None currently reported
+*Yusuf Mohamed*
 
-## 📄 License
+- GitHub: [@yusuf-4444](https://github.com/yusuf-4444)
+- LinkedIn: [Yusuf Mohamed](https://www.linkedin.com/in/yusuf-mohamed-8a2798306/)
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+## License
 
-## 👥 Contributors
-
-- **Your Name** - Initial work - [YourGitHub](https://github.com/yourusername)
-
-## 🙏 Acknowledgments
-
-- Design inspiration from modern food delivery apps
-- Icons from [Lucide Icons](https://lucide.dev/)
-- Images from [Unsplash](https://unsplash.com/)
-
-## 📞 Contact
-
-For questions or feedback, please reach out:
-- Email: your.email@example.com
-- GitHub: [@yourusername](https://github.com/yourusername)
+MIT License
 
 ---
 
-Made with ❤️ using Flutter
+⭐ Star this repo if you found it helpful!
