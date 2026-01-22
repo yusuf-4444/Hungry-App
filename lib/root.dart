@@ -5,6 +5,7 @@ import 'package:hungry_app/core/constants/app_colors.dart';
 import 'package:hungry_app/core/di/dependancy_injection.dart';
 import 'package:hungry_app/features/auth/logout/logic/cubit/logout_cubit.dart';
 import 'package:hungry_app/features/auth/profile/logic/cubit/profile_cubit.dart';
+import 'package:hungry_app/features/auth/profile/logic/cubit/update_profile_cubit.dart';
 import 'package:hungry_app/features/auth/view/profile_view.dart';
 import 'package:hungry_app/features/cart/views/cart_view.dart';
 import 'package:hungry_app/features/home/views/home_view.dart';
@@ -18,32 +19,27 @@ class Root extends StatefulWidget {
 }
 
 class _RootState extends State<Root> {
-  late List<Widget> screens;
-
   int currentPage = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    screens = [
-      const HomeView(),
-      const CartView(),
-      const OrderHistroyView(),
-
-      MultiBlocProvider(
-        providers: [
-          BlocProvider(create: (context) => getIt<LogoutCubit>()),
-          BlocProvider.value(value: getIt<ProfileCubit>()),
-        ],
-        child: const ProfileView(),
-      ),
-    ];
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(index: currentPage, children: screens),
+      body: IndexedStack(
+        index: currentPage,
+        children: [
+          const HomeView(),
+          const CartView(),
+          const OrderHistroyView(),
+          MultiBlocProvider(
+            providers: [
+              BlocProvider(create: (context) => getIt<LogoutCubit>()),
+              BlocProvider.value(value: getIt<ProfileCubit>()),
+              BlocProvider(create: (context) => getIt<UpdateProfileCubit>()),
+            ],
+            child: const ProfileView(),
+          ),
+        ],
+      ),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(10),
         decoration: const BoxDecoration(
@@ -55,8 +51,9 @@ class _RootState extends State<Root> {
         ),
         child: BottomNavigationBar(
           onTap: (value) {
-            currentPage = value;
-            setState(() {});
+            setState(() {
+              currentPage = value;
+            });
           },
           selectedItemColor: Colors.white,
           unselectedItemColor: Colors.grey.shade700,
