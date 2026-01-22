@@ -33,18 +33,6 @@ class _CartViewState extends State<CartView> {
     await context.read<GetCartCubit>().refreshCart();
   }
 
-  Future<void> _deleteItem(int itemId) async {
-    setState(() {
-      isRemoving = true;
-    });
-
-    // Delete logic here
-
-    setState(() {
-      isRemoving = false;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
@@ -144,7 +132,6 @@ class _CartViewState extends State<CartView> {
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 15.0),
                     child: CustomCard(
-                      onPressed: () => _deleteItem(item.itemId),
                       image: item.image,
                       title: item.name,
                       subTitle: 'Spice ${item.spicy}',

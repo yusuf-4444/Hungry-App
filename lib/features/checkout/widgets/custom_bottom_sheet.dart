@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:hungry_app/core/constants/app_colors.dart';
-import 'package:hungry_app/core/di/dependancy_injection.dart';
+import 'package:hungry_app/core/route/app_routes.dart';
+import 'package:hungry_app/features/cart/logic/deleteItem/delete_item_cubit.dart';
 import 'package:hungry_app/features/cart/logic/getCart/get_cart_cubit.dart';
 import 'package:hungry_app/features/checkout/data/models/save_order.dart';
 import 'package:hungry_app/features/checkout/logic/cubit/save_order_cubit.dart';
 import 'package:hungry_app/features/checkout/logic/cubit/save_order_state.dart';
-import 'package:hungry_app/root.dart';
 import 'package:hungry_app/shared/custom_main_button.dart';
 import 'package:hungry_app/shared/custom_snack_bar.dart';
 import 'package:hungry_app/shared/custom_text.dart';
@@ -27,83 +27,30 @@ class CustomBottomSheet extends StatefulWidget {
 }
 
 class _CustomBottomSheetState extends State<CustomBottomSheet> {
-  @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => getIt<SaveOrderCubit>(),
-      child: Container(
-        height: 100,
-        decoration: BoxDecoration(
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-          ),
-          color: Colors.white,
-          boxShadow: [BoxShadow(color: Colors.grey.shade800, blurRadius: 8)],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Gap(13),
-                  const CustomText(
-                    text: "Total",
-                    color: Colors.black,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                  ),
-                  const Gap(10),
-                  CustomText(
-                    text:
-                        "\$ ${(widget.totalPrice + 5 + 20.5).toStringAsFixed(2)}",
-                    color: Colors.black,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ],
-              ),
-              BlocConsumer<SaveOrderCubit, SaveOrderState>(
-                listener: (context, state) {
-                  if (state is Success) {
-                    context.read<GetCartCubit>().clearLocalChanges();
+  bool _isProcessing = false;
 
-                    context.read<GetCartCubit>().refreshCart();
+  Future<void> _handlePayment() async {
+    if (_isProcessing) return;
 
-                    _showSuccessDialog(context);
-                  } else if (state is Failure) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      CustomSnackBar(
-                        'Payment failed: ${state.error}',
-                        Colors.red,
-                      ),
-                    );
-                  }
-                },
-                builder: (context, state) {
-                  final isProcessing = state is Loading;
+    setState(() {
+      _isProcessing = true;
+    });
 
-                  return CustomMainButton(
-                    text: isProcessing ? "Please Wait..." : "Pay Now",
-                    fontSize: 16,
-                    onPressed: isProcessing
-                        ? null
-                        : () {
-                            context.read<SaveOrderCubit>().saveOrder(
-                              widget.saveOrder,
-                            );
-                          },
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+    try {
+      await context.read<SaveOrderCubit>().saveOrder(widget.saveOrder);
+      for (var item in widget.saveOrder.items) {
+        context.read<DeleteItemCubit>().deleteItem(item.productId);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          CustomSnackBar('Error processing payment: $e', Colors.red),
+        );
+        setState(() {
+          _isProcessing = false;
+        });
+      }
+    }
   }
 
   void _showSuccessDialog(BuildContext context) {
@@ -153,14 +100,93 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
                 fontSize: 15,
                 width: 200,
                 onPressed: () {
-                  Navigator.pushReplacement(
+                  Navigator.of(dialogContext).pop(); // Close dialog
+                  Navigator.pushNamedAndRemoveUntil(
                     context,
-                    MaterialPageRoute(builder: (context) => const Root()),
+                    AppRoutes.root,
+                    (_) => false,
                   );
                 },
               ),
               const Gap(20),
             ],
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocConsumer<SaveOrderCubit, SaveOrderState>(
+      listener: (context, state) {
+        if (state is Success) {
+          context.read<GetCartCubit>().clearLocalChanges();
+
+          context.read<GetCartCubit>().refreshCart();
+
+          if (mounted) {
+            setState(() {
+              _isProcessing = false;
+            });
+            _showSuccessDialog(context);
+          }
+        } else if (state is Failure) {
+          if (mounted) {
+            setState(() {
+              _isProcessing = false;
+            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              CustomSnackBar('Payment failed: ${state.error}', Colors.red),
+            );
+          }
+        }
+      },
+      builder: (context, state) {
+        final isLoading = state is Loading || _isProcessing;
+
+        return Container(
+          height: 100,
+          decoration: BoxDecoration(
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+            color: Colors.white,
+            boxShadow: [BoxShadow(color: Colors.grey.shade800, blurRadius: 8)],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Gap(13),
+                    const CustomText(
+                      text: "Total",
+                      color: Colors.black,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
+                    const Gap(10),
+                    CustomText(
+                      text:
+                          "\$ ${(widget.totalPrice + 5 + 20.5).toStringAsFixed(2)}",
+                      color: Colors.black,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ],
+                ),
+                CustomMainButton(
+                  text: isLoading ? "Processing..." : "Pay Now",
+                  fontSize: 16,
+                  onPressed: isLoading ? null : _handlePayment,
+                ),
+              ],
+            ),
           ),
         );
       },

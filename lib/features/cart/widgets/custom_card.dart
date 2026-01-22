@@ -15,7 +15,6 @@ class CustomCard extends StatefulWidget {
     required this.image,
     required this.title,
     required this.subTitle,
-    this.onPressed,
     required this.itemId,
   });
 
@@ -23,7 +22,6 @@ class CustomCard extends StatefulWidget {
   final String title;
   final String subTitle;
   final int itemId;
-  final void Function()? onPressed;
 
   @override
   State<CustomCard> createState() => _CustomCardState();
@@ -33,15 +31,12 @@ class _CustomCardState extends State<CustomCard> {
   bool _isRemoving = false;
 
   Future<void> _removeItem() async {
-    if (widget.onPressed == null) return;
-
     setState(() {
       _isRemoving = true;
     });
 
     try {
       await context.read<DeleteItemCubit>().deleteItem(widget.itemId);
-      widget.onPressed!();
       context.read<GetCartCubit>().refreshCart();
     } finally {
       if (mounted) {
@@ -92,7 +87,6 @@ class _CustomCardState extends State<CustomCard> {
             const Spacer(),
             Column(
               children: [
-                // Quantity Controls
                 BlocBuilder<GetCartCubit, GetCartState>(
                   builder: (context, state) {
                     final quantity = cubit.getCurrentQuantity(widget.itemId);
@@ -164,7 +158,7 @@ class _CustomCardState extends State<CustomCard> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: TextButton(
-                        onPressed: _isRemoving ? null : _removeItem,
+                        onPressed: _removeItem,
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 10,
