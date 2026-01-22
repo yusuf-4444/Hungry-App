@@ -4,6 +4,7 @@ import 'package:gap/gap.dart';
 import 'package:hungry_app/core/constants/app_colors.dart';
 import 'package:hungry_app/core/route/app_routes.dart';
 import 'package:hungry_app/features/cart/data/models/addToCart/add_to_cart_model.dart';
+import 'package:hungry_app/features/cart/logic/addToCartCubit/add_to_cart_cubit.dart';
 import 'package:hungry_app/features/home/data/models/side_options_model.dart';
 import 'package:hungry_app/features/home/data/models/toppings_model.dart';
 import 'package:hungry_app/features/product/logic/cubit/side_options_cubit.dart';
@@ -53,53 +54,6 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
     super.initState();
   }
 
-  Future<void> _fetchToppings() async {
-    setState(() {
-      isToppingsLoading = true;
-      toppingsError = null;
-    });
-
-    try {
-      // TODO: Fetch toppings data
-      // final data = await yourService.getToppings();
-      // setState(() {
-      //   toppingsData = data;
-      //   isToppingsLoading = false;
-      // });
-      // final data = await context.read<ToppingsCubit>().getToppings();
-      setState(() {
-        //toppingsData = data;
-        isToppingsLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        toppingsError = e.toString();
-        isToppingsLoading = false;
-      });
-    }
-  }
-
-  Future<void> _fetchSideOptions() async {
-    setState(() {
-      isSideOptionsLoading = true;
-      sideOptionsError = null;
-    });
-
-    try {
-      // TODO: Fetch side options data
-      // final data = await yourService.getSideOptions();
-      // setState(() {
-      //   sideOptionsData = data;
-      //   isSideOptionsLoading = false;
-      // });
-    } catch (e) {
-      setState(() {
-        sideOptionsError = e.toString();
-        isSideOptionsLoading = false;
-      });
-    }
-  }
-
   Future<void> _addToCart() async {
     setState(() {
       isAddingToCart = true;
@@ -108,9 +62,8 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
     try {
       final cartData = _cartData();
 
-      // TODO: Add to cart logic
-      // await yourService.addToCart(cartData);
-      // await yourService.refreshCart();
+      final addToCartCubit = context.read<AddToCartCubit>();
+      await addToCartCubit.addToCart(cartData);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

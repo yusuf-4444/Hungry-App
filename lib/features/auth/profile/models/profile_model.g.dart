@@ -17,7 +17,7 @@ Data _$DataFromJson(Map<String, dynamic> json) => Data(
   email: json['email'] as String,
   image: json['image'] as String?,
   address: json['address'] as String?,
-  visa: json['Visa'] as String?,
+  visa: json['visa'] as String?,
 );
 
 Map<String, dynamic> _$DataToJson(Data instance) => <String, dynamic>{

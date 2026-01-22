@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:json_annotation/json_annotation.dart';
 
 part 'cart_model.g.dart';
@@ -31,6 +32,14 @@ class CartItemsData {
   factory CartItemsData.fromJson(Map<String, dynamic> json) =>
       _$CartItemsDataFromJson(json);
   Map<String, dynamic> toJson() => _$CartItemsDataToJson(this);
+
+  CartItemsData copyWith({int? id, String? totalPrice, List<ItemData>? items}) {
+    return CartItemsData(
+      id: id ?? this.id,
+      totalPrice: totalPrice ?? this.totalPrice,
+      items: items ?? this.items,
+    );
+  }
 }
 
 @JsonSerializable()

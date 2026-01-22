@@ -47,7 +47,14 @@ class _ProfileViewState extends State<ProfileView> {
     super.initState();
     print('👤 ProfileView - initState');
     _checkGuestMode();
-    // ✅ لا تنادي على getProfile هنا - الـ Root بينادي عليه
+
+    final profileCubit = context.read<ProfileCubit>();
+    final currentState = profileCubit.state;
+
+    if (currentState is profile_state.Success) {
+      print('✅ Found cached profile data');
+      _updateProfileData(currentState.data);
+    }
   }
 
   Future<void> _checkGuestMode() async {

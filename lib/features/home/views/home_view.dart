@@ -210,10 +210,9 @@ class _HomeViewState extends State<HomeView> {
     //     ),
     //   ),
     // );
-    Navigator.pushNamedAndRemoveUntil(
+    Navigator.pushNamed(
       context,
       AppRoutes.productDetails,
-      ModalRoute.withName(AppRoutes.home),
       arguments: {'productId': food.id, 'price': food.price},
     );
   }

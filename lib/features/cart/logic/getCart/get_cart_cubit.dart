@@ -10,6 +10,7 @@ class GetCartCubit extends Cubit<GetCartState> {
 
   CartItemsData? cartItemsData;
   bool _hasLoadedData = false;
+  int quantity = 1;
 
   Future<void> getCart({bool forceRefresh = false}) async {
     if (_hasLoadedData && !forceRefresh && cartItemsData != null) {
@@ -22,9 +23,14 @@ class GetCartCubit extends Cubit<GetCartState> {
       final response = await cartRepo.myCart();
       response.when(
         success: (success) {
-          cartItemsData = success.data;
+          String calculatedTotalPrice = _calculateTotalPrice(
+            success.data,
+          ).toString();
+          cartItemsData = success.data.copyWith(
+            totalPrice: calculatedTotalPrice,
+          );
           _hasLoadedData = true;
-          emit(GetCartState.success(success));
+          emit(GetCartState.success(CartModel(data: cartItemsData!)));
         },
         failure: (failure) => emit(GetCartState.failure(failure)),
       );
@@ -42,4 +48,41 @@ class GetCartCubit extends Cubit<GetCartState> {
     _hasLoadedData = false;
     emit(const GetCartState.initial());
   }
+
+  void incrementQuantity() {
+    for (var element in cartItemsData!.items) {
+      if (element.itemId == element.itemId) {
+        quantity++;
+        cartItemsData = cartItemsData?.copyWith(
+          items: cartItemsData!.items
+              .map(
+                (item) => item.itemId == element.itemId
+                    ? ItemData(
+                        itemId: item.itemId,
+                        productId: item.productId,
+                        name: item.name,
+                        image: item.image,
+                        quantity: quantity,
+                        price: item.price,
+                        spicy: item.spicy,
+                        toppings: item.toppings,
+                        sideOptions: item.sideOptions,
+                      )
+                    : item,
+              )
+              .toList(),
+        );
+      }
+    }
+    emit(GetCartState.increment(quantity));
+  }
+}
+
+double _calculateTotalPrice(CartItemsData cartItemsData) {
+  double total = 0;
+  for (var item in cartItemsData.items) {
+    double price = double.tryParse(item.price) ?? 0;
+    total += price * item.quantity;
+  }
+  return total;
 }

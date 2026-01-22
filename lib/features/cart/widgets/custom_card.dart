@@ -1,6 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:hungry_app/core/constants/app_colors.dart';
+import 'package:hungry_app/features/cart/logic/getCart/get_cart_cubit.dart';
+import 'package:hungry_app/features/cart/logic/getCart/get_cart_state.dart';
 import 'package:hungry_app/shared/custom_text.dart';
 
 class CustomCard extends StatefulWidget {
@@ -55,10 +59,7 @@ class _CustomCardState extends State<CustomCard> {
   }
 
   void onAdd() {
-    setState(() {
-      number++;
-    });
-    widget.onQuantityChanged?.call(number);
+    context.read<GetCartCubit>().incrementQuantity();
   }
 
   void onMinus() {
@@ -82,11 +83,14 @@ class _CustomCardState extends State<CustomCard> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Image.network(
-                  widget.image,
+                CachedNetworkImage(
+                  imageUrl: widget.image,
                   width: 111,
                   height: 102.18,
                   fit: BoxFit.cover,
+                  placeholder: (context, url) =>
+                      const Center(child: CircularProgressIndicator.adaptive()),
+                  errorWidget: (context, url, error) => const Icon(Icons.error),
                 ),
                 const Gap(8),
                 CustomText(
@@ -135,26 +139,57 @@ class _CustomCardState extends State<CustomCard> {
                       fontWeight: FontWeight.bold,
                     ),
                     const Gap(20),
-                    GestureDetector(
-                      onTap: onAdd,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryColor,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 15,
-                            vertical: 5,
+                    BlocBuilder<GetCartCubit, GetCartState>(
+                      bloc: context.read<GetCartCubit>(),
+                      buildWhen: (previous, current) =>
+                          current is Increment || current is Decrement,
+                      builder: (context, state) {
+                        if (state is Increment) {
+                          number = state.data;
+                          return GestureDetector(
+                            onTap: onAdd,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: AppColors.primaryColor,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Padding(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 15,
+                                  vertical: 5,
+                                ),
+                                child: CustomText(
+                                  fontSize: 20,
+                                  text: "+",
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+                        return GestureDetector(
+                          onTap: onAdd,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryColor,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 15,
+                                vertical: 5,
+                              ),
+                              child: CustomText(
+                                fontSize: 20,
+                                text: "+",
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
-                          child: CustomText(
-                            fontSize: 20,
-                            text: "+",
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
+                        );
+                      },
                     ),
                   ],
                 ),

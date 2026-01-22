@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:hungry_app/features/cart/data/models/myCart/cart_model.dart';
+import 'package:hungry_app/features/cart/logic/getCart/get_cart_cubit.dart';
+import 'package:hungry_app/features/cart/logic/getCart/get_cart_state.dart';
 import 'package:hungry_app/features/cart/widgets/custom_card.dart';
 import 'package:hungry_app/features/checkout/data/models/save_order.dart';
 import 'package:hungry_app/features/checkout/views/checkout_view.dart';
 import 'package:hungry_app/shared/custom_main_button.dart';
 import 'package:hungry_app/shared/custom_text.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class CartView extends StatefulWidget {
   const CartView({super.key});
@@ -20,34 +24,20 @@ class _CartViewState extends State<CartView> {
   double finalPrice = 0;
   late double checkoutPrice = 0;
 
-  // TODO: Add your state management here
-  bool isLoading = false;
   List<ItemData> items = [];
   double totalPrice = 0;
-  String? errorMessage;
 
   @override
   void initState() {
     super.initState();
-    // TODO: Call your data fetching method here
-    // Example: _fetchCartData();
+    context.read<GetCartCubit>().getCart();
   }
 
   Future<void> _refreshCart() async {
-    // TODO: Implement refresh logic
-    setState(() {
-      isLoading = true;
-    });
-
-    // Your refresh logic here
-
-    setState(() {
-      isLoading = false;
-    });
+    await context.read<GetCartCubit>().refreshCart();
   }
 
   Future<void> _deleteItem(int itemId) async {
-    // TODO: Implement delete logic
     setState(() {
       isRemoving = true;
     });
@@ -61,44 +51,6 @@ class _CartViewState extends State<CartView> {
 
   @override
   Widget build(BuildContext context) {
-    finalPrice = totalPrice;
-
-    final displayItems = isLoading
-        ? List<ItemData>.generate(
-            4,
-            (index) => ItemData(
-              itemId: 0,
-              productId: 0,
-              name: '',
-              image:
-                  'https://sonic-zdi0.onrender.com/storage/products/cheeseburger.jpg',
-              quantity: 0,
-              price: '',
-              spicy: '',
-              toppings: [],
-              sideOptions: [],
-            ),
-          )
-        : items;
-
-    // Error State
-    if (errorMessage != null && !isLoading) {
-      return Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(errorMessage ?? 'An error occurred'),
-              ElevatedButton(
-                onPressed: _refreshCart,
-                child: const Text("Retry"),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
     return RefreshIndicator(
       onRefresh: _refreshCart,
       child: Scaffold(
@@ -108,65 +60,115 @@ class _CartViewState extends State<CartView> {
           scrolledUnderElevation: 0,
           elevation: 0,
         ),
-        body: Padding(
-          padding: const EdgeInsets.only(
-            top: 20,
-            bottom: 80,
-            left: 8,
-            right: 8,
-          ),
-          child: displayItems.isEmpty && !isLoading
-              ? const Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.shopping_cart_outlined,
-                        size: 64,
-                        color: Colors.grey,
-                      ),
-                      Gap(16),
-                      Text(
-                        "Your cart is empty",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
+        body: BlocBuilder<GetCartCubit, GetCartState>(
+          builder: (context, state) {
+            if (state is Loading) {
+              return Skeletonizer(
+                child: ListView.separated(
+                  padding: const EdgeInsets.only(
+                    top: 20,
+                    bottom: 80,
+                    left: 8,
+                    right: 8,
+                  ),
+                  itemBuilder: (context, index) => const CustomCard(
+                    image: 'https://via.placeholder.com/200',
+                    title: '',
+                    subTitle: '',
+                    initialNumber: 0,
+                  ),
+                  separatorBuilder: (context, index) => const Gap(15),
+                  itemCount: 5,
+                ),
+              );
+            }
+
+            if (state is Failure) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(state.error),
+                    const Gap(16),
+                    ElevatedButton(
+                      onPressed: _refreshCart,
+                      child: const Text("Retry"),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            if (state is Success) {
+              items = state.data.data.items;
+              totalPrice = double.tryParse(state.data.data.totalPrice) ?? 0;
+              checkoutPrice = totalPrice;
+
+              if (items.isEmpty) {
+                return const Padding(
+                  padding: EdgeInsets.only(
+                    top: 20,
+                    bottom: 80,
+                    left: 8,
+                    right: 8,
+                  ),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.shopping_cart_outlined,
+                          size: 64,
                           color: Colors.grey,
                         ),
-                      ),
-                    ],
+                        Gap(16),
+                        Text(
+                          "Your cart is empty",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                )
-              : ListView.builder(
-                  itemCount: displayItems.length,
-                  itemBuilder: (context, index) {
-                    final item = displayItems[index];
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 15.0),
-                      child: CustomCard(
-                        onQuantityChanged: (newQuantity) {
-                          setState(() {
-                            quantity = newQuantity;
-                            finalPrice = totalPrice * quantity;
-                            checkoutPrice = finalPrice;
-                          });
-                          print(finalPrice);
-                        },
-                        onPressed: isLoading
-                            ? null
-                            : () => _deleteItem(item.itemId),
-                        image: item.image,
-                        title: item.name,
-                        subTitle: 'Spice ${item.spicy}',
-                        initialNumber: item.quantity,
-                      ),
-                    );
-                  },
-                ),
+                );
+              }
+
+              return ListView.builder(
+                itemCount: items.length,
+                itemBuilder: (context, index) {
+                  final item = items[index];
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 15.0),
+                    child: CustomCard(
+                      onQuantityChanged: (newQuantity) {
+                        setState(() {
+                          quantity = newQuantity;
+                          finalPrice = totalPrice * quantity;
+                          checkoutPrice = finalPrice;
+                        });
+                        print(finalPrice);
+                      },
+                      onPressed: () => _deleteItem(item.itemId),
+                      image: item.image,
+                      title: item.name,
+                      subTitle: 'Spice ${item.spicy}',
+                      initialNumber: item.quantity,
+                    ),
+                  );
+                },
+              );
+            }
+
+            return const SizedBox.shrink();
+          },
         ),
-        bottomSheet: (items.isEmpty && !isLoading)
-            ? const SizedBox()
-            : Container(
+        bottomSheet: BlocBuilder<GetCartCubit, GetCartState>(
+          builder: (context, state) {
+            if (state is Success && items.isNotEmpty) {
+              return Container(
                 height: 80,
                 decoration: BoxDecoration(
                   borderRadius: const BorderRadius.only(
@@ -205,7 +207,7 @@ class _CartViewState extends State<CartView> {
                       CustomMainButton(
                         text: "Checkout",
                         fontSize: 14,
-                        onPressed: isLoading || items.isEmpty
+                        onPressed: items.isEmpty
                             ? null
                             : () {
                                 List<OrderItems> orderItems = [];
@@ -240,7 +242,11 @@ class _CartViewState extends State<CartView> {
                     ],
                   ),
                 ),
-              ),
+              );
+            }
+            return const SizedBox.shrink();
+          },
+        ),
       ),
     );
   }

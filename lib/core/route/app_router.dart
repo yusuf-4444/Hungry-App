@@ -3,11 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hungry_app/core/di/dependancy_injection.dart';
 import 'package:hungry_app/core/route/app_routes.dart';
 import 'package:hungry_app/features/auth/login/logic/cubit/auto_login_cubit.dart';
-import 'package:hungry_app/features/auth/logout/logic/cubit/logout_cubit.dart';
-import 'package:hungry_app/features/auth/profile/logic/cubit/profile_cubit.dart';
-import 'package:hungry_app/features/auth/profile/logic/cubit/update_profile_cubit.dart';
 import 'package:hungry_app/features/auth/register/logic/cubit/register_cubit.dart';
-import 'package:hungry_app/features/auth/view/profile_view.dart';
 import 'package:hungry_app/features/auth/view/signin_view.dart';
 import 'package:hungry_app/features/auth/view/signup_view.dart';
 import 'package:hungry_app/features/cart/logic/addToCartCubit/add_to_cart_cubit.dart';
@@ -32,17 +28,7 @@ class AppRouter {
             child: const SigninView(),
           ),
         );
-      case AppRoutes.profile:
-        return CupertinoPageRoute(
-          builder: (_) => MultiBlocProvider(
-            providers: [
-              BlocProvider(create: (context) => getIt<LogoutCubit>()),
-              BlocProvider.value(value: getIt<ProfileCubit>()),
-              BlocProvider(create: (context) => getIt<UpdateProfileCubit>()),
-            ],
-            child: const ProfileView(),
-          ),
-        );
+
       case AppRoutes.root:
         return CupertinoPageRoute(builder: (_) => const Root());
       case AppRoutes.register:
