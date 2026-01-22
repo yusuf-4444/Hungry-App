@@ -45,45 +45,59 @@ class _ProfileViewState extends State<ProfileView> {
   @override
   void initState() {
     super.initState();
+    print('👤 ProfileView - initState');
     _checkGuestMode();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!isGuestMode) {
-        context.read<ProfileCubit>().getProfile();
-      }
-    });
+    // ✅ لا تنادي على getProfile هنا - الـ Root بينادي عليه
   }
 
   Future<void> _checkGuestMode() async {
     final guest = await PrefHelper.isGuest();
-    setState(() {
-      isGuestMode = guest;
-    });
+    if (mounted) {
+      setState(() {
+        isGuestMode = guest;
+      });
+      print('🎭 Guest Mode: $isGuestMode');
+    }
   }
 
   void _updateProfileData(ProfileModel data) {
-    setState(() {
-      profileModel = data;
-      _name.text = data.data.name;
-      _email.text = data.data.email;
-      _address.text = data.data.address ?? "";
-      _visa.text = data.data.visa ?? "";
-      _selectedImageUrl = data.data.image;
-      _selectedImageFile = null;
-    });
-  }
+    print('📝 Updating Profile Data in UI');
+    print('   ├─ Name: ${data.data.name}');
+    print('   ├─ Email: ${data.data.email}');
+    print('   └─ Image: ${data.data.image ?? "No Image"}');
 
-  Future<void> uploadImage() async {
-    final image = await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (image != null) {
+    if (mounted) {
       setState(() {
-        _selectedImageFile = File(image.path);
-        _selectedImageUrl = null;
+        profileModel = data;
+        _name.text = data.data.name;
+        _email.text = data.data.email;
+        _address.text = data.data.address ?? "";
+        _visa.text = data.data.visa ?? "";
+        _selectedImageUrl = data.data.image;
+        _selectedImageFile = null;
       });
     }
   }
 
+  Future<void> uploadImage() async {
+    print('📸 Upload Image Tapped');
+    final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      print('✅ Image Selected: ${image.path}');
+      setState(() {
+        _selectedImageFile = File(image.path);
+        _selectedImageUrl = null;
+      });
+    } else {
+      print('❌ No Image Selected');
+    }
+  }
+
   Future<void> _updateProfile() async {
+    print('💾 Update Profile Tapped');
+
     if (_name.text.isEmpty || _email.text.isEmpty) {
+      print('⚠️ Validation Failed: Name or Email is empty');
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(CustomSnackBar("Please fill name and email", Colors.red));
@@ -95,6 +109,7 @@ class _ProfileViewState extends State<ProfileView> {
     });
 
     try {
+      print('🔄 Calling updateProfile API...');
       await context.read<UpdateProfileCubit>().updateProfile(
         name: _name.text,
         email: _email.text,
@@ -103,6 +118,7 @@ class _ProfileViewState extends State<ProfileView> {
         image: _selectedImageFile,
       );
     } catch (e) {
+      print('❌ Update Profile Exception: $e');
       if (mounted) {
         setState(() {
           isUpdating = false;
@@ -112,12 +128,14 @@ class _ProfileViewState extends State<ProfileView> {
   }
 
   Future<void> _logout() async {
+    print('🚪 Logout Tapped');
     setState(() {
       isLoggingOut = true;
     });
 
     try {
       if (isGuestMode) {
+        print('🎭 Logging out Guest Mode');
         await PrefHelper.removeToken();
         if (mounted) {
           context.read<ProfileCubit>().clearCache();
@@ -128,9 +146,11 @@ class _ProfileViewState extends State<ProfileView> {
           );
         }
       } else {
+        print('👤 Logging out Authenticated User');
         await context.read<LogoutCubit>().logout();
       }
     } catch (e) {
+      print('❌ Logout Exception: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           CustomSnackBar("Logout Failed: ${e.toString()}", Colors.red),
@@ -162,6 +182,8 @@ class _ProfileViewState extends State<ProfileView> {
 
   @override
   Widget build(BuildContext context) {
+    print('🏗️ ProfileView - Building - Guest: $isGuestMode');
+
     if (isGuestMode) {
       return _buildGuestView();
     }
@@ -170,6 +192,9 @@ class _ProfileViewState extends State<ProfileView> {
       listeners: [
         BlocListener<ProfileCubit, profile_state.ProfileState>(
           listener: (context, state) {
+            print(
+              '👂 ProfileView - ProfileCubit Listener - State: ${state.runtimeType}',
+            );
             if (state is profile_state.Success) {
               _updateProfileData(state.data);
             }
@@ -177,12 +202,17 @@ class _ProfileViewState extends State<ProfileView> {
         ),
         BlocListener<UpdateProfileCubit, UpdateProfileState>(
           listener: (context, state) {
+            print(
+              '👂 ProfileView - UpdateProfileCubit Listener - State: ${state.runtimeType}',
+            );
             if (state is Success) {
+              print('✅ Profile Updated Successfully');
               context.read<ProfileCubit>().refreshProfile();
               ScaffoldMessenger.of(context).showSnackBar(
                 CustomSnackBar("Updated Successfully", Colors.white),
               );
             } else if (state is Failure) {
+              print('❌ Profile Update Failed: ${state.error}');
               ScaffoldMessenger.of(context).showSnackBar(
                 CustomSnackBar("Update Failed: ${state.error}", Colors.red),
               );
@@ -196,7 +226,11 @@ class _ProfileViewState extends State<ProfileView> {
         ),
         BlocListener<LogoutCubit, dynamic>(
           listener: (context, state) {
+            print(
+              '👂 ProfileView - LogoutCubit Listener - State: ${state.runtimeType}',
+            );
             if (state is Success) {
+              print('✅ Logout Successful');
               context.read<ProfileCubit>().clearCache();
               ScaffoldMessenger.of(context).showSnackBar(
                 CustomSnackBar("LOGGED OUT SUCCESSFULLY", Colors.white),
@@ -206,16 +240,27 @@ class _ProfileViewState extends State<ProfileView> {
                 AppRoutes.login,
                 (_) => false,
               );
+            } else if (state is Failure) {
+              print('❌ Logout Failed: ${state.error}');
+              if (mounted) {
+                setState(() {
+                  isLoggingOut = false;
+                });
+                ScaffoldMessenger.of(context).showSnackBar(
+                  CustomSnackBar("Logout Failed: ${state.error}", Colors.red),
+                );
+              }
             }
           },
         ),
       ],
       child: BlocBuilder<ProfileCubit, profile_state.ProfileState>(
         builder: (context, state) {
+          print('🏗️ ProfileView - BlocBuilder - State: ${state.runtimeType}');
           final isLoading = state is profile_state.Loading;
 
-          if (state is Failure && !isLoading) {
-            return _buildErrorView();
+          if (state is profile_state.Failure && !isLoading) {
+            return _buildErrorView(state.error);
           }
 
           return Skeletonizer(
@@ -277,19 +322,50 @@ class _ProfileViewState extends State<ProfileView> {
     );
   }
 
-  Widget _buildErrorView() {
+  Widget _buildErrorView(String error) {
     return RefreshIndicator(
       onRefresh: () => context.read<ProfileCubit>().refreshProfile(),
       child: Scaffold(
+        backgroundColor: AppColors.primaryColor,
+        appBar: AppBar(
+          backgroundColor: AppColors.primaryColor,
+          leading: IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+          ),
+        ),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text("Internal Server Error.. please Try again later"),
-              const SizedBox(height: 16),
+              const Icon(Icons.error_outline, size: 80, color: Colors.white),
+              const Gap(20),
+              const CustomText(
+                text: "Error Loading Profile",
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+              const Gap(10),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 40),
+                child: CustomText(
+                  text: error,
+                  color: Colors.white,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const Gap(30),
               ElevatedButton(
                 onPressed: () => context.read<ProfileCubit>().refreshProfile(),
-                child: const Text("Retry"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: AppColors.primaryColor,
+                ),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  child: Text("Retry", style: TextStyle(fontSize: 16)),
+                ),
               ),
             ],
           ),
@@ -502,6 +578,7 @@ class _ProfileViewState extends State<ProfileView> {
 
   @override
   void dispose() {
+    print('🗑️ ProfileView - dispose');
     _name.dispose();
     _email.dispose();
     _address.dispose();

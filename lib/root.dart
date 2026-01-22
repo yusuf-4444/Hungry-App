@@ -33,7 +33,6 @@ class _RootState extends State<Root> {
           MultiBlocProvider(
             providers: [
               BlocProvider(create: (context) => getIt<LogoutCubit>()),
-              BlocProvider.value(value: getIt<ProfileCubit>()),
               BlocProvider(create: (context) => getIt<UpdateProfileCubit>()),
             ],
             child: const ProfileView(),

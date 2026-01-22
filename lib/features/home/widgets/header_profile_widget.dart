@@ -11,28 +11,17 @@ import 'package:hungry_app/features/auth/profile/logic/cubit/profile_state.dart'
 import 'package:hungry_app/shared/custom_text.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-class HeaderProfile extends StatefulWidget {
+class HeaderProfile extends StatelessWidget {
   const HeaderProfile({super.key});
 
   @override
-  State<HeaderProfile> createState() => _HeaderProfileState();
-}
-
-class _HeaderProfileState extends State<HeaderProfile> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        context.read<ProfileCubit>().getProfile(forceRefresh: true);
-      }
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
+    print('🎨 HeaderProfile - Building');
+
     return BlocBuilder<ProfileCubit, ProfileState>(
       builder: (context, state) {
+        print('🏗️ HeaderProfile - State: ${state.runtimeType}');
+
         final username = _getUsername(state);
         final imageUrl = _getImageUrl(state);
         final isLoading = state is Loading;
@@ -59,11 +48,10 @@ class _HeaderProfileState extends State<HeaderProfile> {
         SvgPicture.asset(
           "assets/logo/Hungry_.svg",
           color: AppColors.primaryColor,
-          height: 35.h, // استخدم .h من ScreenUtil
+          height: 35.h,
         ),
-        Gap(5.h), // استخدم .h من ScreenUtil
+        Gap(5.h),
         Skeleton.leaf(
-          // أضف Skeleton للنص
           child: CustomText(
             text: "Hello, $username",
             color: Colors.grey.shade600,
@@ -111,11 +99,7 @@ class _HeaderProfileState extends State<HeaderProfile> {
   }
 
   Widget _buildDefaultIcon() {
-    return Icon(
-      CupertinoIcons.person,
-      color: Colors.white,
-      size: 24.sp, // استخدم .sp من ScreenUtil
-    );
+    return Icon(CupertinoIcons.person, color: Colors.white, size: 24.sp);
   }
 
   String _getUsername(ProfileState state) {
