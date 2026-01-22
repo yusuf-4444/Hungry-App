@@ -4,7 +4,6 @@ import 'package:gap/gap.dart';
 import 'package:hungry_app/core/constants/app_colors.dart';
 import 'package:hungry_app/core/route/app_routes.dart';
 import 'package:hungry_app/features/cart/logic/deleteItem/delete_item_cubit.dart';
-import 'package:hungry_app/features/cart/logic/getCart/get_cart_cubit.dart';
 import 'package:hungry_app/features/checkout/data/models/save_order.dart';
 import 'package:hungry_app/features/checkout/logic/cubit/save_order_cubit.dart';
 import 'package:hungry_app/features/checkout/logic/cubit/save_order_state.dart';
@@ -17,11 +16,12 @@ class CustomBottomSheet extends StatefulWidget {
     super.key,
     required this.totalPrice,
     required this.saveOrder,
+    required this.orderItems,
   });
 
   final double totalPrice;
   final SaveOrder saveOrder;
-
+  final List<OrderItems> orderItems;
   @override
   State<CustomBottomSheet> createState() => _CustomBottomSheetState();
 }
@@ -38,7 +38,7 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
 
     try {
       await context.read<SaveOrderCubit>().saveOrder(widget.saveOrder);
-      for (var item in widget.saveOrder.items) {
+      for (var item in widget.orderItems) {
         context.read<DeleteItemCubit>().deleteItem(item.productId);
       }
     } catch (e) {
@@ -121,10 +121,6 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
     return BlocConsumer<SaveOrderCubit, SaveOrderState>(
       listener: (context, state) {
         if (state is Success) {
-          context.read<GetCartCubit>().clearLocalChanges();
-
-          context.read<GetCartCubit>().refreshCart();
-
           if (mounted) {
             setState(() {
               _isProcessing = false;

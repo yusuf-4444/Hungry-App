@@ -6,13 +6,15 @@ import 'package:hungry_app/core/route/app_routes.dart';
 import 'package:hungry_app/features/cart/data/models/addToCart/add_to_cart_model.dart';
 import 'package:hungry_app/features/cart/logic/addToCartCubit/add_to_cart_cubit.dart';
 import 'package:hungry_app/features/cart/logic/getCart/get_cart_cubit.dart';
+import 'package:hungry_app/features/cart/logic/getCart/get_cart_state.dart';
 import 'package:hungry_app/features/home/data/models/side_options_model.dart';
 import 'package:hungry_app/features/home/data/models/toppings_model.dart';
 import 'package:hungry_app/features/product/logic/cubit/side_options_cubit.dart';
 import 'package:hungry_app/features/product/logic/cubit/side_options_state.dart'
     as side_options_state;
 import 'package:hungry_app/features/product/logic/cubit/toppings_cubit.dart';
-import 'package:hungry_app/features/product/logic/cubit/toppings_state.dart';
+import 'package:hungry_app/features/product/logic/cubit/toppings_state.dart'
+    as toppings_state;
 import 'package:hungry_app/features/product/widgets/custom_header_spicy_details.dart';
 import 'package:hungry_app/features/product/widgets/custom_toppings_side_options.dart';
 import 'package:hungry_app/shared/custom_main_button.dart';
@@ -39,7 +41,6 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
   List<int> toppings = [];
   List<int> sideOptions = [];
 
-  // TODO: Add your state management here
   bool isToppingsLoading = false;
   bool isSideOptionsLoading = false;
   bool isAddingToCart = false;
@@ -55,7 +56,26 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
     super.initState();
   }
 
+  bool _isProductInCart() {
+    final cartCubit = context.read<GetCartCubit>();
+    final cartState = cartCubit.state;
+
+    if (cartState is Success) {
+      final items = cartState.data.data.items;
+      // نتحقق لو في item بنفس الـ productId
+      return items.any((item) => item.productId == widget.productId);
+    }
+    return false;
+  }
+
   Future<void> _addToCart() async {
+    if (_isProductInCart()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        CustomSnackBar("This item is already in your cart!", Colors.orange),
+      );
+      return;
+    }
+
     setState(() {
       isAddingToCart = true;
     });
@@ -65,7 +85,8 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
 
       final addToCartCubit = context.read<AddToCartCubit>();
       await addToCartCubit.addToCart(cartData);
-      context.read<GetCartCubit>().refreshCart();
+
+      await context.read<GetCartCubit>().refreshCart();
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -139,14 +160,14 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
               const Gap(15),
 
               // Toppings Section
-              BlocBuilder<ToppingsCubit, ToppingsState>(
+              BlocBuilder<ToppingsCubit, toppings_state.ToppingsState>(
                 bloc: context.read<ToppingsCubit>(),
                 buildWhen: (previous, current) =>
-                    current is Loading ||
-                    current is Success ||
-                    current is Failure,
+                    current is toppings_state.Loading ||
+                    current is toppings_state.Success ||
+                    current is toppings_state.Failure,
                 builder: (context, state) {
-                  if (state is Loading) {
+                  if (state is toppings_state.Loading) {
                     return Skeletonizer(
                       enabled: true,
                       child: CustomToppingsSideOptionsWidget(
@@ -156,14 +177,14 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                         onItemSelection: (value) {},
                       ),
                     );
-                  } else if (state is Failure) {
+                  } else if (state is toppings_state.Failure) {
                     return Center(
                       child: CustomText(
                         text: "Error: ${state.error}",
                         color: Colors.red,
                       ),
                     );
-                  } else if (state is Success) {
+                  } else if (state is toppings_state.Success) {
                     toppingsData = state.data;
                     isToppingsLoading = false;
                     return CustomToppingsSideOptionsWidget(
@@ -301,10 +322,20 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                   ),
                 ],
               ),
-              CustomMainButton(
-                text: isAddingToCart ? "Adding..." : "Add To Cart",
-                fontSize: 16,
-                onPressed: isAddingToCart ? null : _addToCart,
+              BlocBuilder<GetCartCubit, GetCartState>(
+                builder: (context, cartState) {
+                  final isInCartNow = _isProductInCart();
+
+                  return CustomMainButton(
+                    text: isInCartNow
+                        ? "Already in Cart"
+                        : (isAddingToCart ? "Adding..." : "Add To Cart"),
+                    fontSize: 16,
+                    onPressed: (isAddingToCart || isInCartNow)
+                        ? null
+                        : _addToCart,
+                  );
+                },
               ),
             ],
           ),

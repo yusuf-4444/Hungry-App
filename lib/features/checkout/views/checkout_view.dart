@@ -209,6 +209,7 @@ class _CheckoutViewState extends State<CheckoutView> {
               ),
             ),
             bottomSheet: CustomBottomSheet(
+              orderItems: widget.orderItems,
               totalPrice: widget.price,
               saveOrder: _createSaveOrder(),
             ),
