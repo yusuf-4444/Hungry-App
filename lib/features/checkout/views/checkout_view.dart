@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:hungry_app/core/di/dependancy_injection.dart';
 import 'package:hungry_app/core/network/pref_helper.dart';
@@ -32,7 +33,6 @@ class _CheckoutViewState extends State<CheckoutView> {
   bool isChecked = true;
   bool isGuestMode = false;
 
-  // Profile data
   bool isLoadingProfile = false;
   String? username;
   String? visa;
@@ -127,20 +127,24 @@ class _CheckoutViewState extends State<CheckoutView> {
               backgroundColor: Colors.white,
               leading: IconButton(
                 onPressed: () => Navigator.pop(context),
-                icon: const Icon(Icons.arrow_back, fontWeight: FontWeight.bold),
+                icon: Icon(
+                  Icons.arrow_back,
+                  fontWeight: FontWeight.bold,
+                  size: 24.sp,
+                ),
               ),
             ),
             body: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+              padding: EdgeInsets.symmetric(horizontal: 15.w),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Gap(5),
-                  const CustomText(
+                  Gap(5.h),
+                  CustomText(
                     text: "Order summary",
                     color: Colors.black,
                     fontWeight: FontWeight.w600,
-                    fontSize: 18,
+                    fontSize: 18.sp,
                   ),
                   CustomOrderSummary(
                     order: widget.price,
@@ -148,37 +152,41 @@ class _CheckoutViewState extends State<CheckoutView> {
                     deliveryFees: 20.5,
                     total: widget.price + 5 + 20.5,
                   ),
-                  const Gap(30),
-                  const CustomText(
+                  Gap(30.h),
+                  CustomText(
                     text: "Payment methods",
                     color: Colors.black,
                     fontWeight: FontWeight.w600,
-                    fontSize: 18,
+                    fontSize: 18.sp,
                   ),
-                  const Gap(10),
+                  Gap(10.h),
 
-                  // Cash on Delivery Option
                   _buildPaymentOption(
                     title: "Cash on Delivery",
                     value: "Cash",
                     color: const Color(0xff3C2F2F),
-                    icon: const CircleAvatar(
-                      backgroundColor: Color(0xff1B5E20),
-                      child: CustomText(text: "\$", color: Colors.white),
+                    icon: CircleAvatar(
+                      backgroundColor: const Color(0xff1B5E20),
+                      radius: 20.r,
+                      child: CustomText(
+                        text: "\$",
+                        color: Colors.white,
+                        fontSize: 18.sp,
+                      ),
                     ),
                   ),
-                  const Gap(15),
+                  Gap(15.h),
 
-                  // Visa Option (if available)
                   if (hasVisa && !isGuestMode)
                     _buildPaymentOption(
                       title: "Debit card",
                       subtitle: _formatVisaNumber(visa!),
                       value: "Visa",
                       color: const Color(0xff1565C0),
-                      icon: const Icon(
+                      icon: Icon(
                         CupertinoIcons.creditcard,
                         color: Colors.white,
+                        size: 28.sp,
                       ),
                     ),
 
@@ -195,12 +203,12 @@ class _CheckoutViewState extends State<CheckoutView> {
                             });
                           },
                         ),
-                        const Expanded(
+                        Expanded(
                           child: CustomText(
                             text: "Save card details for future payments",
-                            color: Color(0xff808080),
+                            color: const Color(0xff808080),
                             fontWeight: FontWeight.w400,
-                            fontSize: 13,
+                            fontSize: 13.sp,
                           ),
                         ),
                       ],
@@ -232,23 +240,23 @@ class _CheckoutViewState extends State<CheckoutView> {
           selectedMethod = value;
         });
       },
-      contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      contentPadding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
       tileColor: color,
       leading: icon,
-      horizontalTitleGap: 30,
+      horizontalTitleGap: 30.w,
       title: CustomText(
         text: title,
         color: Colors.white,
         fontWeight: FontWeight.w500,
-        fontSize: 17,
+        fontSize: 17.sp,
       ),
       subtitle: subtitle != null
           ? CustomText(
               text: subtitle,
               color: Colors.white,
               fontWeight: FontWeight.w400,
-              fontSize: 14,
+              fontSize: 14.sp,
             )
           : null,
       trailing: RadioGroup<String>(

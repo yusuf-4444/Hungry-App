@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hungry_app/core/constants/app_colors.dart';
 import 'package:hungry_app/core/di/dependancy_injection.dart';
 import 'package:hungry_app/features/auth/logout/logic/cubit/logout_cubit.dart';
@@ -35,7 +36,7 @@ class _RootState extends State<Root> {
       MultiBlocProvider(
         providers: [
           BlocProvider(create: (context) => getIt<LogoutCubit>()),
-          BlocProvider.value(value: getIt<ProfileCubit>()),
+          BlocProvider.value(value: getIt<ProfileCubit>()..getProfile()),
           BlocProvider(create: (context) => getIt<UpdateProfileCubit>()),
           BlocProvider(create: (context) => getIt<DeleteItemCubit>()),
         ],
@@ -49,11 +50,11 @@ class _RootState extends State<Root> {
     return Scaffold(
       body: IndexedStack(index: currentPage, children: _pages),
       bottomNavigationBar: Container(
-        padding: const EdgeInsets.all(10),
-        decoration: const BoxDecoration(
+        padding: EdgeInsets.all(10.w),
+        decoration: BoxDecoration(
           borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(30),
-            topRight: Radius.circular(30),
+            topLeft: Radius.circular(30.r),
+            topRight: Radius.circular(30.r),
           ),
           color: AppColors.primaryColor,
         ),
@@ -69,6 +70,9 @@ class _RootState extends State<Root> {
           backgroundColor: Colors.transparent,
           currentIndex: currentPage,
           type: BottomNavigationBarType.fixed,
+          selectedFontSize: 12.sp,
+          unselectedFontSize: 10.sp,
+          iconSize: 24.sp,
           items: const [
             BottomNavigationBarItem(
               icon: Icon(CupertinoIcons.home),

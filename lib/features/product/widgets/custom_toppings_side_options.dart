@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hungry_app/shared/custom_text.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -40,7 +41,7 @@ class _CustomToppingsSideOptionsWidgetState
                   widget.selectedItems?.contains(itemId ?? -1) ?? false;
 
               return Padding(
-                padding: const EdgeInsets.only(right: 20),
+                padding: EdgeInsets.only(right: 20.w),
                 child: GestureDetector(
                   onTap: () {
                     if (!widget.isLoading && itemId != null) {
@@ -53,18 +54,18 @@ class _CustomToppingsSideOptionsWidgetState
                       Material(
                         elevation: 4,
                         child: Container(
-                          height: 110,
-                          width: 100,
+                          height: 110.h,
+                          width: 100.w,
                           decoration: BoxDecoration(
                             color: const Color(0xff3C2F2F),
-                            borderRadius: BorderRadius.circular(15),
+                            borderRadius: BorderRadius.circular(15.r),
                           ),
                           child: Padding(
-                            padding: const EdgeInsets.only(
-                              left: 10,
-                              right: 10,
-                              top: 20,
-                              bottom: 18,
+                            padding: EdgeInsets.only(
+                              left: 10.w,
+                              right: 10.w,
+                              top: 20.h,
+                              bottom: 18.h,
                             ),
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.end,
@@ -74,18 +75,18 @@ class _CustomToppingsSideOptionsWidgetState
                                       ? item!.name
                                       : "Loading...",
                                   color: Colors.white,
-                                  fontSize: 12,
+                                  fontSize: 12.sp,
                                 ),
                                 const Spacer(),
                                 Container(
                                   decoration: BoxDecoration(
                                     color: Colors.red,
-                                    borderRadius: BorderRadius.circular(10),
+                                    borderRadius: BorderRadius.circular(10.r),
                                   ),
                                   child: Icon(
                                     isSelected ? Icons.remove : Icons.add,
                                     color: Colors.white,
-                                    size: 20,
+                                    size: 20.sp,
                                   ),
                                 ),
                               ],
@@ -97,24 +98,24 @@ class _CustomToppingsSideOptionsWidgetState
                         left: 0,
                         right: 0,
                         child: Container(
-                          decoration: const BoxDecoration(
+                          decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.only(
-                              bottomLeft: Radius.circular(15),
-                              bottomRight: Radius.circular(15),
+                              bottomLeft: Radius.circular(15.r),
+                              bottomRight: Radius.circular(15.r),
                             ),
                           ),
                           child: !widget.isLoading && item?.image != null
                               ? CachedNetworkImage(
                                   imageUrl: item!.image,
-                                  height: 60,
-                                  width: 60,
+                                  height: 60.h,
+                                  width: 60.w,
                                   fit: BoxFit.contain,
-                                  errorWidget: (context, url, error) =>
-                                      const Icon(
-                                        Icons.error,
-                                        color: Colors.red,
-                                      ),
+                                  errorWidget: (context, url, error) => Icon(
+                                    Icons.error,
+                                    color: Colors.red,
+                                    size: 30.sp,
+                                  ),
                                   placeholder: (context, url) => const Center(
                                     child: CircularProgressIndicator.adaptive(
                                       strokeWidth: 2,
@@ -126,8 +127,8 @@ class _CustomToppingsSideOptionsWidgetState
                                 )
                               : Image.asset(
                                   "assets/details/pngwing 15.png",
-                                  height: 60,
-                                  width: 60,
+                                  height: 60.h,
+                                  width: 60.w,
                                 ),
                         ),
                       ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:hungry_app/core/constants/app_colors.dart';
@@ -33,50 +34,52 @@ class _SignupViewState extends State<SignupView> {
           key: globalKey,
           child: Column(
             children: [
-              const Gap(150),
+              Gap(150.h),
               SvgPicture.asset(
                 "assets/logo/Hungry_.svg",
                 color: AppColors.primaryColor,
+                height: 50.h,
               ),
-              const CustomText(
+              CustomText(
                 text: "Welcome To Our Food App",
                 color: Colors.black,
+                fontSize: 14.sp,
               ),
-              const Gap(50),
+              Gap(50.h),
               Expanded(
                 child: Container(
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: AppColors.primaryColor,
                     borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20),
+                      topLeft: Radius.circular(20.r),
+                      topRight: Radius.circular(20.r),
                     ),
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    padding: EdgeInsets.symmetric(horizontal: 20.w),
                     child: SingleChildScrollView(
                       child: Column(
                         children: [
-                          const Gap(40),
+                          Gap(40.h),
                           CustomTextField(
                             controller: _name,
                             hintText: "Name",
                             isPassword: false,
                           ),
-                          const Gap(15),
+                          Gap(15.h),
                           CustomTextField(
                             controller: _emailAddress,
                             hintText: "Email Address",
                             isPassword: false,
                           ),
-                          const Gap(15),
+                          Gap(15.h),
                           CustomTextField(
                             controller: _password,
                             hintText: "Password",
                             isPassword: true,
                           ),
-                          const Gap(15),
-                          const Gap(15),
+                          Gap(15.h),
+                          Gap(15.h),
                           BlocConsumer<RegisterCubit, RegisterState>(
                             listenWhen: (previous, current) =>
                                 current is Failure || current is Success,
@@ -120,7 +123,7 @@ class _SignupViewState extends State<SignupView> {
                               );
                             },
                           ),
-                          const Gap(15),
+                          Gap(15.h),
                           CustomAuthButton(
                             isBackgroudnGreen: false,
                             color: Colors.white,

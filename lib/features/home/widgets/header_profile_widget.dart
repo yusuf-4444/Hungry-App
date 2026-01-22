@@ -74,7 +74,7 @@ class HeaderProfile extends StatelessWidget {
       return SizedBox(
         width: 20.w,
         height: 20.h,
-        child: const CircularProgressIndicator(
+        child: const CircularProgressIndicator.adaptive(
           strokeWidth: 2,
           valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
         ),

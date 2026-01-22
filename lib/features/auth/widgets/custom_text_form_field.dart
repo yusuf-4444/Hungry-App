@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CustomTextFormField extends StatelessWidget {
   const CustomTextFormField({
@@ -16,19 +17,20 @@ class CustomTextFormField extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextFormField(
       keyboardType: textInputType,
-      style: const TextStyle(color: Colors.white),
+      style: TextStyle(color: Colors.white, fontSize: 14.sp),
       cursorColor: Colors.white,
+      cursorHeight: 18.h,
       controller: _controller,
       decoration: InputDecoration(
         labelText: labelText,
-        labelStyle: const TextStyle(color: Colors.white),
+        labelStyle: TextStyle(color: Colors.white, fontSize: 14.sp),
         enabledBorder: OutlineInputBorder(
           borderSide: const BorderSide(color: Colors.white),
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(15.r),
         ),
         focusedBorder: OutlineInputBorder(
           borderSide: const BorderSide(color: Colors.white),
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(15.r),
         ),
       ),
     );

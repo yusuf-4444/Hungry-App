@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hungry_app/core/constants/app_colors.dart';
 
 class CustomTextField extends StatefulWidget {
@@ -35,7 +36,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
           ? true
           : false,
       cursorColor: AppColors.primaryColor,
-      cursorHeight: 18,
+      cursorHeight: 18.h,
+      style: TextStyle(fontSize: 14.sp),
       decoration: InputDecoration(
         suffixIcon: widget.isPassword
             ? IconButton(
@@ -44,22 +46,25 @@ class _CustomTextFieldState extends State<CustomTextField> {
                   setState(() {});
                 },
                 icon: isObsecure == true
-                    ? const Icon(Icons.visibility_off)
-                    : const Icon(CupertinoIcons.eye),
+                    ? Icon(Icons.visibility_off, size: 22.sp)
+                    : Icon(CupertinoIcons.eye, size: 22.sp),
               )
             : null,
-
         hintText: widget.hintText,
+        hintStyle: TextStyle(fontSize: 14.sp),
         fillColor: Colors.white,
         filled: true,
-        enabledBorder: const OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.white),
+        enabledBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: Colors.white),
+          borderRadius: BorderRadius.circular(10.r),
         ),
-        focusedBorder: const OutlineInputBorder(
-          borderSide: BorderSide(color: AppColors.primaryColor),
+        focusedBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: AppColors.primaryColor),
+          borderRadius: BorderRadius.circular(10.r),
         ),
-        border: const OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.white),
+        border: OutlineInputBorder(
+          borderSide: const BorderSide(color: Colors.white),
+          borderRadius: BorderRadius.circular(10.r),
         ),
       ),
     );

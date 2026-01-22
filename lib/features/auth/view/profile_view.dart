@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:hungry_app/core/constants/app_colors.dart';
 import 'package:hungry_app/core/network/pref_helper.dart';
@@ -45,14 +46,12 @@ class _ProfileViewState extends State<ProfileView> {
   @override
   void initState() {
     super.initState();
-    print('👤 ProfileView - initState');
     _checkGuestMode();
 
     final profileCubit = context.read<ProfileCubit>();
     final currentState = profileCubit.state;
 
     if (currentState is profile_state.Success) {
-      print('✅ Found cached profile data');
       _updateProfileData(currentState.data);
     }
   }
@@ -63,86 +62,71 @@ class _ProfileViewState extends State<ProfileView> {
       setState(() {
         isGuestMode = guest;
       });
-      print('🎭 Guest Mode: $isGuestMode');
     }
   }
 
   void _updateProfileData(ProfileModel data) {
-    print('📝 Updating Profile Data in UI');
-    print('   ├─ Name: ${data.data.name}');
-    print('   ├─ Email: ${data.data.email}');
-    print('   └─ Image: ${data.data.image ?? "No Image"}');
+    if (!mounted) return;
 
-    if (mounted) {
-      setState(() {
-        profileModel = data;
-        _name.text = data.data.name;
-        _email.text = data.data.email;
-        _address.text = data.data.address ?? "";
-        _visa.text = data.data.visa ?? "";
-        _selectedImageUrl = data.data.image;
-        _selectedImageFile = null;
-      });
-    }
+    setState(() {
+      profileModel = data;
+      _name.text = data.data.name ?? '';
+      _email.text = data.data.email ?? '';
+      _address.text = data.data.address ?? '';
+      _visa.text = data.data.visa ?? '';
+      _selectedImageUrl = data.data.image;
+      _selectedImageFile = null;
+    });
+
+    // مهم: يساعد في إجبار الـ listeners (مثل الـ TextFormField) على التحديث
   }
 
   Future<void> uploadImage() async {
-    print('📸 Upload Image Tapped');
     final image = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (image != null) {
-      print('✅ Image Selected: ${image.path}');
       setState(() {
         _selectedImageFile = File(image.path);
         _selectedImageUrl = null;
       });
-    } else {
-      print('❌ No Image Selected');
     }
   }
 
   Future<void> _updateProfile() async {
-    print('💾 Update Profile Tapped');
-
-    if (_name.text.isEmpty || _email.text.isEmpty) {
-      print('⚠️ Validation Failed: Name or Email is empty');
+    if (_name.text.trim().isEmpty || _email.text.trim().isEmpty) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(CustomSnackBar("Please fill name and email", Colors.red));
       return;
     }
 
-    setState(() {
-      isUpdating = true;
-    });
+    setState(() => isUpdating = true);
 
     try {
-      print('🔄 Calling updateProfile API...');
       await context.read<UpdateProfileCubit>().updateProfile(
-        name: _name.text,
-        email: _email.text,
-        delivaryAddress: _address.text,
-        visa: _visa.text,
+        name: _name.text.trim(),
+        email: _email.text.trim(),
+        delivaryAddress: _address.text.trim(),
+        visa: _visa.text.trim(),
         image: _selectedImageFile,
       );
     } catch (e) {
-      print('❌ Update Profile Exception: $e');
       if (mounted) {
-        setState(() {
-          isUpdating = false;
-        });
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(CustomSnackBar("Update error: $e", Colors.red));
+      }
+    } finally {
+      if (mounted) {
+        setState(() => isUpdating = false);
       }
     }
   }
 
   Future<void> _logout() async {
-    print('🚪 Logout Tapped');
-    setState(() {
-      isLoggingOut = true;
-    });
+    setState(() => isLoggingOut = true);
 
     try {
       if (isGuestMode) {
-        print('🎭 Logging out Guest Mode');
         await PrefHelper.removeToken();
         if (mounted) {
           context.read<ProfileCubit>().clearCache();
@@ -153,21 +137,26 @@ class _ProfileViewState extends State<ProfileView> {
           );
         }
       } else {
-        print('👤 Logging out Authenticated User');
         await context.read<LogoutCubit>().logout();
+        await PrefHelper.removeToken();
+        if (mounted) {
+          context.read<ProfileCubit>().clearCache();
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            AppRoutes.login,
+            (_) => false,
+          );
+        }
       }
     } catch (e) {
-      print('❌ Logout Exception: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          CustomSnackBar("Logout Failed: ${e.toString()}", Colors.red),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(CustomSnackBar("Logout Failed: $e", Colors.red));
       }
     } finally {
       if (mounted) {
-        setState(() {
-          isLoggingOut = false;
-        });
+        setState(() => isLoggingOut = false);
       }
     }
   }
@@ -189,8 +178,6 @@ class _ProfileViewState extends State<ProfileView> {
 
   @override
   Widget build(BuildContext context) {
-    print('🏗️ ProfileView - Building - Guest: $isGuestMode');
-
     if (isGuestMode) {
       return _buildGuestView();
     }
@@ -199,9 +186,6 @@ class _ProfileViewState extends State<ProfileView> {
       listeners: [
         BlocListener<ProfileCubit, profile_state.ProfileState>(
           listener: (context, state) {
-            print(
-              '👂 ProfileView - ProfileCubit Listener - State: ${state.runtimeType}',
-            );
             if (state is profile_state.Success) {
               _updateProfileData(state.data);
             }
@@ -209,35 +193,24 @@ class _ProfileViewState extends State<ProfileView> {
         ),
         BlocListener<UpdateProfileCubit, UpdateProfileState>(
           listener: (context, state) {
-            print(
-              '👂 ProfileView - UpdateProfileCubit Listener - State: ${state.runtimeType}',
-            );
             if (state is Success) {
-              print('✅ Profile Updated Successfully');
               context.read<ProfileCubit>().refreshProfile();
               ScaffoldMessenger.of(context).showSnackBar(
                 CustomSnackBar("Updated Successfully", Colors.white),
               );
             } else if (state is Failure) {
-              print('❌ Profile Update Failed: ${state.error}');
               ScaffoldMessenger.of(context).showSnackBar(
                 CustomSnackBar("Update Failed: ${state.error}", Colors.red),
               );
             }
             if (mounted) {
-              setState(() {
-                isUpdating = false;
-              });
+              setState(() => isUpdating = false);
             }
           },
         ),
         BlocListener<LogoutCubit, dynamic>(
           listener: (context, state) {
-            print(
-              '👂 ProfileView - LogoutCubit Listener - State: ${state.runtimeType}',
-            );
             if (state is Success) {
-              print('✅ Logout Successful');
               context.read<ProfileCubit>().clearCache();
               ScaffoldMessenger.of(context).showSnackBar(
                 CustomSnackBar("LOGGED OUT SUCCESSFULLY", Colors.white),
@@ -248,11 +221,8 @@ class _ProfileViewState extends State<ProfileView> {
                 (_) => false,
               );
             } else if (state is Failure) {
-              print('❌ Logout Failed: ${state.error}');
               if (mounted) {
-                setState(() {
-                  isLoggingOut = false;
-                });
+                setState(() => isLoggingOut = false);
                 ScaffoldMessenger.of(context).showSnackBar(
                   CustomSnackBar("Logout Failed: ${state.error}", Colors.red),
                 );
@@ -263,7 +233,6 @@ class _ProfileViewState extends State<ProfileView> {
       ],
       child: BlocBuilder<ProfileCubit, profile_state.ProfileState>(
         builder: (context, state) {
-          print('🏗️ ProfileView - BlocBuilder - State: ${state.runtimeType}');
           final isLoading = state is profile_state.Loading;
 
           if (state is profile_state.Failure && !isLoading) {
@@ -287,34 +256,35 @@ class _ProfileViewState extends State<ProfileView> {
         elevation: 0,
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Colors.white, size: 24.sp),
         ),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.person_outline, size: 80, color: Colors.white),
-            const Gap(20),
-            const CustomText(
+            Icon(Icons.person_outline, size: 80.sp, color: Colors.white),
+            Gap(20.h),
+            CustomText(
               text: "Guest Mode",
               color: Colors.white,
-              fontSize: 24,
+              fontSize: 24.sp,
               fontWeight: FontWeight.bold,
             ),
-            const Gap(10),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 40),
+            Gap(10.h),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 40.w),
               child: CustomText(
                 text: "Please login to view and edit your profile",
                 color: Colors.white,
                 textAlign: TextAlign.center,
+                fontSize: 14.sp,
               ),
             ),
-            const Gap(30),
+            Gap(30.h),
             CustomMainButton(
               text: "Go to Login",
-              fontSize: 16,
+              fontSize: 16.sp,
               onPressed: () {
                 Navigator.pushNamedAndRemoveUntil(
                   context,
@@ -338,40 +308,44 @@ class _ProfileViewState extends State<ProfileView> {
           backgroundColor: AppColors.primaryColor,
           leading: IconButton(
             onPressed: () => Navigator.pop(context),
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            icon: Icon(Icons.arrow_back, color: Colors.white, size: 24.sp),
           ),
         ),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.error_outline, size: 80, color: Colors.white),
-              const Gap(20),
-              const CustomText(
+              Icon(Icons.error_outline, size: 80.sp, color: Colors.white),
+              Gap(20.h),
+              CustomText(
                 text: "Error Loading Profile",
                 color: Colors.white,
-                fontSize: 20,
+                fontSize: 20.sp,
                 fontWeight: FontWeight.bold,
               ),
-              const Gap(10),
+              Gap(10.h),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 40),
+                padding: EdgeInsets.symmetric(horizontal: 40.w),
                 child: CustomText(
                   text: error,
                   color: Colors.white,
                   textAlign: TextAlign.center,
+                  fontSize: 14.sp,
                 ),
               ),
-              const Gap(30),
+              Gap(30.h),
               ElevatedButton(
                 onPressed: () => context.read<ProfileCubit>().refreshProfile(),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
                   foregroundColor: AppColors.primaryColor,
                 ),
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  child: Text("Retry", style: TextStyle(fontSize: 16)),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 20.w,
+                    vertical: 12.h,
+                  ),
+                  child: Text("Retry", style: TextStyle(fontSize: 16.sp)),
                 ),
               ),
             ],
@@ -390,13 +364,13 @@ class _ProfileViewState extends State<ProfileView> {
           actions: [
             IconButton(
               onPressed: () {},
-              icon: const Icon(Icons.settings, color: Colors.white),
+              icon: Icon(Icons.settings, color: Colors.white, size: 24.sp),
             ),
           ],
           backgroundColor: AppColors.primaryColor,
           leading: IconButton(
             onPressed: () => Navigator.pop(context),
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            icon: Icon(Icons.arrow_back, color: Colors.white, size: 24.sp),
           ),
         ),
         body: Column(
@@ -405,12 +379,12 @@ class _ProfileViewState extends State<ProfileView> {
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                  padding: EdgeInsets.symmetric(horizontal: 15.w),
                   child: Column(
                     children: [
-                      const Gap(10),
+                      Gap(10.h),
                       _buildAvatar(),
-                      const Gap(10),
+                      Gap(10.h),
                       CustomMainButton(
                         onPressed: uploadImage,
                         text:
@@ -419,37 +393,48 @@ class _ProfileViewState extends State<ProfileView> {
                                     _selectedImageUrl!.isEmpty)
                             ? "Upload Image"
                             : "Change Image",
-                        fontSize: 12,
-                        width: 200,
+                        fontSize: 12.sp,
+                        width: 200.w,
                       ),
-                      const Gap(10),
-                      CustomTextFormField(controller: _name, labelText: 'Name'),
-                      const Gap(20),
+                      Gap(10.h),
                       CustomTextFormField(
+                        key: ValueKey(
+                          "name_${_name.text}",
+                        ), // اختياري – يساعد في حالات نادرة
+                        controller: _name,
+                        labelText: 'Name',
+                      ),
+                      Gap(20.h),
+                      CustomTextFormField(
+                        key: ValueKey("email_${_email.text}"),
                         controller: _email,
                         labelText: 'Email',
                       ),
-                      const Gap(20),
+                      Gap(20.h),
                       CustomTextFormField(
+                        key: ValueKey("address_${_address.text}"),
                         controller: _address,
                         labelText: 'Delivery Address',
                       ),
-                      const Gap(20),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 20.0),
-                        child: Divider(),
+                      Gap(20.h),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 20.w),
+                        child: const Divider(),
                       ),
-                      const Gap(20),
+                      Gap(20.h),
                       CustomTextFormField(
+                        key: ValueKey(
+                          "visa_${_visa.text}",
+                        ), // ← الحل الأساسي لمشكلة الـ visa
                         textInputType: TextInputType.number,
                         controller: _visa,
                         labelText: _visa.text.isEmpty
                             ? "Add Visa"
                             : 'Edit Visa',
                       ),
-                      const Gap(20),
-                      if (_visa.text.isNotEmpty) _buildVisaCard(),
-                      const Gap(80),
+                      Gap(20.h),
+                      if (_visa.text.trim().isNotEmpty) _buildVisaCard(),
+                      Gap(80.h),
                     ],
                   ),
                 ),
@@ -465,14 +450,14 @@ class _ProfileViewState extends State<ProfileView> {
   Widget _buildAvatar() {
     return Center(
       child: Container(
-        height: 120,
-        width: 120,
+        height: 120.w,
+        width: 120.w,
         decoration: BoxDecoration(
-          border: Border.all(width: 3, color: Colors.white),
+          border: Border.all(width: 3.w, color: Colors.white),
           shape: BoxShape.circle,
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(60),
+          borderRadius: BorderRadius.circular(80.r),
           child: _selectedImageFile != null
               ? Image.file(_selectedImageFile!, fit: BoxFit.cover)
               : (_selectedImageUrl != null && _selectedImageUrl!.isNotEmpty)
@@ -497,29 +482,34 @@ class _ProfileViewState extends State<ProfileView> {
 
   Widget _buildVisaCard() {
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      contentPadding: EdgeInsets.symmetric(vertical: 6.h, horizontal: 16.w),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
       tileColor: Colors.white,
-      leading: Image.asset("assets/profileIcons/image 13.png"),
-      horizontalTitleGap: 30,
-      title: const CustomText(
+      leading: Image.asset("assets/profileIcons/image 13.png", height: 30.h),
+      horizontalTitleGap: 30.w,
+      title: CustomText(
         text: "Debit card",
         color: Colors.black,
         fontWeight: FontWeight.w700,
-        fontSize: 14,
+        fontSize: 14.sp,
       ),
       subtitle: CustomText(
         text: _formatVisaNumber(_visa.text),
         color: Colors.black,
+        fontSize: 12.sp,
       ),
-      trailing: const CustomText(text: "Default", color: Colors.black),
+      trailing: CustomText(
+        text: "Default",
+        color: Colors.black,
+        fontSize: 12.sp,
+      ),
     );
   }
 
   Widget _buildBottomButtons() {
     return Container(
-      height: 70,
-      padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10),
+      height: 70.h,
+      padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 10.h),
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border(top: BorderSide(color: Colors.grey.shade300, width: 1)),
@@ -532,21 +522,19 @@ class _ProfileViewState extends State<ProfileView> {
             child: Container(
               decoration: BoxDecoration(
                 color: isUpdating ? Colors.grey : AppColors.primaryColor,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(10.r),
               ),
               child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 10,
-                ),
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
                 child: Row(
                   children: [
                     CustomText(
                       text: isUpdating ? "Updating..." : "Edit Profile",
                       color: Colors.white,
+                      fontSize: 14.sp,
                     ),
-                    const Gap(10),
-                    const Icon(Icons.edit, color: Colors.white),
+                    Gap(10.w),
+                    Icon(Icons.edit, color: Colors.white, size: 20.sp),
                   ],
                 ),
               ),
@@ -557,22 +545,20 @@ class _ProfileViewState extends State<ProfileView> {
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(10.r),
                 border: Border.all(color: Colors.black),
               ),
               child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 10,
-                ),
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
                 child: Row(
                   children: [
                     CustomText(
                       text: isLoggingOut ? "Logging out..." : "Logout",
                       color: Colors.black,
+                      fontSize: 14.sp,
                     ),
-                    const Gap(10),
-                    const Icon(Icons.logout, color: Colors.black),
+                    Gap(10.w),
+                    Icon(Icons.logout, color: Colors.black, size: 20.sp),
                   ],
                 ),
               ),
@@ -585,7 +571,6 @@ class _ProfileViewState extends State<ProfileView> {
 
   @override
   void dispose() {
-    print('🗑️ ProfileView - dispose');
     _name.dispose();
     _email.dispose();
     _address.dispose();

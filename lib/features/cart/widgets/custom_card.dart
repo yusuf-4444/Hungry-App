@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:hungry_app/core/constants/app_colors.dart';
 import 'package:hungry_app/features/cart/logic/deleteItem/delete_item_cubit.dart';
@@ -55,7 +56,7 @@ class _CustomCardState extends State<CustomCard> {
       elevation: 3,
       color: Colors.white,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
         child: Row(
           children: [
             Column(
@@ -63,24 +64,26 @@ class _CustomCardState extends State<CustomCard> {
               children: [
                 CachedNetworkImage(
                   imageUrl: widget.image,
-                  width: 111,
-                  height: 102.18,
+                  width: 95.w,
+                  height: 95.h,
                   fit: BoxFit.cover,
                   placeholder: (context, url) =>
                       const Center(child: CircularProgressIndicator.adaptive()),
-                  errorWidget: (context, url, error) => const Icon(Icons.error),
+                  errorWidget: (context, url, error) =>
+                      Icon(Icons.error, size: 40.sp),
                 ),
-                const Gap(8),
+                Gap(8.h),
                 CustomText(
                   text: widget.title,
                   color: Colors.black,
                   fontWeight: FontWeight.w600,
-                  fontSize: 14,
+                  fontSize: 14.sp,
                 ),
                 CustomText(
                   text: widget.subTitle,
                   color: Colors.black,
                   fontWeight: FontWeight.w400,
+                  fontSize: 12.sp,
                 ),
               ],
             ),
@@ -98,15 +101,15 @@ class _CustomCardState extends State<CustomCard> {
                           child: Container(
                             decoration: BoxDecoration(
                               color: AppColors.primaryColor,
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(10.r),
                             ),
-                            child: const Padding(
+                            child: Padding(
                               padding: EdgeInsets.symmetric(
-                                horizontal: 15,
-                                vertical: 5,
+                                horizontal: 15.w,
+                                vertical: 5.h,
                               ),
                               child: CustomText(
-                                fontSize: 20,
+                                fontSize: 20.sp,
                                 text: "-",
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -114,29 +117,28 @@ class _CustomCardState extends State<CustomCard> {
                             ),
                           ),
                         ),
-                        const Gap(20),
-                        // Quantity Display
+                        Gap(20.w),
                         CustomText(
                           text: quantity.toString(),
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
+                          fontSize: 16.sp,
                         ),
-                        const Gap(20),
-                        // Plus Button
+                        Gap(20.w),
                         GestureDetector(
                           onTap: () => cubit.incrementQuantity(widget.itemId),
                           child: Container(
                             decoration: BoxDecoration(
                               color: AppColors.primaryColor,
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(10.r),
                             ),
-                            child: const Padding(
+                            child: Padding(
                               padding: EdgeInsets.symmetric(
-                                horizontal: 15,
-                                vertical: 5,
+                                horizontal: 15.w,
+                                vertical: 5.h,
                               ),
                               child: CustomText(
-                                fontSize: 20,
+                                fontSize: 20.sp,
                                 text: "+",
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -148,26 +150,25 @@ class _CustomCardState extends State<CustomCard> {
                     );
                   },
                 ),
-                const Gap(30),
-                // Remove Button
+                Gap(30.h),
                 BlocBuilder<DeleteItemCubit, DeleteItemState>(
                   builder: (context, state) {
                     return Container(
                       decoration: BoxDecoration(
                         color: AppColors.primaryColor,
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(12.r),
                       ),
                       child: TextButton(
                         onPressed: _removeItem,
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 5,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 10.w,
+                            vertical: 5.h,
                           ),
                           child: CustomText(
                             text: _isRemoving ? "Removing..." : "Remove",
                             color: Colors.white,
-                            fontSize: 18,
+                            fontSize: 18.sp,
                             fontWeight: FontWeight.w500,
                           ),
                         ),

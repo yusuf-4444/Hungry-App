@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:hungry_app/features/cart/data/models/myCart/cart_model.dart';
 import 'package:hungry_app/features/cart/logic/getCart/get_cart_cubit.dart';
@@ -49,11 +50,11 @@ class _CartViewState extends State<CartView> {
             if (state is Loading) {
               return Skeletonizer(
                 child: ListView.separated(
-                  padding: const EdgeInsets.only(
-                    top: 20,
-                    bottom: 80,
-                    left: 8,
-                    right: 8,
+                  padding: EdgeInsets.only(
+                    top: 20.h,
+                    bottom: 80.h,
+                    left: 8.w,
+                    right: 8.w,
                   ),
                   itemBuilder: (context, index) => const CustomCard(
                     image: 'https://via.placeholder.com/200',
@@ -61,7 +62,7 @@ class _CartViewState extends State<CartView> {
                     subTitle: '',
                     itemId: 0,
                   ),
-                  separatorBuilder: (context, index) => const Gap(15),
+                  separatorBuilder: (context, index) => Gap(15.h),
                   itemCount: 5,
                 ),
               );
@@ -72,11 +73,11 @@ class _CartViewState extends State<CartView> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(state.error),
-                    const Gap(16),
+                    Text(state.error, style: TextStyle(fontSize: 14.sp)),
+                    Gap(16.h),
                     ElevatedButton(
                       onPressed: _refreshCart,
-                      child: const Text("Retry"),
+                      child: Text("Retry", style: TextStyle(fontSize: 14.sp)),
                     ),
                   ],
                 ),
@@ -88,12 +89,12 @@ class _CartViewState extends State<CartView> {
               totalPrice = double.tryParse(state.data.data.totalPrice) ?? 0;
 
               if (items.isEmpty) {
-                return const Padding(
+                return Padding(
                   padding: EdgeInsets.only(
-                    top: 20,
-                    bottom: 80,
-                    left: 8,
-                    right: 8,
+                    top: 20.h,
+                    bottom: 80.h,
+                    left: 8.w,
+                    right: 8.w,
                   ),
                   child: Center(
                     child: Column(
@@ -101,14 +102,14 @@ class _CartViewState extends State<CartView> {
                       children: [
                         Icon(
                           Icons.shopping_cart_outlined,
-                          size: 64,
+                          size: 64.sp,
                           color: Colors.grey,
                         ),
-                        Gap(16),
+                        Gap(16.h),
                         Text(
                           "Your cart is empty",
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 18.sp,
                             fontWeight: FontWeight.w500,
                             color: Colors.grey,
                           ),
@@ -120,17 +121,17 @@ class _CartViewState extends State<CartView> {
               }
 
               return ListView.builder(
-                padding: const EdgeInsets.only(
-                  top: 20,
-                  bottom: 100,
-                  left: 8,
-                  right: 8,
+                padding: EdgeInsets.only(
+                  top: 20.h,
+                  bottom: 100.h,
+                  left: 8.w,
+                  right: 8.w,
                 ),
                 itemCount: items.length,
                 itemBuilder: (context, index) {
                   final item = items[index];
                   return Padding(
-                    padding: const EdgeInsets.only(bottom: 15.0),
+                    padding: EdgeInsets.only(bottom: 15.h),
                     child: CustomCard(
                       image: item.image,
                       title: item.name,
@@ -152,11 +153,11 @@ class _CartViewState extends State<CartView> {
                   double.tryParse(state.data.data.totalPrice) ?? 0;
 
               return Container(
-                height: 80,
+                height: 100.h,
                 decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20.r),
+                    topRight: Radius.circular(20.r),
                   ),
                   color: Colors.white,
                   boxShadow: [
@@ -164,32 +165,32 @@ class _CartViewState extends State<CartView> {
                   ],
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  padding: EdgeInsets.symmetric(horizontal: 10.w),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Gap(13),
-                          const CustomText(
+                          Gap(13.h),
+                          CustomText(
                             text: "Total",
                             color: Colors.black,
                             fontWeight: FontWeight.w600,
-                            fontSize: 14,
+                            fontSize: 14.sp,
                           ),
-                          const Gap(10),
+                          Gap(10.h),
                           CustomText(
                             text: "\$ ${checkoutPrice.toStringAsFixed(2)}",
                             color: Colors.black,
-                            fontSize: 22,
+                            fontSize: 22.sp,
                             fontWeight: FontWeight.w900,
                           ),
                         ],
                       ),
                       CustomMainButton(
                         text: "Checkout",
-                        fontSize: 14,
+                        fontSize: 14.sp,
                         onPressed: items.isEmpty
                             ? null
                             : () {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:hungry_app/core/constants/app_colors.dart';
 import 'package:hungry_app/core/route/app_routes.dart';
@@ -62,7 +63,6 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
 
     if (cartState is Success) {
       final items = cartState.data.data.items;
-      // نتحقق لو في item بنفس الـ productId
       return items.any((item) => item.productId == widget.productId);
     }
     return false;
@@ -133,11 +133,15 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
           onPressed: () {
             Navigator.popAndPushNamed(context, AppRoutes.root);
           },
-          icon: const Icon(Icons.arrow_back, fontWeight: FontWeight.bold),
+          icon: Icon(
+            Icons.arrow_back,
+            fontWeight: FontWeight.bold,
+            size: 24.sp,
+          ),
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15),
+        padding: EdgeInsets.symmetric(horizontal: 15.w),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -150,16 +154,15 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                   });
                 },
               ),
-              const Gap(20),
-              const CustomText(
+              Gap(20.h),
+              CustomText(
                 text: "Toppings",
-                color: Color(0xff3C2F2F),
+                color: const Color(0xff3C2F2F),
                 fontWeight: FontWeight.w600,
-                fontSize: 18,
+                fontSize: 18.sp,
               ),
-              const Gap(15),
+              Gap(15.h),
 
-              // Toppings Section
               BlocBuilder<ToppingsCubit, toppings_state.ToppingsState>(
                 bloc: context.read<ToppingsCubit>(),
                 buildWhen: (previous, current) =>
@@ -182,6 +185,7 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                       child: CustomText(
                         text: "Error: ${state.error}",
                         color: Colors.red,
+                        fontSize: 14.sp,
                       ),
                     );
                   } else if (state is toppings_state.Success) {
@@ -211,16 +215,15 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                 },
               ),
 
-              const Gap(30),
-              const CustomText(
+              Gap(30.h),
+              CustomText(
                 text: "Side Options",
-                color: Color(0xff3C2F2F),
+                color: const Color(0xff3C2F2F),
                 fontWeight: FontWeight.w600,
-                fontSize: 18,
+                fontSize: 18.sp,
               ),
-              const Gap(15),
+              Gap(15.h),
 
-              // Side Options Section
               BlocBuilder<
                 SideOptionsCubit,
                 side_options_state.SideOptionsState
@@ -246,6 +249,7 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                       child: CustomText(
                         text: "Error: ${state.error}",
                         color: Colors.red,
+                        fontSize: 14.sp,
                       ),
                     );
                   } else if (state is side_options_state.Success) {
@@ -283,41 +287,41 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                 },
               ),
 
-              const Gap(120),
+              Gap(120.h),
             ],
           ),
         ),
       ),
       bottomSheet: Container(
-        height: 100,
+        height: 130.h,
         decoration: BoxDecoration(
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20.r),
+            topRight: Radius.circular(20.r),
           ),
           color: Colors.white,
           boxShadow: [BoxShadow(color: Colors.grey.shade800, blurRadius: 8)],
         ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          padding: EdgeInsets.symmetric(horizontal: 10.w),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Gap(13),
-                  const CustomText(
+                  Gap(13.h),
+                  CustomText(
                     text: "Total",
                     color: Colors.black,
                     fontWeight: FontWeight.w600,
-                    fontSize: 14,
+                    fontSize: 14.sp,
                   ),
-                  const Gap(10),
+                  Gap(10.h),
                   CustomText(
                     text: "\$ ${widget.price}",
                     color: Colors.black,
-                    fontSize: 22,
+                    fontSize: 22.sp,
                     fontWeight: FontWeight.w900,
                   ),
                 ],
@@ -330,7 +334,7 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                     text: isInCartNow
                         ? "Already in Cart"
                         : (isAddingToCart ? "Adding..." : "Add To Cart"),
-                    fontSize: 16,
+                    fontSize: 16.sp,
                     onPressed: (isAddingToCart || isInCartNow)
                         ? null
                         : _addToCart,

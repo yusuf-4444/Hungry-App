@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:hungry_app/shared/custom_text.dart';
 
@@ -19,20 +20,20 @@ class CustomOrderSummary extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15.0),
+      padding: EdgeInsets.symmetric(horizontal: 15.w),
       child: Column(
         children: [
-          const Gap(15),
+          Gap(15.h),
           customCheckout("Order", "\$ $order", false, false),
-          const Gap(10),
+          Gap(10.h),
           customCheckout("Taxes", "\$ $taxes", false, false),
-          const Gap(10),
+          Gap(10.h),
           customCheckout("Delivery Fees", "\$ $deliveryFees", false, false),
-          const Gap(10),
+          Gap(10.h),
           const Divider(),
-          const Gap(15),
+          Gap(15.h),
           customCheckout("Total: ", "\$ $total", true, false),
-          const Gap(20),
+          Gap(20.h),
           customCheckout(
             "Estimated delivery time: ",
             "15 - 30 mins",
@@ -53,13 +54,13 @@ Widget customCheckout(text, price, isBold, isSmall) {
         text: text,
         color: isBold ? Colors.black : const Color(0xff7d7d7d),
         fontWeight: isBold ? FontWeight.w600 : FontWeight.w400,
-        fontSize: isSmall ? 11 : 15,
+        fontSize: isSmall ? 11.sp : 15.sp,
       ),
       CustomText(
         text: price.toString(),
         color: isBold ? Colors.black : const Color(0xff7d7d7d),
         fontWeight: isBold ? FontWeight.w600 : FontWeight.w400,
-        fontSize: isSmall ? 11 : 15,
+        fontSize: isSmall ? 11.sp : 15.sp,
       ),
     ],
   );

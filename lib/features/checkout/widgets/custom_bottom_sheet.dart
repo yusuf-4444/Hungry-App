@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:hungry_app/core/constants/app_colors.dart';
 import 'package:hungry_app/core/route/app_routes.dart';
 import 'package:hungry_app/features/cart/logic/deleteItem/delete_item_cubit.dart';
+import 'package:hungry_app/features/cart/logic/getCart/get_cart_cubit.dart';
+import 'package:hungry_app/features/cart/logic/getCart/get_cart_state.dart'
+    as cart_state;
 import 'package:hungry_app/features/checkout/data/models/save_order.dart';
 import 'package:hungry_app/features/checkout/logic/cubit/save_order_cubit.dart';
 import 'package:hungry_app/features/checkout/logic/cubit/save_order_state.dart';
@@ -22,6 +26,7 @@ class CustomBottomSheet extends StatefulWidget {
   final double totalPrice;
   final SaveOrder saveOrder;
   final List<OrderItems> orderItems;
+
   @override
   State<CustomBottomSheet> createState() => _CustomBottomSheetState();
 }
@@ -38,9 +43,22 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
 
     try {
       await context.read<SaveOrderCubit>().saveOrder(widget.saveOrder);
-      for (var item in widget.orderItems) {
-        context.read<DeleteItemCubit>().deleteItem(item.productId);
-      }
+
+      final cartCubit = context.read<GetCartCubit>();
+      final cartState = cartCubit.state;
+
+      cartState.maybeWhen(
+        success: (cartData) async {
+          final cartItems = cartData.data.items;
+
+          for (var item in cartItems) {
+            await context.read<DeleteItemCubit>().deleteItem(item.itemId);
+          }
+
+          await cartCubit.refreshCart();
+        },
+        orElse: () {},
+      );
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -55,52 +73,43 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
 
   void _showSuccessDialog(BuildContext context) {
     showDialog(
-      barrierDismissible: false,
+      barrierDismissible: true,
       context: context,
       builder: (dialogContext) {
         return Dialog(
-          insetPadding: const EdgeInsets.symmetric(
-            horizontal: 50,
-            vertical: 170,
-          ),
+          insetPadding: EdgeInsets.symmetric(horizontal: 50.w, vertical: 300.h),
           backgroundColor: Colors.white,
           child: Column(
             children: [
-              const Gap(15),
-              const CircleAvatar(
-                radius: 33,
+              Gap(15.h),
+              CircleAvatar(
+                radius: 33.r,
                 backgroundColor: AppColors.primaryColor,
-                child: Icon(
-                  Icons.check,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w900,
-                  size: 40,
-                ),
+                child: Icon(Icons.check, color: Colors.white, size: 40.sp),
               ),
-              const Gap(30),
-              const CustomText(
+              Gap(30.h),
+              CustomText(
                 text: "Success !",
                 color: AppColors.primaryColor,
                 fontWeight: FontWeight.w700,
-                fontSize: 25,
+                fontSize: 25.sp,
               ),
-              const Gap(15),
-              const CustomText(
+              Gap(15.h),
+              CustomText(
                 text:
                     "Your payment was successful\n.A receipt for this purchase has\n been sent to your email.",
-                color: Color(0xffBCBBBB),
+                color: const Color(0xffBCBBBB),
                 fontWeight: FontWeight.w400,
-                fontSize: 14,
+                fontSize: 14.sp,
                 textAlign: TextAlign.center,
               ),
-              const Gap(10),
-              const Spacer(),
+              Gap(30.h),
               CustomMainButton(
                 text: "Go Back",
-                fontSize: 15,
-                width: 200,
+                fontSize: 15.sp,
+                width: 200.w,
                 onPressed: () {
-                  Navigator.of(dialogContext).pop(); // Close dialog
+                  Navigator.of(dialogContext).pop();
                   Navigator.pushNamedAndRemoveUntil(
                     context,
                     AppRoutes.root,
@@ -108,7 +117,7 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
                   );
                 },
               ),
-              const Gap(20),
+              Gap(20.h),
             ],
           ),
         );
@@ -125,6 +134,7 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
             setState(() {
               _isProcessing = false;
             });
+            context.read<GetCartCubit>().clearCache();
             _showSuccessDialog(context);
           }
         } else if (state is Failure) {
@@ -142,43 +152,43 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
         final isLoading = state is Loading || _isProcessing;
 
         return Container(
-          height: 100,
+          height: 135.h,
           decoration: BoxDecoration(
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20.r),
+              topRight: Radius.circular(20.r),
             ),
             color: Colors.white,
             boxShadow: [BoxShadow(color: Colors.grey.shade800, blurRadius: 8)],
           ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            padding: EdgeInsets.symmetric(horizontal: 10.w),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Gap(13),
-                    const CustomText(
+                    Gap(13.h),
+                    CustomText(
                       text: "Total",
                       color: Colors.black,
                       fontWeight: FontWeight.w600,
-                      fontSize: 14,
+                      fontSize: 14.sp,
                     ),
-                    const Gap(10),
+                    Gap(10.h),
                     CustomText(
                       text:
                           "\$ ${(widget.totalPrice + 5 + 20.5).toStringAsFixed(2)}",
                       color: Colors.black,
-                      fontSize: 22,
+                      fontSize: 22.sp,
                       fontWeight: FontWeight.w900,
                     ),
                   ],
                 ),
                 CustomMainButton(
                   text: isLoading ? "Processing..." : "Pay Now",
-                  fontSize: 16,
+                  fontSize: 16.sp,
                   onPressed: isLoading ? null : _handlePayment,
                 ),
               ],

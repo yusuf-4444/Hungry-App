@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:hungry_app/core/constants/app_colors.dart';
@@ -40,44 +41,46 @@ class _SigninViewState extends State<SigninView> {
             key: globalKey,
             child: Column(
               children: [
-                const Gap(150),
+                Gap(150.h),
                 SvgPicture.asset(
                   "assets/logo/Hungry_.svg",
                   color: AppColors.primaryColor,
+                  height: 50.h,
                 ),
-                const Gap(7),
-                const CustomText(
+                Gap(7.h),
+                CustomText(
                   text: "Welcome Back, Discover The Fast Food",
                   color: AppColors.primaryColor,
+                  fontSize: 14.sp,
                 ),
-                const Gap(100),
+                Gap(100.h),
                 Expanded(
                   child: Container(
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       color: AppColors.primaryColor,
                       borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        topRight: Radius.circular(20),
+                        topLeft: Radius.circular(20.r),
+                        topRight: Radius.circular(20.r),
                       ),
                     ),
                     child: Padding(
-                      padding: const EdgeInsets.all(20.0),
+                      padding: EdgeInsets.all(20.w),
                       child: SingleChildScrollView(
                         child: Column(
                           children: [
-                            const Gap(20),
+                            Gap(20.h),
                             CustomTextField(
                               controller: _emailAddress,
                               hintText: "Email Address",
                               isPassword: false,
                             ),
-                            const Gap(20),
+                            Gap(20.h),
                             CustomTextField(
                               controller: _password,
                               hintText: "Password",
                               isPassword: true,
                             ),
-                            const Gap(30),
+                            Gap(30.h),
                             BlocConsumer<LoginCubit, login_state.LoginState>(
                               bloc: context.read<LoginCubit>(),
                               listenWhen: (previous, current) =>
@@ -135,7 +138,7 @@ class _SigninViewState extends State<SigninView> {
                                 );
                               },
                             ),
-                            const Gap(10),
+                            Gap(10.h),
                             CustomAuthButton(
                               isBackgroudnGreen: false,
                               color: Colors.white,
@@ -148,7 +151,7 @@ class _SigninViewState extends State<SigninView> {
                                 );
                               },
                             ),
-                            const Gap(10),
+                            Gap(10.h),
                             BlocConsumer<AutoLoginCubit, AutoLoginState>(
                               listener: (context, state) {
                                 if (state is Guest && mounted) {
@@ -175,9 +178,10 @@ class _SigninViewState extends State<SigninView> {
                                         },
                                   child: isLoading
                                       ? const CircularProgressIndicator.adaptive()
-                                      : const CustomText(
+                                      : CustomText(
                                           text: "Continue as a Guest ?",
                                           color: Colors.white,
+                                          fontSize: 14.sp,
                                         ),
                                 );
                               },

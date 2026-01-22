@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:hungry_app/core/constants/app_colors.dart';
 import 'package:hungry_app/core/network/pref_helper.dart';
 import 'package:hungry_app/core/route/app_routes.dart';
+import 'package:hungry_app/features/auth/profile/logic/cubit/profile_cubit.dart';
 
 class SplashView extends StatefulWidget {
   const SplashView({super.key});
@@ -32,7 +35,6 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
     super.initState();
 
     _initAnimations();
-
     _startAnimations();
 
     Future.delayed(const Duration(seconds: 4), () async {
@@ -40,6 +42,7 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
         _token = await PrefHelper.getToken();
         if (_token != null && _token!.isNotEmpty) {
           Navigator.pushReplacementNamed(context, AppRoutes.root);
+          await context.read<ProfileCubit>().getProfile();
         } else {
           Navigator.pushReplacementNamed(context, AppRoutes.login);
         }
@@ -67,7 +70,6 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
       ),
     );
 
-    // Burger Animation Controller
     _burgerController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1500),
@@ -133,8 +135,7 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
       body: Center(
         child: Column(
           children: [
-            const Gap(150),
-            // Animated Logo with Shimmer Effect
+            Gap(150.h),
             AnimatedBuilder(
               animation: _logoController,
               builder: (context, child) {
@@ -144,7 +145,10 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
                     scale: _logoScaleAnimation.value,
                     child: Stack(
                       children: [
-                        SvgPicture.asset("assets/logo/Hungry_.svg"),
+                        SvgPicture.asset(
+                          "assets/logo/Hungry_.svg",
+                          height: 60.h,
+                        ),
                         AnimatedBuilder(
                           animation: _shimmerAnimation,
                           builder: (context, child) {
@@ -169,6 +173,7 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
                                 blendMode: BlendMode.srcATop,
                                 child: SvgPicture.asset(
                                   "assets/logo/Hungry_.svg",
+                                  height: 60.h,
                                 ),
                               ),
                             );
@@ -181,7 +186,6 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
               },
             ),
             const Spacer(),
-            // Animated Burger Image
             AnimatedBuilder(
               animation: _burgerController,
               builder: (context, child) {
@@ -193,8 +197,8 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
                       opacity: _burgerFadeAnimation.value,
                       child: Image.asset(
                         "assets/splash/image 1.png",
-                        width: 400,
-                        height: 250,
+                        width: 400.w,
+                        height: 250.h,
                         fit: BoxFit.contain,
                       ),
                     ),
