@@ -9,6 +9,7 @@ import 'package:hungry_app/core/route/app_router.dart';
 import 'package:hungry_app/core/route/app_routes.dart';
 import 'package:hungry_app/features/auth/login/logic/cubit/login_cubit.dart';
 import 'package:hungry_app/features/auth/profile/logic/cubit/profile_cubit.dart';
+import 'package:hungry_app/features/cart/logic/deleteItem/delete_item_cubit.dart';
 import 'package:hungry_app/features/cart/logic/getCart/get_cart_cubit.dart';
 import 'package:hungry_app/features/home/logic/cubit/food_cubit.dart';
 
@@ -35,6 +36,7 @@ class HungryApp extends StatelessWidget {
         BlocProvider.value(value: getIt<ProfileCubit>()..getProfile()),
         BlocProvider(create: (context) => getIt<LoginCubit>()),
         BlocProvider(create: (context) => getIt<GetCartCubit>()),
+        BlocProvider(create: (context) => getIt<DeleteItemCubit>()),
       ],
       child: ScreenUtilInit(
         designSize: const Size(375, 812),

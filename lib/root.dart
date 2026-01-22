@@ -7,7 +7,7 @@ import 'package:hungry_app/features/auth/logout/logic/cubit/logout_cubit.dart';
 import 'package:hungry_app/features/auth/profile/logic/cubit/profile_cubit.dart';
 import 'package:hungry_app/features/auth/profile/logic/cubit/update_profile_cubit.dart';
 import 'package:hungry_app/features/auth/view/profile_view.dart';
-import 'package:hungry_app/features/cart/logic/getCart/get_cart_cubit.dart';
+import 'package:hungry_app/features/cart/logic/deleteItem/delete_item_cubit.dart';
 import 'package:hungry_app/features/cart/views/cart_view.dart';
 import 'package:hungry_app/features/home/views/home_view.dart';
 import 'package:hungry_app/features/orderHistory/views/order_histroy_view.dart';
@@ -37,6 +37,7 @@ class _RootState extends State<Root> {
           BlocProvider(create: (context) => getIt<LogoutCubit>()),
           BlocProvider.value(value: getIt<ProfileCubit>()),
           BlocProvider(create: (context) => getIt<UpdateProfileCubit>()),
+          BlocProvider(create: (context) => getIt<DeleteItemCubit>()),
         ],
         child: const ProfileView(),
       ),
@@ -46,10 +47,7 @@ class _RootState extends State<Root> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: currentPage,
-        children: _pages, // ✅ استخدم الـ pages المحفوظة
-      ),
+      body: IndexedStack(index: currentPage, children: _pages),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(10),
         decoration: const BoxDecoration(

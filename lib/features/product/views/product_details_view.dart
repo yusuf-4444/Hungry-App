@@ -5,6 +5,7 @@ import 'package:hungry_app/core/constants/app_colors.dart';
 import 'package:hungry_app/core/route/app_routes.dart';
 import 'package:hungry_app/features/cart/data/models/addToCart/add_to_cart_model.dart';
 import 'package:hungry_app/features/cart/logic/addToCartCubit/add_to_cart_cubit.dart';
+import 'package:hungry_app/features/cart/logic/getCart/get_cart_cubit.dart';
 import 'package:hungry_app/features/home/data/models/side_options_model.dart';
 import 'package:hungry_app/features/home/data/models/toppings_model.dart';
 import 'package:hungry_app/features/product/logic/cubit/side_options_cubit.dart';
@@ -64,6 +65,7 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
 
       final addToCartCubit = context.read<AddToCartCubit>();
       await addToCartCubit.addToCart(cartData);
+      context.read<GetCartCubit>().refreshCart();
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

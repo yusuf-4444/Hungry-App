@@ -20,10 +20,6 @@ class CartView extends StatefulWidget {
 
 class _CartViewState extends State<CartView> {
   bool isRemoving = false;
-  int quantity = 1;
-  double finalPrice = 0;
-  late double checkoutPrice = 0;
-
   List<ItemData> items = [];
   double totalPrice = 0;
 
@@ -42,7 +38,7 @@ class _CartViewState extends State<CartView> {
       isRemoving = true;
     });
 
-    // Your delete logic here
+    // Delete logic here
 
     setState(() {
       isRemoving = false;
@@ -75,7 +71,7 @@ class _CartViewState extends State<CartView> {
                     image: 'https://via.placeholder.com/200',
                     title: '',
                     subTitle: '',
-                    initialNumber: 0,
+                    itemId: 0,
                   ),
                   separatorBuilder: (context, index) => const Gap(15),
                   itemCount: 5,
@@ -102,7 +98,6 @@ class _CartViewState extends State<CartView> {
             if (state is Success) {
               items = state.data.data.items;
               totalPrice = double.tryParse(state.data.data.totalPrice) ?? 0;
-              checkoutPrice = totalPrice;
 
               if (items.isEmpty) {
                 return const Padding(
@@ -137,25 +132,23 @@ class _CartViewState extends State<CartView> {
               }
 
               return ListView.builder(
+                padding: const EdgeInsets.only(
+                  top: 20,
+                  bottom: 100,
+                  left: 8,
+                  right: 8,
+                ),
                 itemCount: items.length,
                 itemBuilder: (context, index) {
                   final item = items[index];
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 15.0),
                     child: CustomCard(
-                      onQuantityChanged: (newQuantity) {
-                        setState(() {
-                          quantity = newQuantity;
-                          finalPrice = totalPrice * quantity;
-                          checkoutPrice = finalPrice;
-                        });
-                        print(finalPrice);
-                      },
                       onPressed: () => _deleteItem(item.itemId),
                       image: item.image,
                       title: item.name,
                       subTitle: 'Spice ${item.spicy}',
-                      initialNumber: item.quantity,
+                      itemId: item.itemId,
                     ),
                   );
                 },
@@ -168,6 +161,9 @@ class _CartViewState extends State<CartView> {
         bottomSheet: BlocBuilder<GetCartCubit, GetCartState>(
           builder: (context, state) {
             if (state is Success && items.isNotEmpty) {
+              final checkoutPrice =
+                  double.tryParse(state.data.data.totalPrice) ?? 0;
+
               return Container(
                 height: 80,
                 decoration: BoxDecoration(
@@ -197,7 +193,7 @@ class _CartViewState extends State<CartView> {
                           ),
                           const Gap(10),
                           CustomText(
-                            text: "\$ $checkoutPrice",
+                            text: "\$ ${checkoutPrice.toStringAsFixed(2)}",
                             color: Colors.black,
                             fontSize: 22,
                             fontWeight: FontWeight.w900,
@@ -210,8 +206,14 @@ class _CartViewState extends State<CartView> {
                         onPressed: items.isEmpty
                             ? null
                             : () {
+                                final cubit = context.read<GetCartCubit>();
                                 List<OrderItems> orderItems = [];
+
                                 for (var item in items) {
+                                  final quantity = cubit.getCurrentQuantity(
+                                    item.itemId,
+                                  );
+
                                   orderItems.add(
                                     OrderItems(
                                       productId: item.productId,
@@ -226,6 +228,7 @@ class _CartViewState extends State<CartView> {
                                     ),
                                   );
                                 }
+
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(

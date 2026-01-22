@@ -7,6 +7,7 @@ import 'package:hungry_app/features/auth/register/logic/cubit/register_cubit.dar
 import 'package:hungry_app/features/auth/view/signin_view.dart';
 import 'package:hungry_app/features/auth/view/signup_view.dart';
 import 'package:hungry_app/features/cart/logic/addToCartCubit/add_to_cart_cubit.dart';
+import 'package:hungry_app/features/checkout/views/checkout_view.dart';
 import 'package:hungry_app/features/home/views/home_view.dart';
 import 'package:hungry_app/features/product/logic/cubit/side_options_cubit.dart';
 import 'package:hungry_app/features/product/logic/cubit/toppings_cubit.dart';
@@ -53,6 +54,18 @@ class AppRouter {
             child: ProductDetailsView(
               productId: foodItem['productId'],
               price: foodItem['price'],
+            ),
+          ),
+        );
+      case AppRoutes.checkout:
+        final args = settings.arguments as Map<String, dynamic>?;
+        return CupertinoPageRoute(
+          settings: settings,
+          builder: (_) => BlocProvider(
+            create: (context) => getIt<RegisterCubit>(),
+            child: CheckoutView(
+              price: args?['price'],
+              orderItems: args?['orderItems'],
             ),
           ),
         );
